@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  #MySQL Service
+  database:
+    image: mysql:latest
+    container_name: database
+    command: --default-authentication-plugin=mysql_native_password
+    tty: true
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: api-symfony-unlock
+    ports:
+      - '3306:3306'
+    networks:
+      - app-network
+    volumes:
+      - ./database:/var/lib/mysql
+
+  #PHP Service
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: application
+    tty: true
+    environment:
+      SERVICE_NAME: application
+      SERVICE_TAGS: dev
+    working_dir: /var/www/html
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app-network
+    links:
+      - database
+
+  #Nginx Service
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - '8080:80'
+    volumes:
+      - ./public:/var/www/html/public
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - app-network
+    links:
+      - database
+      - php
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+#Volumes
+volumes:
+  dbdata:
+    driver: local
