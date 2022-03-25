@@ -1,6 +1,6 @@
 
 ###> symfony/framework-bundle ###
-/.idea
+/.idea/
 /.env.local
 /.env.local.php
 /.env.*.local
@@ -18,5 +18,5 @@ yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
 ###> database ###
-/database
+/database/
 ###< database ###
