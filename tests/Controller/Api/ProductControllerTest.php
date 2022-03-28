@@ -8,7 +8,6 @@ use App\Tests\Controller\BaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-
 class ProductControllerTest extends BaseWebTestCase
 {
     private $productRepository;
@@ -42,5 +41,28 @@ class ProductControllerTest extends BaseWebTestCase
         $this->assertSame('Product description', $data['description']);
         $this->assertIsArray($data['items']);
         $this->assertIsArray($data['gallery']);
+    }
+
+    public function testGetProducts(): void
+    {
+        $productFixtures = new ProductFixtures();
+        $this->loadFixture($productFixtures);
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/api/products',
+            [],
+            [],
+            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE]
+        );
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $data = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($data);
+        $this->assertCount(1, $data);
+
+        $product = $data[0];
+        $this->assertSame('Product name', $product['name']);
+        $this->assertSame('500000', $product['price']);
     }
 }
