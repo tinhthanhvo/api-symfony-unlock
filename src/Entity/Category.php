@@ -17,11 +17,13 @@ class Category
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"getListCategory"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"getListCategory"})
      */
     private $name;
 
