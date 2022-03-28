@@ -17,12 +17,13 @@ class ProductItem
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     *
+     * @Groups({"getDetailProduct"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"getDetailProduct"})
      */
     private $amount;
 
@@ -56,6 +57,7 @@ class ProductItem
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class, inversedBy="productItems")
+     * @Groups({"getDetailProduct"})
      */
     private $size;
 
