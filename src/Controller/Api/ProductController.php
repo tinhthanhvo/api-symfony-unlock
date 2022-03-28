@@ -39,6 +39,27 @@ class ProductController extends AbstractFOSRestController
     }
 
     /**
+     * @Rest\Get("/products/{id}")
+     * @param int $id
+     */
+    public function getProduct(int $id): Response
+    {
+        $product = $this->productRepository->find($id);
+        if(!$product) {
+            $view = $this->view(['error' => 'Product is not found.'], Response::HTTP_NOT_FOUND);
+            return $this->handleView($view);
+        }
+
+        $product = $this->dataTransferProductObject($product);
+
+        $serializer = SerializerBuilder::create()->build();
+        $convertToJson = $serializer->serialize($product, 'json', SerializationContext::create()->setGroups(array('show')));
+        $product = $serializer->deserialize($convertToJson, 'array', 'json');
+
+        return $this->handleView($this->view($product, Response::HTTP_OK));
+    }
+
+    /**
     * @param Product $product
     * @return array
     */

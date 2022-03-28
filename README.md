@@ -16,23 +16,49 @@ cd api-symfony-unlock
 docker-compose up -d
 ```
 
-#### Run require
+### Run in container docker environment
 ```bash
 docker exec -it application bash
-composer install
 ```
 
-Example - GET collection: GET http://127.0.0.1:8080/api/products
+#### Run require
+```bash
+composer install
+bin/console doctrine:migrations:migrate
+```
+
+#### Run test
+```bash
+bin/phpunit
+```
+
+###Example - GET collection: 
+GET http://127.0.0.1:8080/api/products/1
 ```json
 {
-    "status": "success",
-    "code": 200,
-    "message": "OK",
-    "data": [
-        {
-          "name": "Product name",
-          "description": "Product description"
-        }
-    ]
+  "id": 1,
+  "name": "HIGH HEEL SHOE EVERY LEATHER HIGH HEEL",
+  "description": "DESCRIPTION: HIGH HEEL SHOES LEATHER HIGH HEEL - BLACK",
+  "price": "400000",
+  "gallery": [
+    "cover.jpg",
+    "notCover.jpg",
+    "notCover.jpg",
+    "notCover.jpg",
+    "notCover.jpg"
+  ],
+  "color": "Black",
+  "items": [
+    {
+      "id": 1,
+      "amount": 10,
+      "size": "35"
+    },
+    {
+      "id": 9,
+      "amount": 3,
+      "size": "36"
+    }
+  ]
 }
 ``` 

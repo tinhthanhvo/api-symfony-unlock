@@ -40,7 +40,7 @@ class Gallery
     private $deleteAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="gallery")
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="gallery", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $product;
@@ -108,5 +108,10 @@ class Gallery
         $this->product = $product;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getPath();
     }
 }

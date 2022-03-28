@@ -55,26 +55,26 @@ class Product
     private $deleteAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products")
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductItem::class, mappedBy="product", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=ProductItem::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
      * @Groups({"getDetailProduct"})
      */
     private $items;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Color::class, inversedBy="products")
+     * @ORM\ManyToOne(targetEntity=Color::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false))
      * @Groups({"getDetailProduct"})
      */
     private $color;
 
     /**
-     * @ORM\OneToMany(targetEntity=Gallery::class, mappedBy="product", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Gallery::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
      * @Groups({"getProductList"})
      */
     private $gallery;

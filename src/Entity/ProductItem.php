@@ -44,7 +44,7 @@ class ProductItem
     private $deleteAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="items")
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="items", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      *
      */
@@ -56,7 +56,7 @@ class ProductItem
     private $cart;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Size::class, inversedBy="productItems")
+     * @ORM\ManyToOne(targetEntity=Size::class, inversedBy="productItems", cascade={"persist"})
      * @Groups({"getDetailProduct"})
      */
     private $size;
@@ -208,5 +208,10 @@ class ProductItem
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName();
     }
 }
