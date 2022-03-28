@@ -17,25 +17,25 @@ class Product
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"getAll"})
+     * @Groups({"getDetailProduct"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=200)
-     * @Groups({"getAll"})
+     * @Groups({"getDetailProduct"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"show"})
+     * @Groups({"getDetailProduct"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="bigint")
-     * @Groups({"getAll"})
+     * @Groups({"getDetailProduct"})
      */
     private $price;
 
@@ -62,17 +62,20 @@ class Product
 
     /**
      * @ORM\OneToMany(targetEntity=ProductItem::class, mappedBy="product", orphanRemoval=true)
+     * @Groups({"getDetailProduct"})
      */
     private $items;
 
     /**
      * @ORM\ManyToOne(targetEntity=Color::class, inversedBy="products")
      * @ORM\JoinColumn(nullable=false))
+     * @Groups({"getDetailProduct"})
      */
     private $color;
 
     /**
      * @ORM\OneToMany(targetEntity=Gallery::class, mappedBy="product", orphanRemoval=true)
+     * @Groups({"getProductList"})
      */
     private $gallery;
 

@@ -22,6 +22,7 @@ class Color
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"getDetailProduct"})
      */
     private $name;
 

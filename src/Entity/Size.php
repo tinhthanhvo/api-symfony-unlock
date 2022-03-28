@@ -22,6 +22,7 @@ class Size
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups({"getDetailProduct"})
      */
     private $value;
 
