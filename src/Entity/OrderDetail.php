@@ -44,7 +44,7 @@ class OrderDetail
     private $deleteAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="orderItems")
+     * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="orderItems", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $order;

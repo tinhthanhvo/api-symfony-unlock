@@ -61,7 +61,7 @@ class Order
     private $amount;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
