@@ -17,13 +17,13 @@ class Product
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getProductList"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=200)
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getProductList"})
      */
     private $name;
 
@@ -35,7 +35,7 @@ class Product
 
     /**
      * @ORM\Column(type="bigint")
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getProductList"})
      */
     private $price;
 

@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProductController extends AbstractFOSRestController
 {
     private $productRepository;
+
     public function __construct(ProductRepository $productRepository)
     {
         $this->productRepository = $productRepository;
@@ -27,15 +28,39 @@ class ProductController extends AbstractFOSRestController
      */
     public function getProducts(): Response
     {
-        $products = $this->productRepository->findAll();
+        $products = $this->productRepository->findBy(['deleteAt' => null], ['createAt' => 'DESC'], 8);
+        if ($products) {
+            $transferData = array_map('self::dataTransferProductListObject', $products);
+            $serializer = SerializerBuilder::create()->build();
+            $convertToJson = $serializer->serialize(
+                $transferData,
+                'json',
+                SerializationContext::create()->setGroups(array('getProductList'))
+            );
+            $products = $serializer->deserialize($convertToJson, 'array', 'json');
 
-        $products = array_map('self::dataTransferProductObject', $products);
+            return $this->handleView($this->view($products, Response::HTTP_OK));
+        }
 
-        $serializer = SerializerBuilder::create()->build();
-        $convertToJson = $serializer->serialize($products, 'json', SerializationContext::create()->setGroups(array('getProductList')));
-        $products = $serializer->deserialize($convertToJson, 'array', 'json');
+        return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
+    }
 
-        return $this->handleView($this->view($products));
+    /**
+     * @param Product $product
+     * @return array
+     */
+    public function dataTransferProductListObject(Product $product): array
+    {
+        $formattedProduct = [];
+
+        $formattedProduct['id'] = $product->getId();
+        $formattedProduct['name'] = $product->getName();
+        $formattedProduct['price'] = $product->getPrice();
+        foreach ($product->getGallery() as $gallery) {
+            $formattedProduct['gallery'][] = $gallery->getPath();
+        }
+
+        return $formattedProduct;
     }
 
     /**
@@ -45,7 +70,7 @@ class ProductController extends AbstractFOSRestController
     public function getProduct(int $id): Response
     {
         $product = $this->productRepository->find($id);
-        if(!$product) {
+        if (!$product) {
             $view = $this->view(['error' => 'Product is not found.'], Response::HTTP_NOT_FOUND);
             return $this->handleView($view);
         }
@@ -90,7 +115,7 @@ class ProductController extends AbstractFOSRestController
      * @param ProductItem $productItem
      * @return array
      */
-    public function dataTransferItemObject(ProductItem $productItem) : array
+    public function dataTransferItemObject(ProductItem $productItem): array
     {
         $item = [];
         $item['id'] = $productItem->getId();

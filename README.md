@@ -33,6 +33,23 @@ bin/phpunit
 ```
 
 ###Example - GET collection: 
+GET http://127.0.0.1:8080/api/products
+```json
+{
+  "id": 1,
+  "name": "HIGH HEEL SHOE EVERY LEATHER HIGH HEEL",
+  "price": "400000",
+  "gallery": [
+    "cover.jpg",
+    "notCover.jpg",
+    "notCover.jpg",
+    "notCover.jpg",
+    "notCover.jpg"
+  ]
+}
+``` 
+
+###Example - GET collection: 
 GET http://127.0.0.1:8080/api/products/1
 ```json
 {
