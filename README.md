@@ -8,32 +8,29 @@ What things you need to install the software and how to install them.
 - [symfony](https://symfony.com/doc/current/setup.html)
 - docker
 
-### Installing project
-
+### Step 1: Create project already existed
 ```bash
 git clone git@github.com:tinhthanhvo/api-symfony-unlock.git
 cd api-symfony-unlock
-docker-compose up -d
 ```
-
-### Run in container docker environment
+### Step 2: Start docker + use container docker environment
 ```bash
+docker-compose up -d
 docker exec -it application bash
 ```
-
-#### Run require
+### Step 3: Install require
 ```bash
 composer install
 bin/console doctrine:migrations:migrate
 ```
-
-#### Run test
+### Step 4: Create tables for database
 ```bash
-bin/phpunit
+bin/console doctrine:migrations:migrate
 ```
-
-###Example - GET collection: 
-GET http://127.0.0.1:8080/api/products
+### Step 5: Example - call api
+#### 1. Example - Get Product list without filter options: 
+#####GET http://127.0.0.1:8080/api/products
+``Response:``
 ```json
 {
   "id": 1,
@@ -47,10 +44,38 @@ GET http://127.0.0.1:8080/api/products
     "notCover.jpg"
   ]
 }
-``` 
-
-###Example - GET collection: 
-GET http://127.0.0.1:8080/api/products/1
+...
+```
+#### 2. Example - Get Product list with filter options:
+##### POST http://127.0.0.1:8080/api/products/filter
+``Payload:``
+```json
+{
+  "category": 1,
+  "color": 1,
+  "priceFrom": "400000",
+  "priceTo": "500000"
+}
+```
+``Response:``
+```json
+{
+  "id": 1,
+  "name": "HIGH HEEL SHOE EVERY LEATHER HIGH HEEL",
+  "price": "400000",
+  "gallery": [
+    "cover.jpg",
+    "notCover.jpg",
+    "notCover.jpg",
+    "notCover.jpg",
+    "notCover.jpg"
+  ]
+}
+...
+```
+#### 3. Example - Get Product Detail by Id:
+#####GET http://127.0.0.1:8080/api/products/1
+``Response:``
 ```json
 {
   "id": 1,

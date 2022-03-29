@@ -45,22 +45,43 @@ class ProductRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return Product[] Returns an array of Product objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param array|null $param
+     * @return float|int|mixed|string
+     */
+    public function findByOptions(array $param = null)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+        $queryBuilder = $this->createQueryBuilder('p');
+        if(isset($param['priceFrom']) && $param['priceFrom'] != '') {
+            $queryBuilder
+                ->andWhere('p.price >= :minPrice')
+                ->setParameter('minPrice', $param['priceFrom']);
+        }
+
+        if(isset($param['priceTo']) && $param['priceTo'] != '') {
+            $queryBuilder
+                ->andWhere('p.price <= :maxPrice')
+                ->setParameter('maxPrice', $param['priceTo']);
+        }
+
+        if(isset($param['category']) && $param['category'] != 0) {
+            $queryBuilder
+                ->andWhere('p.category = :categoryId')
+                ->setParameter('categoryId', $param['category']);
+        }
+
+        if(isset($param['color']) && $param['color'] != 0) {
+            $queryBuilder
+                ->andWhere('p.color = :colorId')
+                ->setParameter('colorId', $param['color']);
+        }
+
+        return $queryBuilder
+            ->andWhere('p.deleteAt IS NULL')
+            ->orderBy('p.createAt', 'DESC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->execute();
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Product

@@ -41,16 +41,6 @@ class ProductFixtures extends Fixture
         $item1->setSize($size1);
         $product->addItem($item1);
 
-        $item2 = new ProductItem();
-        $item2->setAmount(10);
-        $item2->setCreateAt(new \DateTime("now"));
-
-        $size2 = new Size();
-        $size2->setValue('35');
-        $size2->setCreateAt(new \DateTime("now"));
-        $item2->setSize($size2);
-        $product->addItem($item2);
-
         $gallery = new Gallery();
         $gallery->setPath('cover.jpg');
         $gallery->setCreateAt(new \DateTime("now"));
