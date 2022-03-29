@@ -52,25 +52,25 @@ class ProductRepository extends ServiceEntityRepository
     public function findByOptions(array $param = null)
     {
         $queryBuilder = $this->createQueryBuilder('p');
-        if(isset($param['priceFrom']) && $param['priceFrom'] != '') {
+        if (isset($param['priceFrom']) && $param['priceFrom'] != '') {
             $queryBuilder
                 ->andWhere('p.price >= :minPrice')
                 ->setParameter('minPrice', $param['priceFrom']);
         }
 
-        if(isset($param['priceTo']) && $param['priceTo'] != '') {
+        if (isset($param['priceTo']) && $param['priceTo'] != '') {
             $queryBuilder
                 ->andWhere('p.price <= :maxPrice')
                 ->setParameter('maxPrice', $param['priceTo']);
         }
 
-        if(isset($param['category']) && $param['category'] != 0) {
+        if (isset($param['category']) && $param['category'] != 0) {
             $queryBuilder
                 ->andWhere('p.category = :categoryId')
                 ->setParameter('categoryId', $param['category']);
         }
 
-        if(isset($param['color']) && $param['color'] != 0) {
+        if (isset($param['color']) && $param['color'] != 0) {
             $queryBuilder
                 ->andWhere('p.color = :colorId')
                 ->setParameter('colorId', $param['color']);

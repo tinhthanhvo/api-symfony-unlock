@@ -60,7 +60,7 @@ class ProductController extends AbstractFOSRestController
      * @param Request $request
      * @return Response
      */
-    public function getProductListFilter(Request $request) : Response
+    public function getProductListFilter(Request $request): Response
     {
         $dataFilter = json_decode($request->getContent(), true);
         $products = $this->productRepository->findByOptions($dataFilter);
