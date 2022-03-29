@@ -20,6 +20,7 @@ class CategoryController extends AbstractFOSRestController
 
     /**
      * @Rest\Get("/categories")
+     * @return Response
      */
     public function getCategories(): Response
     {
