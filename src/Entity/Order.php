@@ -71,6 +71,21 @@ class Order
      */
     private $orderItems;
 
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $addressDelivery;
+
+    /**
+     * @ORM\Column(type="string", length=150)
+     */
+    private $recipientName;
+
+    /**
+     * @ORM\Column(type="string", length=11)
+     */
+    private $recipientPhone;
+
     public function __construct()
     {
         $this->orderItems = new ArrayCollection();
@@ -215,6 +230,42 @@ class Order
                 $orderItem->setOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAddressDelivery(): ?string
+    {
+        return $this->addressDelivery;
+    }
+
+    public function setAddressDelivery(string $addressDelivery): self
+    {
+        $this->addressDelivery = $addressDelivery;
+
+        return $this;
+    }
+
+    public function getRecipientName(): ?string
+    {
+        return $this->recipientName;
+    }
+
+    public function setRecipientName(string $recipientName): self
+    {
+        $this->recipientName = $recipientName;
+
+        return $this;
+    }
+
+    public function getRecipientPhone(): ?string
+    {
+        return $this->recipientPhone;
+    }
+
+    public function setRecipientPhone(string $recipientPhone): self
+    {
+        $this->recipientPhone = $recipientPhone;
 
         return $this;
     }
