@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends AbstractFOSRestController
 {
+    public const PRODUCT_PER_PAGE = 9;
+    public const PRODUCT_PAGE_NUMBER = 1;
     private $productRepository;
 
     public function __construct(ProductRepository $productRepository)
@@ -23,30 +25,33 @@ class ProductController extends AbstractFOSRestController
 
     /**
      * @Rest\Get("/products")
+     * @param Request $request
+     * @return Response
      */
-    public function getProducts(): Response
+    public function getProducts(Request $request): Response
     {
-        $products = $this->productRepository->findBy(['deleteAt' => null], ['createAt' => 'DESC'], 8);
-        if ($products) {
-            $transferData = array_map('self::dataTransferProductListObject', $products);
-            $products = $this->transferDataGroup($transferData, 'getProductList');
+        $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
+        $products = $this->productRepository->findBy(['deleteAt' => null], ['createAt' => 'DESC'], $limit);
 
-            return $this->handleView($this->view($products, Response::HTTP_OK));
-        }
+        $transferData = array_map('self::dataTransferProductListObject', $products);
+        $products = $this->transferDataGroup($transferData, 'getProductList');
 
-        return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
+        return $this->handleView($this->view($products, Response::HTTP_OK));
     }
 
     /**
      * @Rest\Get("/products/{id}")
      * @param int $id
+     * @return Response
      */
     public function getProduct(int $id): Response
     {
         $product = $this->productRepository->find($id);
         if (!$product) {
-            $view = $this->view(['error' => 'Product is not found.'], Response::HTTP_NOT_FOUND);
-            return $this->handleView($view);
+            return $this->handleView($this->view(
+                ['error' => 'Product is not found.'], 
+                Response::HTTP_NOT_FOUND
+            ));
         }
 
         $product = $this->dataTransferProductObject($product);
@@ -62,20 +67,25 @@ class ProductController extends AbstractFOSRestController
      */
     public function getProductListFilter(Request $request): Response
     {
-        $dataFilter = json_decode($request->getContent(), true);
-        $products = $this->productRepository->findByOptions($dataFilter);
+        $filterOptions = json_decode($request->getContent(), true);
 
-        $transferData = array_map('self::dataTransferProductListObject', $products);
-        $products = $this->transferDataGroup($transferData, 'getProductList');
+        $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
+        $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
+        $offset = $limit * ($page - 1);
+
+        $products = $this->productRepository->findByConditions($filterOptions, ['createAt' => 'DESC'], $limit, $offset);
+
+        $transferData = array_map('self::dataTransferProductListObject', $products['data']);
+        $products['data'] = $this->transferDataGroup($transferData, 'getProductList');
 
         return $this->handleView($this->view($products, Response::HTTP_OK));
     }
 
     /**
-    * @param Product $product
-    * @return array
-    */
-    public function dataTransferProductObject(Product $product): array
+     * @param Product $product
+     * @return array
+     */
+    private function dataTransferProductObject(Product $product): array
     {
         $formattedProduct = [];
         $formattedProduct['id'] = $product->getId();
@@ -102,7 +112,7 @@ class ProductController extends AbstractFOSRestController
      * @param Product $product
      * @return array
      */
-    public function dataTransferProductListObject(Product $product): array
+    private function dataTransferProductListObject(Product $product): array
     {
         $formattedProduct = [];
         $formattedProduct['id'] = $product->getId();
@@ -115,17 +125,17 @@ class ProductController extends AbstractFOSRestController
         return $formattedProduct;
     }
 
-
     /**
      * @param ProductItem $productItem
      * @return array
      */
-    public function dataTransferItemObject(ProductItem $productItem): array
+    private function dataTransferItemObject(ProductItem $productItem): array
     {
         $item = [];
         $item['id'] = $productItem->getId();
         $item['amount'] = $productItem->getAmount();
         $item['size'] = $productItem->getSize()->getValue();
+
         return $item;
     }
 

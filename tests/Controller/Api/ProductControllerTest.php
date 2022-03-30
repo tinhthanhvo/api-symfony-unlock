@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ProductControllerTest extends BaseWebTestCase
 {
     use ReloadDatabaseTrait;
+
     private $productRepository;
 
     public function setUp(): void
@@ -21,11 +22,11 @@ class ProductControllerTest extends BaseWebTestCase
         $this->productRepository = $this->entityManager->getRepository(Product::class);
     }
 
-    public function testGetProduct()
+    public function testGetProduct(): void
     {
         $productFixture = new ProductFixtures();
         $this->loadFixture($productFixture);
-        $product = $this->productRepository->findOneBy(['name' => 'Product name']);
+        $product = $this->productRepository->findOneBy(['name' => 'Product name 1']);
 
         $this->client->request(
             Request::METHOD_GET,
@@ -38,9 +39,9 @@ class ProductControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $data = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertIsArray($data);
-        $this->assertSame('Product name', $data['name']);
+        $this->assertSame('Product name 1', $data['name']);
         $this->assertSame('Color name', $data['color']);
-        $this->assertSame('Product description', $data['description']);
+        $this->assertSame('Product description 1', $data['description']);
         $this->assertIsArray($data['items']);
         $this->assertIsArray($data['gallery']);
     }
@@ -61,11 +62,11 @@ class ProductControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $data = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertIsArray($data);
-        $this->assertCount(1, $data);
+        $this->assertCount(2, $data);
 
         $product = $data[0];
-        $this->assertSame('Product name', $product['name']);
-        $this->assertSame('500000', $product['price']);
+        $this->assertSame('Product name 1', $product['name']);
+        $this->assertSame(300000, $product['price']);
     }
 
     public function testFilterByCondition(): void
@@ -76,8 +77,8 @@ class ProductControllerTest extends BaseWebTestCase
         $payload = [
             'category' => 1,
             'color' => 1,
-            'priceForm' => 400000,
-            'priceTo' => 500000
+            'priceFrom' => 400000,
+            'priceTo' => 500000,
         ];
 
         $this->client->request(
@@ -85,17 +86,17 @@ class ProductControllerTest extends BaseWebTestCase
             '/api/products/filter',
             [],
             [],
-            [
-                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE
-            ],
+            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE],
             json_encode($payload)
         );
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $data = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertIsArray($data);
-        $product = $data[0];
-        $this->assertSame('Product name', $product['name']);
-        $this->assertSame('500000', $product['price']);
+        $this->assertIsArray($data['data']);
+        $this->assertCount(1, $data['data']);
+
+        $product = $data['data'][0];
+        $this->assertSame('Product name 2', $product['name']);
+        $this->assertSame(500000, $product['price']);
     }
 }

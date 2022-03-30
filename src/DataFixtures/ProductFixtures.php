@@ -15,38 +15,58 @@ class ProductFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $product = new Product();
-        $product->setName('Product name');
-        $product->setDescription('Product description');
-        $product->setPrice('500000');
-        $product->setCreateAt(new \DateTime("now"));
-
         $category = new Category();
         $category->setName('Category name');
         $category->setCreateAt(new \DateTime("now"));
-        $product->setCategory($category);
 
         $color = new Color();
         $color->setName('Color name');
         $color->setCreateAt(new \DateTime("now"));
-        $product->setColor($color);
 
-        $item1 = new ProductItem();
-        $item1->setAmount(10);
-        $item1->setCreateAt(new \DateTime("now"));
+        $item = new ProductItem();
+        $item->setAmount(10);
+        $item->setCreateAt(new \DateTime("now"));
 
-        $size1 = new Size();
-        $size1->setValue('35');
-        $size1->setCreateAt(new \DateTime("now"));
-        $item1->setSize($size1);
-        $product->addItem($item1);
+        $size = new Size();
+        $size->setValue('35');
+        $size->setCreateAt(new \DateTime("now"));
+        $item->setSize($size);
 
         $gallery = new Gallery();
         $gallery->setPath('cover.jpg');
         $gallery->setCreateAt(new \DateTime("now"));
-        $product->addGallery($gallery);
 
-        $manager->persist($product);
+        $gallery2 = new Gallery();
+        $gallery2->setPath('cover.jpg');
+        $gallery2->setCreateAt(new \DateTime("now"));
+
+        $product1 = new Product();
+        $product1->setName('Product name 1');
+        $product1->setDescription('Product description 1');
+        $product1->setPrice(300000);
+        $product1->setCreateAt(new \DateTime("now"));
+        $product1->setCategory($category);
+        $product1->setColor($color);
+        $product1->addItem($item);
+        $product1->addGallery($gallery);
+        $manager->persist($product1);
+
+        $product2 = new Product();
+        $product2->setName('Product name 2');
+        $product2->setDescription('Product description 2');
+        $product2->setPrice(500000);
+        $product2->setCreateAt(new \DateTime("now"));
+        $product2->setCategory($category);
+        $product2->setColor($color);
+
+        $item2 = new ProductItem();
+        $item2->setAmount(10);
+        $item2->setCreateAt(new \DateTime("now"));
+        $item2->setSize($size);
+        $product2->addItem($item2);
+        $product2->addGallery($gallery2);
+        $manager->persist($product2);
+
         $manager->flush();
     }
 }
