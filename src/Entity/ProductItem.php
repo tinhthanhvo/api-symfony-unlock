@@ -46,7 +46,7 @@ class ProductItem
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="items", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
-     *
+     * @Groups({"getCartItems"})
      */
     private $product;
 
@@ -57,7 +57,7 @@ class ProductItem
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class, inversedBy="productItems", cascade={"persist"})
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getCartItems"})
      */
     private $size;
 
@@ -212,6 +212,6 @@ class ProductItem
 
     public function __toString(): string
     {
-        return $this->getName();
+        return $this->getProduct()->getName();
     }
 }

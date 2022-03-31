@@ -23,7 +23,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=200)
-     * @Groups({"getDetailProduct", "getProductList"})
+     * @Groups({"getDetailProduct", "getProductList", "getCartItems"})
      */
     private $name;
 
@@ -69,13 +69,13 @@ class Product
     /**
      * @ORM\ManyToOne(targetEntity=Color::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false))
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getCartItems"})
      */
     private $color;
 
     /**
      * @ORM\OneToMany(targetEntity=Gallery::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
-     * @Groups({"getProductList"})
+     * @Groups({"getProductList", "getCartItems"})
      */
     private $gallery;
 
