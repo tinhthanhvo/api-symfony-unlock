@@ -44,16 +44,16 @@ class Cart
     private $deleteAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="carts")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
-
-    /**
      * @ORM\ManyToOne(targetEntity=ProductItem::class, inversedBy="color")
      * @ORM\JoinColumn(nullable=false)
      */
     private $productItem;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="carts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
 
     public function getId(): ?int
     {
@@ -120,18 +120,6 @@ class Cart
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getProductItem(): ?ProductItem
     {
         return $this->productItem;
@@ -140,6 +128,18 @@ class Cart
     public function setProductItem(?ProductItem $productItem): self
     {
         $this->productItem = $productItem;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

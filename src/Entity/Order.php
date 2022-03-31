@@ -61,12 +61,6 @@ class Order
     private $amount;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $customer;
-
-    /**
      * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="eexit", orphanRemoval=true)
      */
     private $orderItems;
@@ -90,6 +84,12 @@ class Order
      * @ORM\Column(type="string", length=100)
      */
     private $recipientEmail;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $customer;
 
     public function __construct()
     {
@@ -197,18 +197,6 @@ class Order
         return $this;
     }
 
-    public function getCustomer(): ?User
-    {
-        return $this->customer;
-    }
-
-    public function setCustomer(?User $customer): self
-    {
-        $this->customer = $customer;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, OrderDetail>
      */
@@ -283,6 +271,18 @@ class Order
     public function setRecipientEmail(string $recipientEmail): self
     {
         $this->recipientEmail = $recipientEmail;
+
+        return $this;
+    }
+
+    public function getCustomer(): ?User
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?User $customer): self
+    {
+        $this->customer = $customer;
 
         return $this;
     }
