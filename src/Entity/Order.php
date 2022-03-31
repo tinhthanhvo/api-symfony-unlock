@@ -86,6 +86,11 @@ class Order
      */
     private $recipientPhone;
 
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $recipientEmail;
+
     public function __construct()
     {
         $this->orderItems = new ArrayCollection();
@@ -266,6 +271,18 @@ class Order
     public function setRecipientPhone(string $recipientPhone): self
     {
         $this->recipientPhone = $recipientPhone;
+
+        return $this;
+    }
+
+    public function getRecipientEmail(): ?string
+    {
+        return $this->recipientEmail;
+    }
+
+    public function setRecipientEmail(string $recipientEmail): self
+    {
+        $this->recipientEmail = $recipientEmail;
 
         return $this;
     }
