@@ -33,11 +33,11 @@ class UserRegisterType extends AbstractType
                 'label' => 'Full name',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'fullName=Full name can not be null',
+                        'message' => 'Full name cannot be null.',
                     ]),
                     new Length([
                         'max' => 100,
-                        'maxMessage' => 'fullName=Full name cannot be longer than 100 characters',
+                        'maxMessage' => 'Full name cannot be longer than 100 characters.',
                     ])
                 ]
             ])
@@ -45,15 +45,15 @@ class UserRegisterType extends AbstractType
                 'label' => 'Email',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'email=Email can not be null',
+                        'message' => 'Email cannot be null.',
                     ]),
                     new Length([
                         'max' => 150,
-                        'maxMessage' => 'email=Email cannot be longer than 150 characters',
+                        'maxMessage' => 'Email cannot be longer than 150 characters.',
                     ]),
                     new Regex([
                         'pattern' => '/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix',
-                        'message' => "email=Email is incorrect"
+                        'message' => "Email is incorrect."
                     ])
                 ]
             ])
@@ -61,11 +61,11 @@ class UserRegisterType extends AbstractType
                 'label' => 'Phone number',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'phoneNumber=Phone number can not be null',
+                        'message' => 'Phone number cannot be null.',
                     ]),
                     new Regex([
                         'pattern' => '/^[0-9]{10,20}$/',
-                        'message' => "phoneNumber=Phone number is incorrect"
+                        'message' => "Phone number is incorrect."
                     ])
                 ]
             ])
@@ -73,23 +73,20 @@ class UserRegisterType extends AbstractType
                 'label' => 'Password',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'password=Password can not be null',
+                        'message' => 'Password cannot be null.',
                     ]),
-                    new Length([
-                        'max' => 20, //255
-                        'maxMessage' => 'password=Password cannot be longer than 20 characters',
+                    new Regex([
+                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/',
+                        'message' => "Password is incorrect."
                     ])
                 ]
             ])
-            ->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-                $data = $event->getData();
-                if (isset($data['email']) && !empty($data['email'])) {
-                    $user = $this->userRepository->findOneBy([
-                        'email' => $data['email'],
-                    ]);
+            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $form = $event->getForm();
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $user = $this->userRepository->findOneBy(['email' => $event->getData()->getEmail()]);
                     if ($user) {
-                        $form = $event->getForm();
-                        $form->addError(new FormError('email=Email is already existed'));
+                        $form->get('email')->addError(new FormError('Email is already existed.'));
                     }
                 }
             });

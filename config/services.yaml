@@ -25,3 +25,7 @@ services:
     App\Service\FileUploader:
         arguments:
             $targetDirectory: '%images_directory%'
+
+    App\Service\GetUserInfo:
+        arguments: 
+            $tokenStorage: '@security.token_storage'
