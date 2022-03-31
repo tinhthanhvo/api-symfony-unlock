@@ -2,12 +2,13 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Category;
 use App\Repository\CategoryRepository;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
-use FOS\RestBundle\Controller\Annotations as Rest;
 
 class CategoryController extends AbstractFOSRestController
 {
@@ -22,10 +23,9 @@ class CategoryController extends AbstractFOSRestController
      * @Rest\Get("/categories")
      * @return Response
      */
-    public function getCategories(): Response
+    public function getCategories(): ?Response
     {
-        $categories = $this->categoryRepository->findAll();
-
+        $categories = $this->categoryRepository->findBy(['deleteAt' => null], ['name' => 'ASC']);
         $serializer = SerializerBuilder::create()->build();
         $convertToJson = $serializer->serialize($categories, 'json', SerializationContext::create()->setGroups(array('getListCategory')));
         $categories = $serializer->deserialize($convertToJson, 'array', 'json');
