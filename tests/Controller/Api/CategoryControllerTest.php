@@ -4,11 +4,14 @@ namespace App\Tests\Controller\Api;
 
 use App\DataFixtures\CategoryFixtures;
 use App\Tests\Controller\BaseWebTestCase;
+use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CategoryControllerTest extends BaseWebTestCase
 {
+    use ReloadDatabaseTrait;
+
     public function setUp(): void
     {
         parent::setUp();

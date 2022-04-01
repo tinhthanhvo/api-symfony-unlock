@@ -49,7 +49,7 @@ class ProductController extends AbstractFOSRestController
         $product = $this->productRepository->find($id);
         if (!$product) {
             return $this->handleView($this->view(
-                ['error' => 'Product is not found.'], 
+                ['error' => 'Product is not found.'],
                 Response::HTTP_NOT_FOUND
             ));
         }
