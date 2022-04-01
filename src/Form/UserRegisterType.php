@@ -29,15 +29,15 @@ class UserRegisterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('full_name', TextType::class, [
+            ->add('fullName', TextType::class, [
                 'label' => 'Full name',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'full_name=Full name can not be null',
+                        'message' => 'fullName=Full name can not be null',
                     ]),
                     new Length([
                         'max' => 100,
-                        'maxMessage' => 'full_name=Full name cannot be longer than 100 characters',
+                        'maxMessage' => 'fullName=Full name cannot be longer than 100 characters',
                     ])
                 ]
             ])
@@ -57,15 +57,15 @@ class UserRegisterType extends AbstractType
                     ])
                 ]
             ])
-            ->add('phone_number', TextType::class, [
+            ->add('phoneNumber', TextType::class, [
                 'label' => 'Phone number',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'phone_number=Phone number can not be null',
+                        'message' => 'phoneNumber=Phone number can not be null',
                     ]),
                     new Regex([
                         'pattern' => '/^[0-9]{10,20}$/',
-                        'message' => "phone_number=Phone number is incorrect"
+                        'message' => "phoneNumber=Phone number is incorrect"
                     ])
                 ]
             ])

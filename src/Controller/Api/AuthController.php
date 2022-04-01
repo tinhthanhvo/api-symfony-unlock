@@ -35,7 +35,7 @@ class AuthController extends ApiController
 
         $user = new User();
         $form = $this->createForm(UserRegisterType::class, $user);
-        $form->submit($payload);
+        $form->submit($payload, false);
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setPassword($encoder->hashPassword($user, $payload['password']));
             $user->setRoles(['ROLE_USER']);

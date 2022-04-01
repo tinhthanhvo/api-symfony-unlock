@@ -26,8 +26,8 @@ class AuthControllerTest extends BaseWebTestCase
         $payload = [
             'email' => 'user_mail@gmail.com',
             'password' => '123456',
-            'full_name' => 'User full name',
-            'phone_number' => '0908855655'
+            'fullName' => 'User full name',
+            'phoneNumber' => '0908855655'
         ];
 
         $this->client->request(
