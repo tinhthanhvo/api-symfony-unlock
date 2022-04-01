@@ -14,6 +14,9 @@ class CategoryControllerTest extends BaseWebTestCase
         parent::setUp();
     }
 
+    /**
+     * @return void
+     */
     public function testGetCategories(): void
     {
         $categoryFixtures = new CategoryFixtures();

@@ -21,13 +21,16 @@ docker exec -it application bash
 ### Step 3: Install require
 ```bash
 composer install
-bin/console doctrine:migrations:migrate
 ```
 ### Step 4: Create tables for database
 ```bash
 bin/console doctrine:migrations:migrate
 ```
-### Step 5: Example - call api
+### Step 5: Generate the SSL keys
+```bash
+bin/console lexik:jwt:generate-keypair
+```
+### Step 6: Example - call api
 #### 1. Example - Get Product list without filter options: 
 #####GET http://127.0.0.1:8080/api/products
 ``Response:``

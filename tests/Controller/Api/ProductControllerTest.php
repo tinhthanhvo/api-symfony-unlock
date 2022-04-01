@@ -66,7 +66,7 @@ class ProductControllerTest extends BaseWebTestCase
 
         $product = $data[0];
         $this->assertSame('Product name 1', $product['name']);
-        $this->assertSame(300000, $product['price']);
+        $this->assertSame('300000', $product['price']);
     }
 
     public function testFilterByCondition(): void
@@ -97,6 +97,6 @@ class ProductControllerTest extends BaseWebTestCase
 
         $product = $data['data'][0];
         $this->assertSame('Product name 2', $product['name']);
-        $this->assertSame(500000, $product['price']);
+        $this->assertSame('500000', $product['price']);
     }
 }
