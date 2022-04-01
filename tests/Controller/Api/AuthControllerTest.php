@@ -32,7 +32,7 @@ class AuthControllerTest extends BaseWebTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/users/register',
+            '/api/register',
             [],
             [],
             ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE],

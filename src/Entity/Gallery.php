@@ -20,7 +20,7 @@ class Gallery
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"getDetailProduct", "getProductList"})
+     * @Groups({"getDetailProduct", "getProductList", "getCartItems"})
      */
     private $path;
 

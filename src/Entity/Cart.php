@@ -15,16 +15,19 @@ class Cart
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"getCartItems"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"getCartItems"})
      */
     private $amount;
 
     /**
      * @ORM\Column(type="bigint")
+     * @Groups({"getCartItems"})
      */
     private $price;
 
@@ -44,13 +47,14 @@ class Cart
     private $deleteAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ProductItem::class, inversedBy="color")
+     * @ORM\ManyToOne(targetEntity=ProductItem::class, inversedBy="color", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"getCartItems"})
      */
     private $productItem;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="carts")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="carts", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
