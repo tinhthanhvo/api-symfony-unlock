@@ -51,7 +51,7 @@ class AuthController extends ApiController
     }
 
     /**
-     * @Rest\Get ("/login_check")
+     * @Rest\Post ("/login_check")
      * @param UserInterface $user
      * @param JWTTokenManagerInterface $JWTManager
      * @return JsonResponse
