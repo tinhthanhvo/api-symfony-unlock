@@ -9,7 +9,7 @@ use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProductControllerTest extends BaseWebTestCase
+class HomePageControllerTest extends BaseWebTestCase
 {
     use ReloadDatabaseTrait;
 

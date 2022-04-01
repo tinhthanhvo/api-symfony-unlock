@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Product;
 use App\Entity\ProductItem;
+use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -12,15 +13,31 @@ use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProductController extends AbstractFOSRestController
+class HomePageController extends AbstractFOSRestController
 {
     public const PRODUCT_PER_PAGE = 9;
     public const PRODUCT_PAGE_NUMBER = 1;
     private $productRepository;
+    private $categoryRepository;
 
-    public function __construct(ProductRepository $productRepository)
+    public function __construct(ProductRepository $productRepository, CategoryRepository $categoryRepository)
     {
         $this->productRepository = $productRepository;
+        $this->categoryRepository = $categoryRepository;
+    }
+
+    /**
+     * @Rest\Get("/categories")
+     * @return Response
+     */
+    public function getCategories(): ?Response
+    {
+        $categories = $this->categoryRepository->findBy(['deleteAt' => null], ['name' => 'ASC']);
+        $serializer = SerializerBuilder::create()->build();
+        $convertToJson = $serializer->serialize($categories, 'json', SerializationContext::create()->setGroups(array('getListCategory')));
+        $categories = $serializer->deserialize($convertToJson, 'array', 'json');
+
+        return $this->handleView($this->view($categories, Response::HTTP_OK));
     }
 
     /**
