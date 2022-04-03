@@ -17,12 +17,13 @@ class Color
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"getProductListAdmin", "getDetailProduct", "getDetailProductAdmin"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"getDetailProduct", "getCartItems"})
+     * @Groups({"getDetailProduct", "getCartItems", "getProductListAdmin", "getDetailProductAdmin"})
      */
     private $name;
 
