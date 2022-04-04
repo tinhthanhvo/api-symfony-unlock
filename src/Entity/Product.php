@@ -17,25 +17,25 @@ class Product
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"getDetailProduct", "getProductList"})
+     * @Groups({"getDetailProduct", "getProductList", "getProductListAdmin", "getDetailProductAdmin"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=200)
-     * @Groups({"getDetailProduct", "getProductList", "getCartItems"})
+     * @Groups({"getDetailProduct", "getProductList", "getCartItems", "getProductListAdmin", "getDetailProductAdmin"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getProductListAdmin", "getDetailProductAdmin"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="bigint")
-     * @Groups({"getDetailProduct", "getProductList"})
+     * @Groups({"getDetailProduct", "getProductList", "getProductListAdmin", "getDetailProductAdmin"})
      */
     private $price;
 
@@ -57,25 +57,26 @@ class Product
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"getProductListAdmin", "getDetailProductAdmin", "getDetailProductAdmin"})
      */
     private $category;
 
     /**
      * @ORM\OneToMany(targetEntity=ProductItem::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getDetailProductAdmin", "getProductListAdmin"})
      */
     private $items;
 
     /**
      * @ORM\ManyToOne(targetEntity=Color::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false))
-     * @Groups({"getDetailProduct", "getCartItems"})
+     * @Groups({"getDetailProduct", "getCartItems", "getProductListAdmin", "getDetailProductAdmin"})
      */
     private $color;
 
     /**
      * @ORM\OneToMany(targetEntity=Gallery::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
-     * @Groups({"getProductList", "getCartItems"})
+     * @Groups({"getProductList", "getCartItems", "getDetailProductAdmin"})
      */
     private $gallery;
 

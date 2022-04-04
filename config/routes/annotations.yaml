@@ -10,3 +10,7 @@ api_controllers:
     resource: ../../src/Controller/Api
     type: annotation
     prefix: '/api'
+api_admin_controllers:
+    resource: ../../src/Controller/Api/Admin
+    type: annotation
+    prefix: '/api/admin'

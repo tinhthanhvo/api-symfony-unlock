@@ -17,13 +17,13 @@ class ProductItem
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getDetailProductAdmin", "getProductListAdmin"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"getDetailProduct"})
+     * @Groups({"getDetailProduct", "getDetailProductAdmin", "getProductListAdmin"})
      */
     private $amount;
 
@@ -57,7 +57,7 @@ class ProductItem
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class, inversedBy="productItems", cascade={"persist"})
-     * @Groups({"getDetailProduct", "getCartItems"})
+     * @Groups({"getDetailProduct", "getCartItems", "getDetailProductAdmin", "getProductListAdmin"})
      */
     private $size;
 

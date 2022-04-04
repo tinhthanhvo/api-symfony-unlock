@@ -15,12 +15,13 @@ class Gallery
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"getDetailProductAdmin"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"getDetailProduct", "getProductList", "getCartItems"})
+     * @Groups({"getDetailProduct", "getProductList", "getCartItems", "getDetailProductAdmin"})
      */
     private $path;
 

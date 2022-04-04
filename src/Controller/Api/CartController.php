@@ -24,7 +24,7 @@ class CartController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Get("/users/carts")
+     * @Rest\Get("/carts")
      * @param Request $request
      * @return Response
      */
