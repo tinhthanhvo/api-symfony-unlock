@@ -36,7 +36,7 @@ class UserControllerTest extends BaseWebTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/users/profile',
+            '/api/users/email',
             [],
             [],
             [

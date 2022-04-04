@@ -2,7 +2,10 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\GetUserInfo;
+use App\Service\HandleDataOutput;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
@@ -18,17 +21,31 @@ class UserController extends AbstractFOSRestController
      * @var UserRepository
      */
     private $userRepository;
+    /**
+     * @var User|null
+     */
+    private $userLoginInfo;
+    /**
+     * @var HandleDataOutput
+     */
+    private $handleDataOutput;
 
     /**
      * @param UserRepository $userRepository
      */
-    public function __construct(UserRepository $userRepository)
+    public function __construct(
+        UserRepository $userRepository,
+        GetUserInfo $userLogin,
+        HandleDataOutput $handleDataOutput
+    )
     {
         $this->userRepository = $userRepository;
+        $this->userLoginInfo = $userLogin->getUserLoginInfo();
+        $this->handleDataOutput = $handleDataOutput;
     }
 
     /**
-     * @Rest\Post ("/users/profile")
+     * @Rest\Post ("/users/email")
      * @param Request $request
      * @return Response
      */
@@ -44,5 +61,16 @@ class UserController extends AbstractFOSRestController
         $user = $serializer->deserialize($convertToJson, 'array', 'json');
 
         return $this->handleView($this->view($user, Response::HTTP_OK));
+    }
+
+    /**
+    * @Rest\Get ("/users/profile")
+    * @return Response
+    */
+    public function getUserLogin(): Response
+    {
+        $user = $this->handleDataOutput->transferDataGroup([$this->userLoginInfo], 'getDetailUser');
+
+        return $this->handleView($this->view($user[0], Response::HTTP_OK));
     }
 }
