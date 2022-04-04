@@ -38,8 +38,7 @@ class ProductController extends AbstractFOSRestController
         ProductRepository $productRepository,
         SizeRepository $sizeRepository,
         ProductItemRepository $productItemRepository
-    )
-    {
+    ) {
         $this->productRepository = $productRepository;
         $this->sizeRepository = $sizeRepository;
         $this->productItemRepository = $productItemRepository;
@@ -107,7 +106,7 @@ class ProductController extends AbstractFOSRestController
         $existedProduct = $this->productRepository->findOneBy([
             'name' => $requestData['name']
         ]);
-        if($existedProduct && $existedProduct->getColor()->getId() == $requestData['color']) {
+        if ($existedProduct && $existedProduct->getColor()->getId() == $requestData['color']) {
             return $this->handleView($this->view(['error' => 'This product is existed.'], Response::HTTP_BAD_REQUEST));
         }
 
@@ -116,7 +115,7 @@ class ProductController extends AbstractFOSRestController
             $product->setCreateAt(new \DateTime());
 
             $galleryData = $request->files->get('gallery');
-            foreach ($galleryData as $image){
+            foreach ($galleryData as $image) {
                 $saveFile = $fileUploader->upload($image);
                 $saveFile = self::PATH . $saveFile;
                 $gallery = new Gallery();
@@ -126,7 +125,7 @@ class ProductController extends AbstractFOSRestController
             }
 
             $productItemsData = (json_decode($requestData['items'][0], true));
-            foreach ($productItemsData as $productItemData){
+            foreach ($productItemsData as $productItemData) {
                 $productItem = new ProductItem();
                 $productItem->setCreateAt(new \DateTime());
                 $size = $this->sizeRepository->find($productItemData['size']);
@@ -166,7 +165,7 @@ class ProductController extends AbstractFOSRestController
             $product->setUpdateAt(new \DateTime());
             $productItemsData = $requestData['items'];
 
-            foreach ($productItemsData as $productItemData){
+            foreach ($productItemsData as $productItemData) {
                 $productItem = $this->productItemRepository->find($productItemData['id']);
                 $productItem->setAmount($productItemData['amount']);
                 $this->productItemRepository->add($productItem);

@@ -23,10 +23,11 @@ security:
         api:
             pattern: ^/api
             stateless: true
-            provider: app_user_provider
-            guard:
-                authenticators:
-                    - lexik_jwt_authentication.jwt_token_authenticator
+            jwt: ~
+            # provider: app_user_provider
+            # guard:
+            #     authenticators:
+            #         - lexik_jwt_authentication.jwt_token_authenticator
 
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/

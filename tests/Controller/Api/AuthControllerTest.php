@@ -35,9 +35,7 @@ class AuthControllerTest extends BaseWebTestCase
             '/api/register',
             [],
             [],
-            [
-                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE
-            ],
+            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE],
             json_encode($payload)
         );
 

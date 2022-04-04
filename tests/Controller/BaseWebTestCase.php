@@ -13,6 +13,7 @@ use FOS\OAuthServerBundle\Model\ClientManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTEncodeFailureException;
 use OAuth2\OAuth2;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +34,7 @@ class BaseWebTestCase extends WebTestCase
      * @var string
      */
     protected static $token;
+
     /**
      * @var ObjectManager
      */
@@ -56,15 +58,13 @@ class BaseWebTestCase extends WebTestCase
      */
     protected function setUp(): void
     {
-
         $this->client = self::createClient(array(), array(
             'HTTP_HOST' => '127.0.0.1',
         ));
 
         $this->entityManager = static::$kernel->getContainer()
             ->get('doctrine')
-            ->getManager()
-        ;
+            ->getManager();
     }
 
     public function loadFixture(FixtureInterface $fixture)

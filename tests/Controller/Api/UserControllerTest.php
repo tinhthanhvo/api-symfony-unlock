@@ -49,7 +49,35 @@ class UserControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $data = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertIsArray($data);
-        $this->assertSame(1, $data['id']);
+        $this->assertEquals(1, $data['id']);
+        $this->assertSame('user@gmail.com', $data['email']);
+        $this->assertSame('Full name', $data['full_name']);
+        $this->assertSame('0123456789', $data['phone_number']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserLogin(): void
+    {
+        $userFixture = new UserFixtures();
+        $this->loadFixture($userFixture, ['ROLE_USER']);
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/api/users/profile',
+            [],
+            [],
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ]
+        );
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $data = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($data);
+        $this->assertEquals(1, $data['id']);
         $this->assertSame('user@gmail.com', $data['email']);
         $this->assertSame('Full name', $data['full_name']);
         $this->assertSame('0123456789', $data['phone_number']);
