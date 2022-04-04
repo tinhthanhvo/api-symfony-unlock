@@ -21,6 +21,7 @@ class HomePageController extends AbstractFOSRestController
 {
     public const PRODUCT_PER_PAGE = 9;
     public const PRODUCT_PAGE_NUMBER = 1;
+    public const ORDER_BY_DEFAULT = ['createAt' => 'DESC'];
     private $productRepository;
     private $categoryRepository;
 
@@ -52,7 +53,8 @@ class HomePageController extends AbstractFOSRestController
     public function getProducts(Request $request): Response
     {
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
-        $products = $this->productRepository->findBy(['deleteAt' => null], ['createAt' => 'DESC'], $limit);
+
+        $products = $this->productRepository->findBy(['deleteAt' => null], ORDER_BY_DEFAULT, $limit);
 
         $transferData = array_map('self::dataTransferProductListObject', $products);
         $products = $this->transferDataGroup($transferData, 'getProductList');
@@ -92,9 +94,10 @@ class HomePageController extends AbstractFOSRestController
 
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
+        $orderBy = $request->get('order', self::ORDER_BY_DEFAULT);
         $offset = $limit * ($page - 1);
 
-        $products = $this->productRepository->findByConditions($filterOptions, ['createAt' => 'DESC'], $limit, $offset);
+        $products = $this->productRepository->findByConditions($filterOptions, $orderBy, $limit, $offset);
 
         $transferData = array_map('self::dataTransferProductListObject', $products['data']);
         $products['data'] = $this->transferDataGroup($transferData, 'getProductList');
