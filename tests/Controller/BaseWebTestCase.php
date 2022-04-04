@@ -10,6 +10,8 @@ use Doctrine\Persistence\ObjectManager;
 use Exception;
 use FOS\OAuthServerBundle\Model\ClientInterface;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTEncodeFailureException;
 use OAuth2\OAuth2;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -28,37 +30,41 @@ class BaseWebTestCase extends WebTestCase
     protected $client;
 
     /**
+     * @var string
+     */
+    protected static $token;
+    /**
      * @var ObjectManager
      */
     protected $entityManager;
+
+    /**
+     * @return void
+     * @throws JWTEncodeFailureException
+     */
+    public static function setUpBeforeClass(): void
+    {
+        static::$kernel = static::createKernel();
+        static::$kernel->boot();
+        /** @var  JWTEncoderInterface $jwtEncode */
+        $jwtEncode = static::$kernel->getContainer()->get('lexik_jwt_authentication.encoder');
+        self::$token = $jwtEncode->encode(['username' => 'user@gmail.com']);
+    }
 
     /**
      * @throws Exception
      */
     protected function setUp(): void
     {
-        parent::setUp();
 
         $this->client = self::createClient(array(), array(
-            'HTTP_HOST' => '127.0.0.1:8080',
+            'HTTP_HOST' => '127.0.0.1',
         ));
-        static::$kernel = static::createKernel();
-        static::$kernel->boot();
+
         $this->entityManager = static::$kernel->getContainer()
             ->get('doctrine')
             ->getManager()
         ;
-    }
-
-    protected function getApiClient(): ClientInterface
-    {
-        /** @var ClientManagerInterface $clientManager */
-        $clientManager = self::$container->get('fos_oauth_server.client_manager.default');
-        $client = $clientManager->createClient();
-        $client->setAllowedGrantTypes([OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS]);
-        $clientManager->updateClient($client);
-
-        return $client;
     }
 
     public function loadFixture(FixtureInterface $fixture)
