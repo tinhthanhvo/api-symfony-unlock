@@ -2,7 +2,9 @@
 
 namespace App\Tests\Controller\Api;
 
+use App\DataFixtures\CategoryFixtures;
 use App\DataFixtures\ProductFixtures;
+use App\DataFixtures\UserFixtures;
 use App\Entity\Product;
 use App\Tests\Controller\BaseWebTestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
@@ -28,12 +30,18 @@ class HomePageControllerTest extends BaseWebTestCase
         $this->loadFixture($productFixture);
         $product = $this->productRepository->findOneBy(['name' => 'Product name 1']);
 
+        $user = new UserFixtures();
+        $this->loadFixture($user);
+
         $this->client->request(
             Request::METHOD_GET,
             '/api/products/' . $product->getId(),
             [],
             [],
-            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE]
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ]
         );
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -51,12 +59,18 @@ class HomePageControllerTest extends BaseWebTestCase
         $productFixtures = new ProductFixtures();
         $this->loadFixture($productFixtures);
 
+        $user = new UserFixtures();
+        $this->loadFixture($user);
+
         $this->client->request(
             Request::METHOD_GET,
             '/api/products',
             [],
             [],
-            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE]
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ]
         );
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -74,6 +88,9 @@ class HomePageControllerTest extends BaseWebTestCase
         $productFixtures = new ProductFixtures();
         $this->loadFixture($productFixtures);
 
+        $user = new UserFixtures();
+        $this->loadFixture($user);
+
         $payload = [
             'category' => 1,
             'color' => 1,
@@ -86,7 +103,10 @@ class HomePageControllerTest extends BaseWebTestCase
             '/api/products/filter',
             [],
             [],
-            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE],
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ],
             json_encode($payload)
         );
 
@@ -98,5 +118,36 @@ class HomePageControllerTest extends BaseWebTestCase
         $product = $data['data'][0];
         $this->assertSame('Product name 2', $product['name']);
         $this->assertSame('500000', $product['price']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetCategories(): void
+    {
+        $categoryFixtures = new CategoryFixtures();
+        $this->loadFixture($categoryFixtures);
+
+        $user = new UserFixtures();
+        $this->loadFixture($user);
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/api/categories',
+            [],
+            [],
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ]
+        );
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $data = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($data);
+        $this->assertCount(1, $data);
+
+        $category = $data[0];
+        $this->assertSame('Category name', $category['name']);
     }
 }

@@ -39,7 +39,10 @@ class UserControllerTest extends BaseWebTestCase
             '/api/users/profile',
             [],
             [],
-            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE],
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ],
             json_encode($payload)
         );
 
