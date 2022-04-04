@@ -15,6 +15,7 @@ class UserFixtures extends Fixture
         $user->setEmail('user@gmail.com');
         $user->setPassword('password');
         $user->setPhoneNumber('0123456789');
+        $user->setRoles(['ROLE_ADMIN']);
         $user->setCreateAt(new \DateTime("now"));
 
         $manager->persist($user);

@@ -3,6 +3,7 @@
 namespace App\Tests\Controller\Api\Admin;
 
 use App\DataFixtures\ProductFixtures;
+use App\DataFixtures\UserFixtures;
 use App\Entity\Product;
 use App\Tests\Controller\BaseWebTestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
@@ -27,12 +28,18 @@ class ProductControllerTest extends BaseWebTestCase
         $productFixtures = new ProductFixtures();
         $this->loadFixture($productFixtures);
 
+        $user = new UserFixtures();
+        $this->loadFixture($user);
+
         $this->client->request(
             Request::METHOD_GET,
             '/api/admin/products',
             [],
             [],
-            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE]
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ]
         );
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -51,12 +58,18 @@ class ProductControllerTest extends BaseWebTestCase
         $this->loadFixture($productFixtures);
         $product = $this->productRepository->findOneBy(['name' => 'Product name 1']);
 
+        $user = new UserFixtures();
+        $this->loadFixture($user);
+
         $this->client->request(
             Request::METHOD_GET,
             '/api/admin/products/' . $product->getId(),
             [],
             [],
-            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE]
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ]
         );
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
