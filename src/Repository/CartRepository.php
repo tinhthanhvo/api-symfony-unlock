@@ -45,6 +45,20 @@ class CartRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param int $userId
+     * @return array
+     */
+    public function countCartItems(int $userId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->setParameter('user', $userId)
+            ->select('COUNT(c.id) as count')
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Cart[] Returns an array of Cart objects
     //  */
