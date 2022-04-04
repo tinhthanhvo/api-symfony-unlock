@@ -50,10 +50,9 @@ class AuthController extends ApiController
                 ));
             }
 
-            return $this->handleView($this->view(
-                ['error' => 'Something went wrong! Please contact support.'],
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            ));
+            return $this->handleView($this->view([
+                'error' => 'Something went wrong! Please contact support.'
+            ],Response::HTTP_INTERNAL_SERVER_ERROR));
         }
 
         $errorsMessage = [];
