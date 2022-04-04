@@ -19,9 +19,10 @@ class CartFixtures extends Fixture
     {
         $user = new User();
         $user->setEmail('user_mail@gmail.com');
-        $user->setPassword('123456');
+        $user->setPassword('23abncH');
         $user->setFullName('User full name');
         $user->setPhoneNumber('0908855655');
+        $user->setRoles(['ROLE_ADMIN']);
         $user->setCreateAt(new \DateTime("now"));
 
         $category = new Category();
@@ -92,7 +93,6 @@ class CartFixtures extends Fixture
         $secondCartItem->setCreateAt(new \DateTime("tomorrow"));
 
         $manager->persist($secondCartItem);
-
         $manager->flush();
     }
 }

@@ -53,6 +53,7 @@ class CartController extends AbstractFOSRestController
                 $limit,
                 $offset
             );
+            dd($carts);
 
             $transferData = array_map('self::dataTransferCartItemObject', $carts);
             $carts = $this->handleDataOutput->transferDataGroup($transferData, 'getCartItems');

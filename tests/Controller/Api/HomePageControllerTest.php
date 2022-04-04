@@ -4,7 +4,6 @@ namespace App\Tests\Controller\Api;
 
 use App\DataFixtures\CategoryFixtures;
 use App\DataFixtures\ProductFixtures;
-use App\DataFixtures\UserFixtures;
 use App\Entity\Product;
 use App\Tests\Controller\BaseWebTestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
@@ -30,17 +29,13 @@ class HomePageControllerTest extends BaseWebTestCase
         $this->loadFixture($productFixture);
         $product = $this->productRepository->findOneBy(['name' => 'Product name 1']);
 
-        $user = new UserFixtures();
-        $this->loadFixture($user);
-
         $this->client->request(
             Request::METHOD_GET,
             '/api/products/' . $product->getId(),
             [],
             [],
             [
-                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE
             ]
         );
 
@@ -59,17 +54,13 @@ class HomePageControllerTest extends BaseWebTestCase
         $productFixtures = new ProductFixtures();
         $this->loadFixture($productFixtures);
 
-        $user = new UserFixtures();
-        $this->loadFixture($user);
-
         $this->client->request(
             Request::METHOD_GET,
             '/api/products',
             [],
             [],
             [
-                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE
             ]
         );
 
@@ -88,9 +79,6 @@ class HomePageControllerTest extends BaseWebTestCase
         $productFixtures = new ProductFixtures();
         $this->loadFixture($productFixtures);
 
-        $user = new UserFixtures();
-        $this->loadFixture($user);
-
         $payload = [
             'category' => 1,
             'color' => 1,
@@ -104,8 +92,7 @@ class HomePageControllerTest extends BaseWebTestCase
             [],
             [],
             [
-                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE
             ],
             json_encode($payload)
         );
@@ -128,17 +115,13 @@ class HomePageControllerTest extends BaseWebTestCase
         $categoryFixtures = new CategoryFixtures();
         $this->loadFixture($categoryFixtures);
 
-        $user = new UserFixtures();
-        $this->loadFixture($user);
-
         $this->client->request(
             Request::METHOD_GET,
             '/api/categories',
             [],
             [],
             [
-                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE
             ]
         );
 

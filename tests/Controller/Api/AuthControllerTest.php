@@ -25,7 +25,7 @@ class AuthControllerTest extends BaseWebTestCase
     {
         $payload = [
             'email' => 'user_mail@gmail.com',
-            'password' => '123456',
+            'password' => '23abncH',
             'fullName' => 'User full name',
             'phoneNumber' => '0908855655'
         ];
@@ -35,7 +35,9 @@ class AuthControllerTest extends BaseWebTestCase
             '/api/register',
             [],
             [],
-            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE],
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE
+            ],
             json_encode($payload)
         );
 

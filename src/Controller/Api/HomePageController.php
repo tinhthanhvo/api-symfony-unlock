@@ -12,11 +12,7 @@ use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
 class HomePageController extends AbstractFOSRestController
 {
     public const PRODUCT_PER_PAGE = 9;
@@ -54,7 +50,7 @@ class HomePageController extends AbstractFOSRestController
     {
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
 
-        $products = $this->productRepository->findBy(['deleteAt' => null], ORDER_BY_DEFAULT, $limit);
+        $products = $this->productRepository->findBy(['deleteAt' => null], self::ORDER_BY_DEFAULT, $limit);
 
         $transferData = array_map('self::dataTransferProductListObject', $products);
         $products = $this->transferDataGroup($transferData, 'getProductList');
