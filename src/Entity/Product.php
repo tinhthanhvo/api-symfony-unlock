@@ -63,7 +63,7 @@ class Product
 
     /**
      * @ORM\OneToMany(targetEntity=ProductItem::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
-     * @Groups({"getDetailProduct", "getDetailProductAdmin"})
+     * @Groups({"getDetailProduct", "getDetailProductAdmin", "getProductListAdmin"})
      */
     private $items;
 

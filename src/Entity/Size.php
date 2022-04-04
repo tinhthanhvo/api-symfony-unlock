@@ -22,7 +22,7 @@ class Size
 
     /**
      * @ORM\Column(type="string", length=10)
-     * @Groups({"getDetailProduct", "getCartItems", "getDetailProductAdmin"})
+     * @Groups({"getDetailProduct", "getCartItems", "getDetailProductAdmin", "getProductListAdmin"})
      */
     private $value;
 
