@@ -1,63 +1,50 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>{% block title %}KVAT - Facture #{{ invoice.id }}{% endblock %}</title>
-    </head>
 
-<style type="text/css" media="all">
-{% block style %}
+{% block stylesheets %}
+<style>
     body { margin: 0px; padding: 0; font: 16px Arial }
 
-   .table-row:after { content: ""; display: table; clear: both; } 
-   .table-column { float: left; padding: 15px; height: 50px; }
-
-
-
+    .table-row:after { content: ""; display: table; clear: both; } 
+    .table-column { float: left; padding: 15px; }
 
     #container { margin: 5px; width: auto }
+    .border-style { border: 1px solid #e3e3e3; border-radius: 8px; padding: 5px 10px; line-height: 5px; }
 
-    #seller { margin: 25px; width: 620px; clear: both;}
-
-    #invoice, #invoice-total {float: right; width: 300px; margin-bottom: 30px}
-    #invoice dt, #invoice-total dt {float: left; width: 100px; margin-bottom: 4px}
-    #invoice dd, #invoice-total dd {float: right; width: 184px; margin: 0 0 4px; text-align: right}
-    .invoice-total {float: left;font-weight: bold;margin: 0;padding: 5px 8px;border-top: 1px solid #f1f1f1;background:#e3e3e3}
-
-    #buyer {float: left; width: 300px}
-
-    #invoice-total {clear: both;}
-
-    #terms, #notes {float: left;width: 100%;margin: 10px 0}
-
-    table {width: 100%}
-    table thead tr {padding: 10px 5px;border: 1px solid #c7c7c7;font-weight: bold;}
-    table thead th {border-top: 1px solid #f1f1f1;background:#e3e3e3}
-
-    table tbody tr {padding: 10px 5px;border-bottom:1px solid #e5e5e5;}
-
-    .col1 {width: 5%; text-align: left}
-    .col2 {width: 50%; text-align: left}
-    .col3 {}
-    .col4 {}
-    .col5 {}
-    .col3, .col4, .col5 {width: 15%; text-align: right}
-{% endblock %}
+    #order_item { width: 100% }
+    #order_item thead th { 
+        border: 1px solid #c7c7c7;
+        background:#e3e3e3; 
+        padding: 10px 5px; 
+        text-align: center !important; 
+        font-weight: bold; 
+    }
+    #order_item tbody td { padding: 10px 5px; border-bottom: 1px solid #e5e5e5; }
+    .col1 { width: 7%; text-align: center }
+    .col2 { width: 50%; text-align: left }
+    .col3 { width: 18%; text-align: right }
+    .col4 { width: 10%; text-align: right }
+    .col5 { width: 15%; text-align: right }
 </style>
+{% endblock %}
 
 <body>
     <div class="table-row">
-        <div class="table-column" style="width: 30%">
-            AAAAAAAA
+        <div class="table-column" style="width: 30%; font: 12px Arial; line-height: 5px;">
+            <p style="font: 14px Arial; font-weight: bold;">.NFQ | Vietnam Limited</p>
+            <p>Victoria Can Tho Resort, Cai Khe Ward</p>
+            <p>Ninh Kieu District, Can Tho City, Vietnam</p>
+            <p>Tax code: 0314588343</p>
         </div>
-        
-        <div class="table-column" style="width: 60%">
+        <div class="table-column" style="width: 10%"> 
+            {# <img src="http://127.0.0.1:8080/images/logo.png" alt="" width="64" height="64"> #}
+        </div>
+        <div class="table-column" style="width: 50%">
             <p style="float: right;">Issued at: {{ exportDate|date('Y-m-d H:i:s') }}</p><br />
             <p style="float: right;">KVAT Team</p>
         </div>
     </div>
     
-
     <div id="container">
     {% block content %}
     {% endblock %}

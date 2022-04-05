@@ -67,7 +67,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         $today = $today->format('Y-m-d');
         $fromDateRequest = $request->get('dateRequest', $today);
         $fromDate = new \DateTime($fromDateRequest);
-        $toDate = new \DateTime($fromDateRequest.' 23:59:59.999999');
+        $toDate = new \DateTime($fromDateRequest . ' 23:59:59.999999');
 
 //        $revenue = $this->purchaseOrderRepository->getRevenue($fromDate, $toDate);
         $revenue = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'totalPrice');

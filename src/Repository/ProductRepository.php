@@ -65,7 +65,7 @@ class ProductRepository extends ServiceEntityRepository
         }
 
         if (isset($param['name']) && $param['name'] != '') {
-            $param['name'] = '%'.$param['name'].'%';
+            $param['name'] = '%' . $param['name'] . '%';
             $queryBuilder
                 ->andWhere('p.name LIKE :name')
                 ->setParameter('name', $param['name']);

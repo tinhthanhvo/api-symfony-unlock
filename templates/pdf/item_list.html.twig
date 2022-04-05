@@ -1,10 +1,10 @@
-<table>
+<table id="order_item">
     <thead>
         <tr>
             <th class="col1">NO.</th>
             <th class="col2">DESCRIPTION</th>
             <th class="col3">UNIT PRICE</th>
-            <th class="col4">QUANTITY</th>
+            <th class="col4">QTY</th>
             <th class="col5">AMOUNT</th>
         </tr>
     </thead>
@@ -12,11 +12,12 @@
     <tbody>
     {% for item in invoice.orderItems %}
         <tr>
-            <td>#{{ loop.index }}</td>
+            <td style="text-align: center;">#{{ loop.index }}</td>
             <td>
-                {{ item.productItem.product.name }} <br />
-                Category: {{ item.productItem.product.category.name }} <br />
+                <span style="font-weight: bold;">{{ item.productItem.product.name }}</span><br />
+                Category: {{ item.productItem.product.category.name }}<br />
                 Color: {{ item.productItem.product.color.name }} 
+                &nbsp;-&nbsp;
                 Size: {{ item.productItem.size.value }}
             </td>
             <td class="col3">{{ item.productItem.product.price }}</td>

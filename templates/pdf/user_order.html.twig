@@ -1,48 +1,55 @@
 {% extends 'pdf/base.html.twig' %}
 
 {% block content %}
-    
-
-    <div id="seller">
-    {% if invoice.deleteAt is not empty %}
-        <img src="{{ invoice.deleteAt }}" alt="">
-    {% endif %}
-        
-    </div>
-
-    <div id="invoice">
-        <dl>
-            <dd>{{ invoice.id }}</dd>
-            <dt>Facture #</dt>
-
-            <dd>{{ invoice.createAt|date('F j, Y') }}</dd>
-            <dt>Facture Date</dt>
-        </dl>
+    <div style="text-align: center;">
+        <h2>Invoice #{{ invoice.id }}</h2>
+        <p style="line-height: 5px;"><span style="font-weight: bold;">Date: </span>{{ invoice.createAt|date('F j, Y') }}</p>
     </div>
 
     {% if invoice.customer is not empty %}
-    <div id="buyer">
-        <p>{{ invoice.recipientName }}</p>
-        <p>{{ invoice.addressDelivery }}</p>
-    </div>
+    <div class="table-row">
+        <div class="table-column border-style" style="width: 35%;">
+            <h3>Customer Info</h3>
+            <p>{{ invoice.customer.fullName }}</p>
+            <p>Phone: {{ invoice.customer.phoneNumber }}</p>
+            <p>Email: {{ invoice.customer.email }}</p>
+            <p>&nbsp;</p>
+        </div>
+        <div class="table-column border-style" style="float: right; width: 55%;">
+            <h3>Recipient</h3>
+            <p>{{ invoice.recipientName }}</p>
+            <p>Address: {{ invoice.addressDelivery }}</p>
+            <p>Phone: {{ invoice.recipientPhone }}</p>
+            <p>Email: {{ invoice.recipientEmail }}</p>
+        </div>
+    </div><br />
     {% endif %}
 
+    <h3>Items</h3>
     {% include 'pdf/item_list.html.twig' %}
 
-    <hr>
-
-    <div id="invoice-total">
-        <dl>
-            <dt><strong>Total</strong></dt>
-            <dd><strong>{{ invoice.totalPrice }}</strong></dd>
-
-        {% if invoice.deleteAt is not empty %}
-            <dt>Coupon used</dt>
-            <dd>{{ invoice.deleteAt }} (-{{ invoice.deleteAt }})</dd>
-        {% endif %}
-
-            <dt>Amount Paid</dt>
-            <dd>-{{ invoice.totalPrice|default('0.00') }}</dd>
-        </dl>
+    <br/ >
+    <div class="table-row">
+        <div class="table-column border-style" style="width: 45%;">
+            <h3>Notes</h3>
+            <p>Tax included in price.</p>
+        </div>
+        <div class="table-column border-style" style="float: right; width: 45%;">
+            <h3>Total</h3>
+            <p>Subtotal: <span style="float: right;">{{ invoice.totalPrice }}</span></p>
+            <p>Discount: <span style="float: right;">-</span></p>
+            <p>Shipping: <span style="float: right;">
+            {% if invoice.shippingCost is not empty %}
+                {{ invoice.shippingCost }}
+            {% else %}
+                -
+            {% endif %}
+            </span></p>
+            <p><strong>Total:</strong>
+                <span style="float: right; font-weight: bold;">
+                {{ invoice.totalPrice + invoice.shippingCost }}
+                </span>
+            </p>
+        </div>
     </div>
 {% endblock %}
