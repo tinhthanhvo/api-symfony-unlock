@@ -89,9 +89,9 @@ class OrderDetail
         return $this->createAt;
     }
 
-    public function setCreateAt(\DateTimeInterface $createAt): self
+    public function setCreateAt(): self
     {
-        $this->createAt = $createAt;
+        $this->createAt = new \DateTime('now');
 
         return $this;
     }

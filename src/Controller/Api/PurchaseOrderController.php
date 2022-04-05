@@ -86,22 +86,24 @@ class PurchaseOrderController extends AbstractFOSRestController
 
             $cartItemsData = $this->userLoginInfo->getCarts();
             foreach ($cartItemsData as $cartItemData){
-
                 $amount = $cartItemData->getAmount();
+
+                $productItem = $cartItemData->getProductItem();
+                if($amount > $productItem->getAmount()) {
+                    return $this->handleView($this->view([
+                        'error' => 'Quantity is not enough.'
+                    ], Response::HTTP_BAD_REQUEST));
+                }
                 $price = $cartItemData->getPrice() * $amount;
 
                 $totalPrice += $price;
                 $totalAmount += $amount;
 
                 $orderDetail = new OrderDetail();
-                $orderDetail->setCreateAt(new \DateTime());
+                $orderDetail->setCreateAt();
                 $orderDetail->setAmount($amount);
                 $orderDetail->setPrice($price);
 
-                $productItem = $cartItemData->getProductItem();
-                if($amount > $productItem->getAmount()) {
-                    return $this->handleView($this->view(['error' => 'Quantity is not enough.'], Response::HTTP_BAD_REQUEST));
-                }
                 $productItem->setAmount($productItem->getAmount() - $amount);
                 $this->productItemRepository->add($productItem);
 
@@ -147,7 +149,7 @@ class PurchaseOrderController extends AbstractFOSRestController
 
                 $this->purchaseOrderRepository->add($purchaseOrder);
 
-                return $this->handleView($this->view(['success' => 'This order is canceled!'], Response::HTTP_NO_CONTENT));
+                return $this->handleView($this->view($purchaseOrder, Response::HTTP_OK));
             }
 
             return $this->handleView($this->view(['error' => 'This order is approved. So, your request is failed.'], Response::HTTP_BAD_REQUEST));

@@ -51,18 +51,20 @@ class ProductController extends AbstractFOSRestController
     public function getProductsAction(Request $request): Response
     {
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
-        $products = $this->productRepository->findBy(['deleteAt' => null], ['createAt' => 'DESC'], $limit);
+        $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
+        $offset = $limit * ($page - 1);
+        $products = $this->productRepository->findByConditions(['deleteAt' => null], ['createAt' => 'DESC'], $limit, $offset);
 
-        $transferData = array_map('self::dataTransferObject', $products);
+        $transferData = array_map('self::dataTransferObject', $products['data']);
         $serializer = SerializerBuilder::create()->build();
         $convertToJson = $serializer->serialize(
             $transferData,
             'json',
             SerializationContext::create()->setGroups(array('getProductListAdmin'))
         );
-        $transferData = $serializer->deserialize($convertToJson, 'array', 'json');
+        $products['data'] = $serializer->deserialize($convertToJson, 'array', 'json');
 
-        return $this->handleView($this->view($transferData, Response::HTTP_OK));
+        return $this->handleView($this->view($products, Response::HTTP_OK));
     }
 
     /**
@@ -80,15 +82,16 @@ class ProductController extends AbstractFOSRestController
             ));
         }
 
+        $dataTransfer = self::dataTransferProductItemObject($product);
         $serializer = SerializerBuilder::create()->build();
         $convertToJson = $serializer->serialize(
-            $product,
+            $dataTransfer,
             'json',
             SerializationContext::create()->setGroups(array('getDetailProductAdmin'))
         );
-        $product = $serializer->deserialize($convertToJson, 'array', 'json');
+        $dataResponse = $serializer->deserialize($convertToJson, 'array', 'json');
 
-        return $this->handleView($this->view($product, Response::HTTP_OK));
+        return $this->handleView($this->view($dataResponse, Response::HTTP_OK));
     }
 
     /**
@@ -184,6 +187,32 @@ class ProductController extends AbstractFOSRestController
      * @return array
      */
     private function dataTransferObject(Product $product): array
+    {
+        $formattedProduct = [];
+        $formattedProduct['id'] = $product->getId();
+        $formattedProduct['name'] = $product->getName();
+        $formattedProduct['price'] = $product->getPrice();
+        $formattedProduct['description'] = $product->getDescription();
+        $formattedProduct['category'] = $product->getCategory();
+        $formattedProduct['color'] = $product->getColor();
+
+        $gallery = $product->getGallery();
+        foreach ($gallery as $image) {
+            $formattedProduct['gallery'][] = $image->getPath();
+        }
+        $items = $product->getItems();
+        foreach ($items as $item) {
+            $formattedProduct['items'][] =  $this->dataTransferItemObject($item);
+        }
+
+        return $formattedProduct;
+    }
+
+    /**
+     * @param Product $product
+     * @return array
+     */
+    private function dataTransferProductItemObject(Product $product): array
     {
         $formattedProduct = [];
         $formattedProduct['id'] = $product->getId();
