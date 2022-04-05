@@ -51,7 +51,7 @@ class ProductItem
     private $product;
 
     /**
-     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="productItem")
+     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="productItem", orphanRemoval=true)
      */
     private $cart;
 
@@ -63,7 +63,6 @@ class ProductItem
 
     /**
      * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="productItem", orphanRemoval=true)
-     *
      */
     private $orderDetails;
 

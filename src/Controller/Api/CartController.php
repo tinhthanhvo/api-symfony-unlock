@@ -37,6 +37,26 @@ class CartController extends AbstractFOSRestController
     }
 
     /**
+     * @Rest\Get("/users/carts/count")
+     * @return Response
+     */
+    public function countCartItems(): Response
+    {
+        try {
+            $countCartItems = $this->cartRepository->countCartItems($this->userLoginInfo->getId());
+
+            return $this->handleView($this->view($countCartItems[0], Response::HTTP_OK));
+        } catch (\Exception $e) {
+            //Need to add log the error message
+        }
+
+        return $this->handleView($this->view(
+            ['error' => 'Something went wrong! Please contact support.'],
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        ));
+    }
+
+    /**
      * @Rest\Get("/users/carts")
      * @param Request $request
      * @return Response
@@ -53,7 +73,6 @@ class CartController extends AbstractFOSRestController
                 $limit,
                 $offset
             );
-            dd($carts);
 
             $transferData = array_map('self::dataTransferCartItemObject', $carts);
             $carts = $this->handleDataOutput->transferDataGroup($transferData, 'getCartItems');
@@ -63,9 +82,10 @@ class CartController extends AbstractFOSRestController
             //Need to add log the error message
         }
 
-        return $this->handleView($this->view([
-            'error' => 'Something went wrong! Please contact support.'
-        ],Response::HTTP_INTERNAL_SERVER_ERROR));
+        return $this->handleView($this->view(
+            ['error' => 'Something went wrong! Please contact support.'],
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        ));
     }
 
     /**
@@ -80,12 +100,15 @@ class CartController extends AbstractFOSRestController
         $formattedCart['color'] = $cart->getProductItem()->getProduct()->getColor()->getName();
         $formattedCart['size'] = $cart->getProductItem()->getSize()->getValue();
         $formattedCart['amount'] = $cart->getAmount();
+        $formattedCart['totalAmount'] = $cart->getProductItem()->getAmount();
         $formattedCart['price'] = $cart->getPrice();
         $formattedCart['unitPrice'] = $cart->getProductItem()->getProduct()->getPrice();
 
         $gallery = $cart->getProductItem()->getProduct()->getGallery();
-        foreach ($gallery as $image) {
-            $formattedCart['gallery'][] =  $image->getPath();
+        if (count($gallery) > 0) {
+            $formattedCart['gallery'] = $gallery[0]->getPath();
+        } else {
+            $formattedCart['gallery'] = "";
         }
 
         return $formattedCart;
@@ -112,6 +135,16 @@ class CartController extends AbstractFOSRestController
             } else {
                 $cartItem->setUpdateAt(new \DateTime("now"));
                 $cartItem->setDeleteAt(null);
+
+                $storageAmount = $cartItem->getProductItem()->getAmount();
+                if (is_numeric($payload['amount']) && intval($payload['amount']) < $storageAmount) {
+                    $totalCartAmount = $cartItem->getAmount() + intval($payload['amount']);
+                    if ($storageAmount < $totalCartAmount) {
+                        $payload['amount'] = $storageAmount;
+                    } else {
+                        $payload['amount'] = $totalCartAmount;
+                    }
+                }
             }
 
             $form = $this->createForm(CartItemType::class, $cartItem);
@@ -132,28 +165,29 @@ class CartController extends AbstractFOSRestController
             //Need to add log the error message
         }
 
-        return $this->handleView($this->view([
-            'error' => 'Something went wrong! Please contact support.'
-        ],Response::HTTP_INTERNAL_SERVER_ERROR));
+        return $this->handleView($this->view(
+            ['error' => 'Something went wrong! Please contact support.'],
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        ));
     }
 
     /**
-     * @Rest\Put("/users/carts")
+     * @Rest\Put("/users/carts/{id}")
+     * @param int $id
      * @param Request $request
      * @return Response
      */
-    public function updateCartItem(Request $request): Response
+    public function updateCartItem(int $id, Request $request): Response
     {
         try {
             $payload = json_decode($request->getContent(), true);
             $cartItem = $this->cartRepository->findOneBy([
-                'id' => $payload['id'],
+                'id' => $id,
                 'user' => $this->userLoginInfo->getId()
             ]);
 
             if ($cartItem) {
                 $form = $this->createForm(CartItemType::class, $cartItem);
-                unset($payload['id']);
                 $payload['productItem'] = $cartItem->getProductItem()->getId();
                 $form->submit($payload);
                 if ($form->isSubmitted() && $form->isValid()) {
@@ -164,7 +198,6 @@ class CartController extends AbstractFOSRestController
 
                     return $this->handleView($this->view(
                         ['success' => 'Update cart item successfully'],
-                        // $cartItem,
                         Response::HTTP_NO_CONTENT
                     ));
                 }
@@ -179,27 +212,26 @@ class CartController extends AbstractFOSRestController
             //Need to add log the error message
         }
 
-        return $this->handleView($this->view([
-            'error' => 'Something went wrong! Please contact support.'
-        ],Response::HTTP_INTERNAL_SERVER_ERROR));
+        return $this->handleView($this->view(
+            ['error' => 'Something went wrong! Please contact support.'],
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        ));
     }
 
     /**
-     * @Rest\Delete("/users/carts")
-     * @param Request $request
+     * @Rest\Delete("/users/carts/{id}")
+     * @param int $id
      * @return Response
      */
-    public function removeCartItem(Request $request): Response
+    public function removeCartItem(int $id): Response
     {
         try {
-            $payload = json_decode($request->getContent(), true);
             $cartItem = $this->cartRepository->findOneBy([
-                'id' => $payload['id'],
+                'id' => $id,
                 'user' => $this->userLoginInfo->getId()
             ]);
             if ($cartItem) {
-                $cartItem->setDeleteAt(new \DateTime("now"));
-                $this->cartRepository->add($cartItem);
+                $this->cartRepository->remove($cartItem);
 
                 return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
             }
@@ -208,25 +240,6 @@ class CartController extends AbstractFOSRestController
                 ['error' => 'No item in cart was found with this id.'],
                 Response::HTTP_NOT_FOUND
             ));
-        } catch (\Exception $e) {
-            //Need to add log the error message
-        }
-
-        return $this->handleView($this->view([
-            'error' => 'Something went wrong! Please contact support.'
-        ],Response::HTTP_INTERNAL_SERVER_ERROR));
-    }
-
-    /**
-     * @Rest\Get("/users/carts/count")
-     * @return Response
-     */
-    public function countCartItems(): Response
-    {
-        try {
-            $countCartItems = $this->cartRepository->countCartItems($this->userLoginInfo->getId());
-
-            return $this->handleView($this->view($countCartItems[0], Response::HTTP_OK));
         } catch (\Exception $e) {
             //Need to add log the error message
         }

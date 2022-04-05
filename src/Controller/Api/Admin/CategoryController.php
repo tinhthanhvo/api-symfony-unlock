@@ -30,5 +30,4 @@ class CategoryController extends AbstractFOSRestController
 
         return $this->handleView($this->view($categories, Response::HTTP_OK));
     }
-
 }

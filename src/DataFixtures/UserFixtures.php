@@ -8,14 +8,14 @@ use Doctrine\Persistence\ObjectManager;
 
 class UserFixtures extends Fixture
 {
-    public function load(ObjectManager $manager): void
+    public function load(ObjectManager $manager, array $role = ['ROLE_ADMIN']): void
     {
         $user = new User();
         $user->setFullName('Full name');
         $user->setEmail('user@gmail.com');
-        $user->setPassword('password');
+        $user->setPassword('Abc123');
         $user->setPhoneNumber('0123456789');
-        $user->setRoles(['ROLE_ADMIN']);
+        $user->setRoles($role);
         $user->setCreateAt(new \DateTime("now"));
 
         $manager->persist($user);

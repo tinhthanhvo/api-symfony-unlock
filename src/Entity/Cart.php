@@ -47,7 +47,7 @@ class Cart
     private $deleteAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ProductItem::class, inversedBy="color", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity=ProductItem::class, inversedBy="cart", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"getCartItems"})
      */

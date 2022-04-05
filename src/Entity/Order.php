@@ -61,7 +61,7 @@ class Order
     private $amount;
 
     /**
-     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="eexit", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="order", orphanRemoval=true)
      */
     private $orderItems;
 
