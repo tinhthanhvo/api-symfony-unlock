@@ -74,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $carts;
 
     /**
-     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="customer", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=PurchaseOrder::class, mappedBy="customer", orphanRemoval=true)
      */
     private $orders;
 
@@ -264,14 +264,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Order>
+     * @return Collection<int, PurchaseOrder>
      */
     public function getOrders(): Collection
     {
         return $this->orders;
     }
 
-    public function addOrder(Order $order): self
+    public function addOrder(PurchaseOrder $order): self
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
@@ -281,7 +281,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeOrder(Order $order): self
+    public function removeOrder(PurchaseOrder $order): self
     {
         if ($this->orders->removeElement($order)) {
             // set the owning side to null (unless already changed)

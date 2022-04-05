@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\OrderRepository;
+use App\Repository\PurchaseOrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity(repositoryClass=OrderRepository::class)
+ * @ORM\Entity(repositoryClass=PurchaseOrderRepository::class)
  */
-class Order
+class PurchaseOrder
 {
     /**
      * @ORM\Id()
@@ -19,11 +19,6 @@ class Order
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $sku;
 
     /**
      * @ORM\Column(type="string", length=25)
@@ -99,18 +94,6 @@ class Order
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getSku(): ?string
-    {
-        return $this->sku;
-    }
-
-    public function setSku(string $sku): self
-    {
-        $this->sku = $sku;
-
-        return $this;
     }
 
     public function getStatus(): ?string

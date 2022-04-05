@@ -44,7 +44,7 @@ class OrderDetail
     private $deleteAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="orderItems", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity=PurchaseOrder::class, inversedBy="orderItems", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $order;
@@ -120,12 +120,12 @@ class OrderDetail
         return $this;
     }
 
-    public function getOrder(): ?Order
+    public function getOrder(): ?PurchaseOrder
     {
         return $this->order;
     }
 
-    public function setOrder(?Order $order): self
+    public function setOrder(?PurchaseOrder $order): self
     {
         $this->order = $order;
 
