@@ -56,7 +56,7 @@ class PurchaseOrder
     private $amount;
 
     /**
-     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="order", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="purchaseOrder", orphanRemoval=true, cascade={"persist"})
      */
     private $orderItems;
 
@@ -81,7 +81,7 @@ class PurchaseOrder
     private $recipientEmail;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
@@ -192,7 +192,7 @@ class PurchaseOrder
     {
         if (!$this->orderItems->contains($orderItem)) {
             $this->orderItems[] = $orderItem;
-            $orderItem->setOrder($this);
+            $orderItem->setPurchaseOrder($this);
         }
 
         return $this;
@@ -202,8 +202,8 @@ class PurchaseOrder
     {
         if ($this->orderItems->removeElement($orderItem)) {
             // set the owning side to null (unless already changed)
-            if ($orderItem->getOrder() === $this) {
-                $orderItem->setOrder(null);
+            if ($orderItem->getPurchaseOrder() === $this) {
+                $orderItem->setPurchaseOrder(null);
             }
         }
 
