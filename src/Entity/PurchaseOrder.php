@@ -56,7 +56,7 @@ class PurchaseOrder
     private $amount;
 
     /**
-     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="purchaseOrder", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="purchaseOrder", orphanRemoval=true)
      */
     private $orderItems;
 
@@ -120,7 +120,7 @@ class PurchaseOrder
 
     public function setCreateAt(): self
     {
-        $this->createAt = new \DateTime('now');;
+        $this->createAt = new \DateTime("now");
 
         return $this;
     }

@@ -2,12 +2,9 @@
 
 namespace App\Controller\Api;
 
+use App\Controller\BaseController;
 use App\Entity\Cart;
 use App\Form\CartItemType;
-use App\Repository\CartRepository;
-use App\Service\GetUserInfo;
-use App\Service\HandleDataOutput;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,24 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
  * Require ROLE_USER for all the actions of this controller
  * @IsGranted("ROLE_USER")
  */
-class CartController extends AbstractFOSRestController
+class CartController extends BaseController
 {
     public const CART_ITEMS_PER_PAGE = 10;
-    public const CART_ITEMS_PAGE_NUMBER = 1;
-
-    private $cartRepository;
-    private $userLoginInfo;
-    private $handleDataOutput;
-
-    public function __construct(
-        CartRepository $cartRepository,
-        GetUserInfo $userLogin,
-        HandleDataOutput $handleDataOutput
-    ) {
-        $this->cartRepository = $cartRepository;
-        $this->userLoginInfo = $userLogin->getUserLoginInfo();
-        $this->handleDataOutput = $handleDataOutput;
-    }
 
     /**
      * @Rest\Get("/users/carts/count")
@@ -47,7 +29,7 @@ class CartController extends AbstractFOSRestController
 
             return $this->handleView($this->view($countCartItems[0], Response::HTTP_OK));
         } catch (\Exception $e) {
-            //Need to add log the error message
+            $this->logger->error($e->getMessage());
         }
 
         return $this->handleView($this->view(
@@ -65,21 +47,21 @@ class CartController extends AbstractFOSRestController
     {
         try {
             $limit = intval($request->get('limit', self::CART_ITEMS_PER_PAGE));
-            $page = intval($request->get('page', self::CART_ITEMS_PAGE_NUMBER));
+            $page = intval($request->get('page', self::ITEMS_PAGE_NUMBER_DEFAULT));
             $offset = $limit * ($page - 1);
             $carts = $this->cartRepository->findBy(
                 ['deleteAt' => null, 'user' => $this->userLoginInfo->getId()],
-                ['createAt' => 'DESC'],
+                self::ORDER_BY_DEFAULT,
                 $limit,
                 $offset
             );
 
             $transferData = array_map('self::dataTransferCartItemObject', $carts);
-            $carts = $this->handleDataOutput->transferDataGroup($transferData, 'getCartItems');
+            $carts = $this->transferDataGroup($transferData, 'getCartItems');
 
             return $this->handleView($this->view($carts, Response::HTTP_OK));
         } catch (\Exception $e) {
-            //Need to add log the error message
+            $this->logger->error($e->getMessage());
         }
 
         return $this->handleView($this->view(
@@ -104,11 +86,10 @@ class CartController extends AbstractFOSRestController
         $formattedCart['price'] = $cart->getPrice();
         $formattedCart['unitPrice'] = $cart->getProductItem()->getProduct()->getPrice();
 
+        $formattedCart['gallery'] = "";
         $gallery = $cart->getProductItem()->getProduct()->getGallery();
         if (count($gallery) > 0) {
             $formattedCart['gallery'] = $gallery[0]->getPath();
-        } else {
-            $formattedCart['gallery'] = "";
         }
 
         return $formattedCart;
@@ -127,42 +108,41 @@ class CartController extends AbstractFOSRestController
                 'productItem' => $payload['productItem'],
                 'user' => $this->userLoginInfo->getId()
             ]);
-
             if (!$cartItem) {
                 $cartItem = new Cart();
-                $cartItem->setUser($this->userLoginInfo);
-                $cartItem->setCreateAt(new \DateTime("now"));
-            } else {
-                $cartItem->setUpdateAt(new \DateTime("now"));
-                $cartItem->setDeleteAt(null);
-
-                $storageAmount = $cartItem->getProductItem()->getAmount();
-                if (is_numeric($payload['amount']) && intval($payload['amount']) < $storageAmount) {
-                    $totalCartAmount = $cartItem->getAmount() + intval($payload['amount']);
-                    if ($storageAmount < $totalCartAmount) {
-                        $payload['amount'] = $storageAmount;
-                    } else {
-                        $payload['amount'] = $totalCartAmount;
-                    }
-                }
             }
 
             $form = $this->createForm(CartItemType::class, $cartItem);
             $form->submit($payload);
             if ($form->isSubmitted() && $form->isValid()) {
+                $cartItem->setUser($this->userLoginInfo);
+
+                if ($cartItem->getId()) {
+                    $cartItem->setUpdateAt(new \DateTime("now"));
+                    $cartItem->setDeleteAt(null);
+
+                    $storageAmount = $cartItem->getProductItem()->getAmount();
+                    $newCartItemAmount = $cartItem->getAmount() + intval($payload['amount']);
+                    if ($storageAmount < $newCartItemAmount) {
+                        $newCartItemAmount = $storageAmount;
+                    }
+                    $cartItem->setAmount($newCartItemAmount);
+                }
+
                 $this->cartRepository->add($cartItem);
 
                 return $this->handleView($this->view(
-                    ['success' => 'Insert cart item successfully'],
+                    ['success' => 'Insert cart item successfully.'],
                     Response::HTTP_CREATED
                 ));
             }
 
-            $errorsMessage = $this->handleDataOutput->getFormErrorMessage($form);
-
-            return $this->handleView($this->view(['error' => $errorsMessage], Response::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view(
+                ['error' => $this->getFormErrorMessage($form)],
+                Response::HTTP_BAD_REQUEST
+            ));
         } catch (\Exception $e) {
-            //Need to add log the error message
+            $this->logger->error($e->getMessage());
         }
 
         return $this->handleView($this->view(
@@ -197,19 +177,23 @@ class CartController extends AbstractFOSRestController
                     $this->cartRepository->add($cartItem);
 
                     return $this->handleView($this->view(
-                        ['success' => 'Update cart item successfully'],
+                        ['success' => 'Update cart item successfully.'],
                         Response::HTTP_NO_CONTENT
                     ));
                 }
 
-                $errorsMessage = $this->handleDataOutput->getFormErrorMessage($form);
-            } else {
-                $errorsMessage = ['id' => 'No item in cart was found with this id.'];
+                return $this->handleView($this->view(
+                    ['error' => $this->getFormErrorMessage($form)],
+                    Response::HTTP_BAD_REQUEST
+                ));
             }
 
-            return $this->handleView($this->view(['error' => $errorsMessage], Response::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view(
+                ['error' => 'No item in cart was found with this id.'],
+                Response::HTTP_NOT_FOUND
+            ));
         } catch (\Exception $e) {
-            //Need to add log the error message
+            $this->logger->error($e->getMessage());
         }
 
         return $this->handleView($this->view(
@@ -233,7 +217,10 @@ class CartController extends AbstractFOSRestController
             if ($cartItem) {
                 $this->cartRepository->remove($cartItem);
 
-                return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
+                return $this->handleView($this->view(
+                    ['success' => 'Delete cart item successfully.'],
+                    Response::HTTP_NO_CONTENT
+                ));
             }
 
             return $this->handleView($this->view(
@@ -241,7 +228,7 @@ class CartController extends AbstractFOSRestController
                 Response::HTTP_NOT_FOUND
             ));
         } catch (\Exception $e) {
-            //Need to add log the error message
+            $this->logger->error($e->getMessage());
         }
 
         return $this->handleView($this->view(

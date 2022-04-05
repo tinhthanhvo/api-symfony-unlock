@@ -76,6 +76,34 @@ class PurchaseOrderRepository extends ServiceEntityRepository
         return ['data' => $purchaseOrdersPerPage, 'total' => count($purchaseOrders)];
     }
 
+    /**
+     * @param array $param
+     * @return array
+     */
+    public function getDataForReport(array $param): array
+    {
+        $queryBuilder = $this->createQueryBuilder('o')
+            ->andWhere('o.deleteAt IS NULL')
+            ->orderBy('o.createAt', 'ASC');
+
+        if (isset($param['status']) && !empty($param['status'])) {
+            $queryBuilder->andWhere('o.status = :status')
+                ->setParameter('status', $param['status']);
+        }
+
+        if (isset($param['fromDate']) && !empty($param['fromDate'])) {
+            $queryBuilder->andWhere('o.createAt >= :fromDate')
+                ->setParameter('fromDate', $param['fromDate'] . ' 00:00:00');
+        }
+
+        if (isset($param['toDate']) && !empty($param['toDate'])) {
+            $queryBuilder->andWhere('o.createAt <= :toDate')
+                ->setParameter('toDate', $param['toDate'] . ' 23:59:59');
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     // /**
     //  * @return PurchaseOrder[] Returns an array of PurchaseOrder objects
     //  */

@@ -126,7 +126,7 @@ class CartControllerTest extends BaseWebTestCase
         $cartItems = $this->cartRepository->findBy(['user' => $user->getId()]);
         $this->assertNotEmpty($cartItems);
         $this->assertCount(1, $cartItems);
-        $this->assertEquals($productItem->getId(), $cartItems[0]->getProductItem()->getId());        
+        $this->assertEquals($productItem->getId(), $cartItems[0]->getProductItem()->getId());
         $this->assertEquals(1, $cartItems[0]->getAmount());
         $this->assertEquals(365000, $cartItems[0]->getPrice());
     }

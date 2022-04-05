@@ -49,6 +49,7 @@ class Size
     public function __construct()
     {
         $this->productItems = new ArrayCollection();
+        $this->createAt = new \DateTime("now");
     }
 
     public function getId(): ?int
@@ -73,9 +74,9 @@ class Size
         return $this->createAt;
     }
 
-    public function setCreateAt(): self
+    public function setCreateAt(?\DateTimeInterface $createAt): self
     {
-        $this->createAt = new \DateTime('now');;
+        $this->createAt = $createAt;
 
         return $this;
     }

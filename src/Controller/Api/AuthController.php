@@ -6,9 +6,9 @@ use App\Controller\ApiController;
 use App\Entity\User;
 use App\Form\UserRegisterType;
 use App\Repository\UserRepository;
-use App\Service\HandleDataOutput;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,23 +17,26 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class AuthController extends ApiController
 {
+    /** @var UserRepository */
     private $userRepository;
-    private $handleDataOutput;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(
         UserRepository $userRepository,
-        HandleDataOutput $handleDataOutput
+        LoggerInterface $logger
     ) {
         $this->userRepository = $userRepository;
-        $this->handleDataOutput = $handleDataOutput;
+        $this->logger = $logger;
     }
 
     /**
-    * @Rest\Post("/register")
-    * @param Request $request
-    * @param UserPasswordHasherInterface $encoder
-    * @return Response
-    */
+     * @Rest\Post("/register")
+     * @param Request $request
+     * @param UserPasswordHasherInterface $encoder
+     * @return Response
+     */
     public function register(Request $request, UserPasswordHasherInterface $encoder): Response
     {
         try {
@@ -45,22 +48,20 @@ class AuthController extends ApiController
             if ($form->isSubmitted() && $form->isValid()) {
                 $user->setPassword($encoder->hashPassword($user, $payload['password']));
                 $user->setRoles(['ROLE_USER']);
-                $user->setCreateAt(new \DateTime("now"));
-
                 $this->userRepository->add($user);
-                if (!empty($user->getId())) {
-                    return $this->handleView($this->view(
-                        ['success' => 'Insert user successfully'],
-                        Response::HTTP_CREATED
-                    ));
-                }
+
+                return $this->handleView($this->view(
+                    ['success' => 'Insert user successfully'],
+                    Response::HTTP_CREATED
+                ));
             }
 
-            $errorsMessage = $this->handleDataOutput->getFormErrorMessage($form);
-
-            return $this->handleView($this->view(['error' => $errorsMessage], Response::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view(
+                ['error' => $this->getFormErrorMessage($form)],
+                Response::HTTP_BAD_REQUEST
+            ));
         } catch (\Exception $e) {
-            //Need to add log the error message
+            $this->logger->error($e->getMessage());
         }
 
         return $this->handleView($this->view(
@@ -70,11 +71,11 @@ class AuthController extends ApiController
     }
 
     /**
-    * @Rest\Post ("/login_check")
-    * @param UserInterface $user
-    * @param JWTTokenManagerInterface $JWTManager
-    * @return JsonResponse
-    */
+     * @Rest\Post ("/login_check")
+     * @param UserInterface $user
+     * @param JWTTokenManagerInterface $JWTManager
+     * @return JsonResponse
+     */
     public function getTokenUser(UserInterface $user, JWTTokenManagerInterface $JWTManager): JsonResponse
     {
         return new JsonResponse(['token' => $JWTManager->create($user)]);

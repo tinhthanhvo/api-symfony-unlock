@@ -62,6 +62,7 @@ class Category
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->createAt = new \DateTime("now");
     }
 
     public function getId(): ?int
@@ -86,9 +87,9 @@ class Category
         return $this->createAt;
     }
 
-    public function setCreateAt(): self
+    public function setCreateAt(?\DateTimeInterface $createAt): self
     {
-        $this->createAt = new \DateTime('now');;
+        $this->createAt = $createAt;
 
         return $this;
     }

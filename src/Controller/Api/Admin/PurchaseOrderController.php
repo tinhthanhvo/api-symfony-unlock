@@ -52,7 +52,7 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $status = $request->get('status');
 
-        if($status != $purchaseOrder->getStatus()) {
+        if ($status != $purchaseOrder->getStatus()) {
             $purchaseOrder->setStatus($status);
             $purchaseOrder->setUpdateAt(new \DateTime('now'));
         }

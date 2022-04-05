@@ -38,8 +38,8 @@ class UserRegisterType extends AbstractType
                     new Length([
                         'max' => 100,
                         'maxMessage' => 'Full name cannot be longer than 100 characters.',
-                    ])
-                ]
+                    ]),
+                ],
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
@@ -54,8 +54,8 @@ class UserRegisterType extends AbstractType
                     new Regex([
                         'pattern' => '/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix',
                         'message' => "Email is incorrect."
-                    ])
-                ]
+                    ]),
+                ],
             ])
             ->add('phoneNumber', TextType::class, [
                 'label' => 'Phone number',
@@ -66,8 +66,8 @@ class UserRegisterType extends AbstractType
                     new Regex([
                         'pattern' => '/^[0-9]{10,20}$/',
                         'message' => "Phone number is incorrect."
-                    ])
-                ]
+                    ]),
+                ],
             ])
             ->add('password', PasswordType::class, [
                 'label' => 'Password',
@@ -78,8 +78,8 @@ class UserRegisterType extends AbstractType
                     new Regex([
                         'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/',
                         'message' => "Password is incorrect."
-                    ])
-                ]
+                    ]),
+                ],
             ])
             ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
                 $form = $event->getForm();

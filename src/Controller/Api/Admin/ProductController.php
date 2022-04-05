@@ -133,6 +133,15 @@ class ProductController extends AbstractFOSRestController
         if ($form->isSubmitted()) {
             $product->setCreateAt(new \DateTime());
 
+            $galleryData = $request->files->get('gallery');
+            foreach ($galleryData as $image) {
+                $saveFile = $fileUploader->upload($image);
+                $saveFile = self::PATH . $saveFile;
+                $gallery = new Gallery();
+                $gallery->setPath($saveFile);
+                $product->addGallery($gallery);
+            }
+
             $productItemsData = (json_decode($requestData['items'][0], true));
             foreach ($productItemsData as $productItemData) {
                 if($productItemData['amount'] < 0) {
@@ -142,7 +151,6 @@ class ProductController extends AbstractFOSRestController
                 }
 
                 $productItem = new ProductItem();
-                $productItem->setCreateAt(new \DateTime());
                 $size = $this->sizeRepository->find($productItemData['size']);
                 $productItem->setSize($size);
                 $productItem->setProduct($product);

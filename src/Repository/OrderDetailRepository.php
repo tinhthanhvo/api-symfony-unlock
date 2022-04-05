@@ -56,6 +56,43 @@ class OrderDetailRepository extends ServiceEntityRepository
             $this->_em->flush();
         }
     }
+    
+    /**
+     * @param int|null $product_id
+     * @return array
+     */
+    public function getListDateOrder(?int $product_id): array
+    {
+        $queryBuilder = $this->createQueryBuilder('o')
+            ->andWhere('o.deleteAt IS NULL')
+            ->orderBy('o.createAt', 'ASC');
+
+        if (!empty($product_id)) {
+            $queryBuilder->innerJoin('o.productItem', 'pi', 'WITH', 'pi.product = :product')
+                ->setParameter('product', $product_id);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param array $param
+     * @return array
+     */
+    public function sumOrderDetailData(array $param): array
+    {
+        return $this->createQueryBuilder('o')
+            ->select('SUM(o.amount) AS sum_quantity')
+            ->groupBy('o.productItem')
+            ->addSelect('SUM(o.price) AS sum_amount')
+            ->groupBy('o.productItem')
+            ->andWhere('o.deleteAt IS NULL')
+            ->andWhere('o.productItem = :product_item_id')
+            ->andWhere('o.createAt LIKE :order_date')
+            ->setParameters($param)
+            ->getQuery()
+            ->getResult();
+    }
 
     // /**
     //  * @return OrderDetail[] Returns an array of OrderDetail objects

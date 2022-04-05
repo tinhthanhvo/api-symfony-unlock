@@ -36,8 +36,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         ProductItemRepository $productItemRepository,
         CartRepository $cartRepository,
         EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
         $this->purchaseOrderRepository = $purchaseOrderRepository;
         $this->userLoginInfo = $userLogin->getUserLoginInfo();
         $this->productItemRepository = $productItemRepository;
@@ -172,7 +171,7 @@ class PurchaseOrderController extends AbstractFOSRestController
 
         return $this->handleView($this->view([
             'error' => 'Something went wrong! Please contact support.'
-        ],Response::HTTP_INTERNAL_SERVER_ERROR));
+        ], Response::HTTP_INTERNAL_SERVER_ERROR));
     }
 
     private function dataTransferOrderObject(PurchaseOrder $purchaseOrder): array
@@ -228,7 +227,7 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $statusResponse = 'Pending';
         switch ($status) {
-           case '2':
+            case '2':
                 $statusResponse = 'Approved';
                 break;
             case '3':

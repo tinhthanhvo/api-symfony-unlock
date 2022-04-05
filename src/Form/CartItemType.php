@@ -27,8 +27,8 @@ class CartItemType extends AbstractType
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Product item cannot be null.',
-                    ])
-                ]
+                    ]),
+                ],
             ])
             ->add('amount', IntegerType::class, [
                 'label' => 'Amount',
@@ -38,8 +38,8 @@ class CartItemType extends AbstractType
                     ]),
                     new Positive([
                         'message' => 'Amount of item have to be a positive number.',
-                    ])
-                ]
+                    ]),
+                ],
             ])
             ->add('price', MoneyType::class, [
                 'label' => 'Price',
@@ -49,8 +49,8 @@ class CartItemType extends AbstractType
                     ]),
                     new Positive([
                         'message' => 'Total price have to be a positive number.',
-                    ])
-                ]
+                    ]),
+                ],
             ])
             ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
                 $form = $event->getForm();
