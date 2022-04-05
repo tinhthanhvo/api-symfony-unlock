@@ -69,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $deleteAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="user", cascade={"persist"})
      */
     private $carts;
 

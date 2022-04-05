@@ -69,8 +69,6 @@ class PurchaseOrderType extends AbstractType
                     ]),
                 ]
             ])
-            ->add('totalPrice', NumberType::class)
-            ->add('amount', NumberType::class)
         ;
     }
 
