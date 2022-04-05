@@ -62,7 +62,7 @@ class ProductItem
     private $size;
 
     /**
-     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="productItem", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="productItem", orphanRemoval=true, cascade={"persist"})
      */
     private $orderDetails;
 

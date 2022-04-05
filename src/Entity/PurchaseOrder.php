@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\OrderRepository;
+use App\Repository\PurchaseOrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity(repositoryClass=OrderRepository::class)
+ * @ORM\Entity(repositoryClass=PurchaseOrderRepository::class)
  */
-class Order
+class PurchaseOrder
 {
     /**
      * @ORM\Id()
@@ -19,11 +19,6 @@ class Order
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $sku;
 
     /**
      * @ORM\Column(type="string", length=25)
@@ -61,7 +56,7 @@ class Order
     private $amount;
 
     /**
-     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="order", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="purchaseOrder", orphanRemoval=true, cascade={"persist"})
      */
     private $orderItems;
 
@@ -86,7 +81,7 @@ class Order
     private $recipientEmail;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
@@ -99,18 +94,6 @@ class Order
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getSku(): ?string
-    {
-        return $this->sku;
-    }
-
-    public function setSku(string $sku): self
-    {
-        $this->sku = $sku;
-
-        return $this;
     }
 
     public function getStatus(): ?string
@@ -209,7 +192,7 @@ class Order
     {
         if (!$this->orderItems->contains($orderItem)) {
             $this->orderItems[] = $orderItem;
-            $orderItem->setOrder($this);
+            $orderItem->setPurchaseOrder($this);
         }
 
         return $this;
@@ -219,8 +202,8 @@ class Order
     {
         if ($this->orderItems->removeElement($orderItem)) {
             // set the owning side to null (unless already changed)
-            if ($orderItem->getOrder() === $this) {
-                $orderItem->setOrder(null);
+            if ($orderItem->getPurchaseOrder() === $this) {
+                $orderItem->setPurchaseOrder(null);
             }
         }
 
