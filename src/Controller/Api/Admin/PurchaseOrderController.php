@@ -38,8 +38,8 @@ class PurchaseOrderController extends AbstractFOSRestController
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
         $offset = $limit * ($page - 1);
 
-        $purchaseOrders = $this->purchaseOrderRepository->findWithPaging([], ['status' => 'ASC'], $limit, $offset);
-        $purchaseOrders['data'] = array_map('self::dataTransferDetailOrderObject', $purchaseOrders['data']);
+        $purchaseOrders = $this->purchaseOrderRepository->findByConditions([], ['status' => 'ASC'], $limit, $offset);
+        $purchaseOrders['data'] = array_map('self::dataTransferOrderObject', $purchaseOrders['data']);
         return $this->handleView($this->view($purchaseOrders, Response::HTTP_OK));
     }
 
@@ -59,16 +59,12 @@ class PurchaseOrderController extends AbstractFOSRestController
 
         $this->purchaseOrderRepository->add($purchaseOrder);
 
-        $purchaseOrder = self::dataTransferDetailOrderObject($purchaseOrder);
+        $purchaseOrder = self::dataTransferOrderObject($purchaseOrder);
 
         return $this->handleView($this->view($purchaseOrder, Response::HTTP_OK));
     }
 
-    /**
-     * @param PurchaseOrder $purchaseOrder
-     * @return array
-     */
-    private function dataTransferDetailOrderObject(PurchaseOrder $purchaseOrder): array
+    private function dataTransferOrderObject(PurchaseOrder $purchaseOrder): array
     {
         $formattedPurchaseOrder = [];
         $formattedPurchaseOrder['id'] = $purchaseOrder->getId();
@@ -103,6 +99,12 @@ class PurchaseOrderController extends AbstractFOSRestController
         $item['amount'] = $orderDetail->getAmount();
         $item['unitPrice'] = $productItem->getProduct()->getPrice();
         $item['price'] = $orderDetail->getPrice();
+
+        $item['gallery'] = "";
+        $gallery = $orderDetail->getProductItem()->getProduct()->getGallery();
+        if (count($gallery) > 0) {
+            $item['gallery'] = $gallery[0]->getPath();
+        }
 
         return $item;
     }

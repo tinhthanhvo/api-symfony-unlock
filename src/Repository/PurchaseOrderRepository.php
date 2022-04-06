@@ -45,9 +45,15 @@ class PurchaseOrderRepository extends ServiceEntityRepository
         }
     }
 
-    public function findWithPaging(array $param, $orderBy, $limit, $offset): array
+    public function findByConditions(array $param, $orderBy, $limit, $offset): array
     {
         $queryBuilder = $this->createQueryBuilder('o');
+
+        if (isset($param['status']) && $param['status'] != 0) {
+            $queryBuilder
+                ->andWhere('o.status = :status')
+                ->setParameter('status', $param['status']);
+        }
 
         if (!empty($orderBy)) {
             $keyOrderList = array_keys($orderBy);
