@@ -3,7 +3,6 @@
 namespace App\Controller\Api;
 
 use App\Entity\OrderDetail;
-use App\Entity\ProductItem;
 use App\Entity\PurchaseOrder;
 use App\Form\PurchaseOrderType;
 use App\Repository\CartRepository;
@@ -11,8 +10,6 @@ use App\Repository\ProductItemRepository;
 use App\Repository\PurchaseOrderRepository;
 use App\Service\GetUserInfo;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use JMS\Serializer\SerializationContext;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -47,7 +44,8 @@ class PurchaseOrderController extends AbstractFOSRestController
     */
     public function getOrdersAction(): Response
     {
-        $orders = $this->purchaseOrderRepository->findBy(['deleteAt' => null], ['createAt' => 'DESC']);
+        $userId = $this->userLoginInfo->getId();
+        $orders = $this->purchaseOrderRepository->findBy(['deleteAt' => null, 'customer' => $userId], ['createAt' => 'DESC']);
         $transferOrders = array_map('self::dataTransferObject', $orders);
 
         return $this->handleView($this->view($transferOrders, Response::HTTP_OK));
@@ -70,50 +68,39 @@ class PurchaseOrderController extends AbstractFOSRestController
      */
     public function addOrderAction(Request $request): Response
     {
-        $order = new PurchaseOrder();
+        $order = new PurchaseOrder($this->userLoginInfo);
         $form = $this->createForm(PurchaseOrderType::class, $order);
         $requestData = $request->request->all();
-
         $form->submit($requestData);
 
+        $totalPrice = 0;
+        $totalAmount = 0;
         if ($form->isSubmitted()) {
-            $order->setCreateAt(new \DateTime());
-            $order->setStatus('Pending');
-            $order->setCustomer($this->userLoginInfo);
-
-            $totalPrice = 0;
-            $totalAmount = 0;
-
             $cartItemsData = $this->userLoginInfo->getCarts();
             foreach ($cartItemsData as $cartItemData){
-                $amount = $cartItemData->getAmount();
-
                 $productItem = $cartItemData->getProductItem();
+                $amount = intval($cartItemData->getAmount());
+
                 if($amount > $productItem->getAmount()) {
-                    return $this->handleView($this->view([
-                        'error' => 'Quantity is not enough.'
-                    ], Response::HTTP_BAD_REQUEST));
+                    return $this->handleView($this->view(['error' => 'Quantity is not enough.'], Response::HTTP_BAD_REQUEST));
                 }
-                $price = $cartItemData->getPrice() * $amount;
 
-                $totalPrice += $price;
+                $price = intval($cartItemData->getPrice()) * $amount;
+                $totalPrice += intval($price);
                 $totalAmount += $amount;
-
                 $orderDetail = new OrderDetail();
-                $orderDetail->setCreateAt();
                 $orderDetail->setAmount($amount);
                 $orderDetail->setPrice($price);
 
                 $productItem->setAmount($productItem->getAmount() - $amount);
                 $this->productItemRepository->add($productItem);
-
                 $orderDetail->setProductItem($productItem);
 
                 $order->addOrderItem($orderDetail);
-                $order->setTotalPrice($totalPrice);
-                $order->setAmount($totalAmount);
                 $this->cartRepository->remove($cartItemData);
             }
+            $order->setTotalPrice($totalPrice);
+            $order->setAmount($totalAmount);
 
             $this->purchaseOrderRepository->add($order);
             $transferPurchaseOrder = self::dataTransferDetailOrderObject($order);
@@ -133,8 +120,9 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         try {
             $status = $purchaseOrder->getStatus();
-            if ($status == 'Pending') {
-                $purchaseOrder->setStatus('Canceled');
+
+            if ($status == '1') {
+                $purchaseOrder->setStatus('3');
                 $purchaseOrder->setUpdateAt(new \DateTime());
                 $purchaseOrder->setDeleteAt(new \DateTime());
 
@@ -148,8 +136,9 @@ class PurchaseOrderController extends AbstractFOSRestController
                 }
 
                 $this->purchaseOrderRepository->add($purchaseOrder);
+                $transferPurchaseOrder = self::dataTransferDetailOrderObject($purchaseOrder);
 
-                return $this->handleView($this->view($purchaseOrder, Response::HTTP_OK));
+                return $this->handleView($this->view($transferPurchaseOrder, Response::HTTP_OK));
             }
 
             return $this->handleView($this->view(['error' => 'This order is approved. So, your request is failed.'], Response::HTTP_BAD_REQUEST));
@@ -171,7 +160,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         $formattedPurchaseOrder['recipientEmail'] = $purchaseOrder->getRecipientEmail();
         $formattedPurchaseOrder['recipientPhone'] = $purchaseOrder->getRecipientPhone();
         $formattedPurchaseOrder['addressDelivery'] = $purchaseOrder->getAddressDelivery();
-        $formattedPurchaseOrder['status'] = $purchaseOrder->getStatus();
+        $formattedPurchaseOrder['status'] = self::formattedStatusOrderResponse($purchaseOrder->getStatus());
         $formattedPurchaseOrder['amount'] = $purchaseOrder->getAmount();
         $formattedPurchaseOrder['totalPrice'] = $purchaseOrder->getTotalPrice();
 
@@ -186,7 +175,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         $formattedPurchaseOrder['recipientEmail'] = $purchaseOrder->getRecipientEmail();
         $formattedPurchaseOrder['recipientPhone'] = $purchaseOrder->getRecipientPhone();
         $formattedPurchaseOrder['addressDelivery'] = $purchaseOrder->getAddressDelivery();
-        $formattedPurchaseOrder['status'] = $purchaseOrder->getStatus();
+        $formattedPurchaseOrder['status'] = self::formattedStatusOrderResponse($purchaseOrder->getStatus());
         $formattedPurchaseOrder['amount'] = $purchaseOrder->getAmount();
         $formattedPurchaseOrder['totalPrice'] = $purchaseOrder->getTotalPrice();
 
@@ -215,5 +204,27 @@ class PurchaseOrderController extends AbstractFOSRestController
         $item['price'] = $orderDetail->getPrice();
 
         return $item;
+    }
+
+    /**
+     * @param string $status
+     * @return string
+     */
+    private function formattedStatusOrderResponse(string $status): string
+    {
+        $statusResponse = 'Pending';
+        switch ($status) {
+           case '2':
+                $statusResponse = 'Approved';
+                break;
+            case '3':
+                $statusResponse = 'Canceled';
+                break;
+            case '4':
+                $statusResponse = 'Completed';
+                break;
+        }
+
+        return $statusResponse;
     }
 }

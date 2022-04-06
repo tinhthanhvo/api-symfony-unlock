@@ -55,6 +55,11 @@ class OrderDetail
      */
     private $productItem;
 
+    public function __construct()
+    {
+        $this->setCreateAt();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
