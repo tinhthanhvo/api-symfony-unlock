@@ -86,8 +86,13 @@ class PurchaseOrder
      */
     private $customer;
 
-    public function __construct()
+    public function __construct(User $user)
     {
+        $this->setCreateAt();
+        $this->setCustomer($user);
+        $this->setStatus('1');
+        $this->setAmount(0);
+        $this->setTotalPrice(0);
         $this->orderItems = new ArrayCollection();
     }
 

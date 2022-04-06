@@ -45,6 +45,29 @@ class PurchaseOrderRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWithPaging(array $param, $orderBy, $limit, $offset): array
+    {
+        $queryBuilder = $this->createQueryBuilder('o');
+
+        if (!empty($orderBy)) {
+            $keyOrderList = array_keys($orderBy);
+            $column = 'o.' . $keyOrderList[0];
+            $valueSort = $orderBy[$keyOrderList[0]];
+            $queryBuilder
+                ->orderBy($column, $valueSort);
+        }
+
+        $purchaseOrders = $queryBuilder->getQuery()->getScalarResult();
+
+        $purchaseOrdersPerPage = $queryBuilder
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->execute();
+
+        return ['data' => $purchaseOrdersPerPage, 'total' => count($purchaseOrders)];
+    }
+
     // /**
     //  * @return PurchaseOrder[] Returns an array of PurchaseOrder objects
     //  */
