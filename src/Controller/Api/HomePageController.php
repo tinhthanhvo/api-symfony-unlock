@@ -4,8 +4,11 @@ namespace App\Controller\Api;
 
 use App\Entity\Product;
 use App\Entity\ProductItem;
+use App\Entity\User;
+use App\Repository\CartRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
+use App\Service\GetUserInfo;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\Serializer\SerializationContext;
@@ -20,11 +23,26 @@ class HomePageController extends AbstractFOSRestController
     public const ORDER_BY_DEFAULT = ['createAt' => 'DESC'];
     private $productRepository;
     private $categoryRepository;
+    /**
+     * @var User|null
+     */
+    private $userLoginInfo;
+    /**
+     * @var CartRepository
+     */
+    private $cartRepository;
 
-    public function __construct(ProductRepository $productRepository, CategoryRepository $categoryRepository)
+    public function __construct(
+        ProductRepository $productRepository,
+        GetUserInfo $userLogin,
+        CategoryRepository $categoryRepository,
+        CartRepository $cartRepository
+    )
     {
         $this->productRepository = $productRepository;
+        $this->userLoginInfo = $userLogin->getUserLoginInfo();
         $this->categoryRepository = $categoryRepository;
+        $this->cartRepository = $cartRepository;
     }
 
     /**
@@ -154,6 +172,20 @@ class HomePageController extends AbstractFOSRestController
         $item = [];
         $item['id'] = $productItem->getId();
         $item['amount'] = $productItem->getAmount();
+
+        $item['amountInCart'] = 0;
+        if ($this->userLoginInfo) {
+            $cartItems = $this->cartRepository->findOneBy([
+                'deleteAt' => null,
+                'user' => $this->userLoginInfo->getId(),
+                'productItem' => $productItem->getId()
+            ]);
+
+            if ($cartItems) {
+                $item['amountInCart'] = $cartItems->getAmount();
+            }
+        }
+        
         $item['size'] = $productItem->getSize()->getValue();
 
         return $item;
