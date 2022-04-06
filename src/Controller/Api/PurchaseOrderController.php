@@ -20,6 +20,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 */
 class PurchaseOrderController extends AbstractFOSRestController
 {
+    public const PRODUCT_PER_PAGE = 10;
+    public const PRODUCT_PAGE_NUMBER = 1;
     private $purchaseOrderRepository;
     private $productItemRepository;
     private $userLoginInfo;
@@ -42,13 +44,17 @@ class PurchaseOrderController extends AbstractFOSRestController
     * @Rest\Get("/users/orders")
     * @return Response
     */
-    public function getOrdersAction(): Response
+    public function getOrdersAction(Request $request): Response
     {
         $userId = $this->userLoginInfo->getId();
-        $orders = $this->purchaseOrderRepository->findBy(['deleteAt' => null, 'customer' => $userId], ['createAt' => 'DESC']);
-        $transferOrders = array_map('self::dataTransferObject', $orders);
+        $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
+        $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
+        $offset = $limit * ($page - 1);
+        $filterByStatus = $request->get('status', 0);
+        $orders = $this->purchaseOrderRepository->findByConditions(['deleteAt' => null, 'customer' => $userId, 'status' => $filterByStatus], ['status' => 'ASC'], $limit, $offset);
+        $orders['data'] = array_map('self::dataTransferOrderObject', $orders['data']);
 
-        return $this->handleView($this->view($transferOrders, Response::HTTP_OK));
+        return $this->handleView($this->view($orders, Response::HTTP_OK));
     }
 
     /**
@@ -57,7 +63,7 @@ class PurchaseOrderController extends AbstractFOSRestController
      */
     public function getOrderAction(PurchaseOrder $purchaseOrder): Response
     {
-        $transferPurchaseOrder = self::dataTransferDetailOrderObject($purchaseOrder);
+        $transferPurchaseOrder = self::dataTransferOrderObject($purchaseOrder);
 
         return $this->handleView($this->view($transferPurchaseOrder, Response::HTTP_OK));
     }
@@ -82,7 +88,7 @@ class PurchaseOrderController extends AbstractFOSRestController
                 $amount = intval($cartItemData->getAmount());
 
                 if($amount > $productItem->getAmount()) {
-                    return $this->handleView($this->view(['error' => 'Quantity is not enough.'], Response::HTTP_BAD_REQUEST));
+                    return $this->handleView($this->view(['error' => 'Amount of available product is not enough!'], Response::HTTP_BAD_REQUEST));
                 }
 
                 $price = intval($cartItemData->getPrice()) * $amount;
@@ -103,7 +109,7 @@ class PurchaseOrderController extends AbstractFOSRestController
             $order->setAmount($totalAmount);
 
             $this->purchaseOrderRepository->add($order);
-            $transferPurchaseOrder = self::dataTransferDetailOrderObject($order);
+            $transferPurchaseOrder = self::dataTransferOrderObject($order);
 
             return $this->handleView($this->view($transferPurchaseOrder, Response::HTTP_CREATED));
         }
@@ -124,7 +130,6 @@ class PurchaseOrderController extends AbstractFOSRestController
             if ($status == '1') {
                 $purchaseOrder->setStatus('3');
                 $purchaseOrder->setUpdateAt(new \DateTime());
-                $purchaseOrder->setDeleteAt(new \DateTime());
 
                 $items = $purchaseOrder->getOrderItems();
                 foreach ($items as $item) {
@@ -136,12 +141,13 @@ class PurchaseOrderController extends AbstractFOSRestController
                 }
 
                 $this->purchaseOrderRepository->add($purchaseOrder);
-                $transferPurchaseOrder = self::dataTransferDetailOrderObject($purchaseOrder);
 
-                return $this->handleView($this->view($transferPurchaseOrder, Response::HTTP_OK));
+                return $this->handleView($this->view(['success' => 'Order is canceled!'], Response::HTTP_NO_CONTENT));
             }
 
-            return $this->handleView($this->view(['error' => 'This order is approved. So, your request is failed.'], Response::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view([
+                'error' => 'This order is approved. So, your request is failed.'
+            ], Response::HTTP_BAD_REQUEST));
         }
         catch (\Exception $e) {
             //write to log
@@ -152,22 +158,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         ],Response::HTTP_INTERNAL_SERVER_ERROR));
     }
 
-    private function dataTransferObject(PurchaseOrder $purchaseOrder): array
-    {
-        $formattedPurchaseOrder = [];
-        $formattedPurchaseOrder['id'] = $purchaseOrder->getId();
-        $formattedPurchaseOrder['recipientName'] = $purchaseOrder->getRecipientName();
-        $formattedPurchaseOrder['recipientEmail'] = $purchaseOrder->getRecipientEmail();
-        $formattedPurchaseOrder['recipientPhone'] = $purchaseOrder->getRecipientPhone();
-        $formattedPurchaseOrder['addressDelivery'] = $purchaseOrder->getAddressDelivery();
-        $formattedPurchaseOrder['status'] = self::formattedStatusOrderResponse($purchaseOrder->getStatus());
-        $formattedPurchaseOrder['amount'] = $purchaseOrder->getAmount();
-        $formattedPurchaseOrder['totalPrice'] = $purchaseOrder->getTotalPrice();
-
-        return $formattedPurchaseOrder;
-    }
-
-    private function dataTransferDetailOrderObject(PurchaseOrder $purchaseOrder): array
+    private function dataTransferOrderObject(PurchaseOrder $purchaseOrder): array
     {
         $formattedPurchaseOrder = [];
         $formattedPurchaseOrder['id'] = $purchaseOrder->getId();
@@ -202,6 +193,12 @@ class PurchaseOrderController extends AbstractFOSRestController
         $item['amount'] = $orderDetail->getAmount();
         $item['unitPrice'] = $productItem->getProduct()->getPrice();
         $item['price'] = $orderDetail->getPrice();
+
+        $item['gallery'] = "";
+        $gallery = $orderDetail->getProductItem()->getProduct()->getGallery();
+        if (count($gallery) > 0) {
+            $item['gallery'] = $gallery[0]->getPath();
+        }
 
         return $item;
     }
