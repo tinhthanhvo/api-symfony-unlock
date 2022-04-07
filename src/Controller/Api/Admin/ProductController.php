@@ -111,7 +111,12 @@ class ProductController extends AbstractFOSRestController
         $existedProduct = $this->productRepository->findOneBy([
             'name' => $requestData['name']
         ]);
-        if ($existedProduct && $existedProduct->getColor()->getId() == $requestData['color']) {
+        if (
+            $existedProduct &&
+            $existedProduct->getColor()->getId() == $requestData['color'] &&
+            $existedProduct->getCategory()->getId() == $requestData['category']
+        )
+        {
             return $this->handleView($this->view(['error' => 'This product is existed.'], Response::HTTP_BAD_REQUEST));
         }
 
