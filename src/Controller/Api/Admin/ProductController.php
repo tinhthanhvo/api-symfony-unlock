@@ -26,7 +26,7 @@ class ProductController extends AbstractFOSRestController
 {
     public const PRODUCT_PER_PAGE = 10;
     public const PRODUCT_PAGE_NUMBER = 1;
-    public const PATH = '127.0.0.1:8080/uploads/images/';
+    public const PATH = 'http://127.0.0.1:8080/uploads/images/';
     private $productRepository;
     private $sizeRepository;
     /**
