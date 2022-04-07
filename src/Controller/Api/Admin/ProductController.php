@@ -2,11 +2,14 @@
 
 namespace App\Controller\Api\Admin;
 
+use App\Entity\Cart;
 use App\Entity\Gallery;
 use App\Entity\Product;
 use App\Entity\ProductItem;
 use App\Form\ProductType;
 use App\Form\ProductUpdateType;
+use App\Repository\CartRepository;
+use App\Repository\GalleryRepository;
 use App\Repository\ProductItemRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SizeRepository;
@@ -35,15 +38,21 @@ class ProductController extends AbstractFOSRestController
      * @var ProductItemRepository
      */
     private $productItemRepository;
+    private $cartRepository;
+    private $galleryRepository;
 
     public function __construct(
         ProductRepository $productRepository,
         SizeRepository $sizeRepository,
-        ProductItemRepository $productItemRepository
+        ProductItemRepository $productItemRepository,
+        CartRepository $cartRepository,
+        GalleryRepository $galleryRepository
     ) {
         $this->productRepository = $productRepository;
         $this->sizeRepository = $sizeRepository;
         $this->productItemRepository = $productItemRepository;
+        $this->cartRepository = $cartRepository;
+        $this->galleryRepository = $galleryRepository;
     }
 
     /**
@@ -124,18 +133,14 @@ class ProductController extends AbstractFOSRestController
         if ($form->isSubmitted()) {
             $product->setCreateAt(new \DateTime());
 
-            $galleryData = $request->files->get('gallery');
-            foreach ($galleryData as $image) {
-                $saveFile = $fileUploader->upload($image);
-                $saveFile = self::PATH . $saveFile;
-                $gallery = new Gallery();
-                $gallery->setCreateAt(new \DateTime());
-                $gallery->setPath($saveFile);
-                $product->addGallery($gallery);
-            }
-
             $productItemsData = (json_decode($requestData['items'][0], true));
             foreach ($productItemsData as $productItemData) {
+                if($productItemData['amount'] < 0) {
+                    return $this->handleView($this->view([
+                        'error' => 'Amount items must be unsigned integer.'
+                    ], Response::HTTP_BAD_REQUEST));
+                }
+
                 $productItem = new ProductItem();
                 $productItem->setCreateAt(new \DateTime());
                 $size = $this->sizeRepository->find($productItemData['size']);
@@ -143,6 +148,21 @@ class ProductController extends AbstractFOSRestController
                 $productItem->setProduct($product);
                 $productItem->setAmount($productItemData['amount']);
                 $product->addItem($productItem);
+            }
+
+            $galleryData = $request->files->get('gallery');
+            if(count($galleryData) != 5) {
+                return $this->handleView($this->view([
+                    'error' => 'You must choose five images to upload for product.'
+                ], Response::HTTP_BAD_REQUEST));
+            }
+            foreach ($galleryData as $image) {
+                $saveFile = $fileUploader->upload($image);
+                $saveFile = self::PATH . $saveFile;
+                $gallery = new Gallery();
+                $gallery->setCreateAt();
+                $gallery->setPath($saveFile);
+                $product->addGallery($gallery);
             }
 
             $this->productRepository->add($product);
@@ -161,26 +181,58 @@ class ProductController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Put("/products/{id}")
+     * @Rest\Post("/products/{id}")
      * @param Request $request
      * @param Product $product
      * @return Response
      */
-    public function updateProductAction(Product $product, Request $request): Response
+    public function updateProductAction(Product $product, Request $request, FileUploader $fileUploader): Response
     {
         $form = $this->createForm(ProductUpdateType::class, $product);
         $requestData = $request->request->all();
+        $existedProducts = $this->productRepository->findBy([
+            'name' => $requestData['name']
+        ]);
+
+        foreach ($existedProducts as $existedProduct) {
+            if($existedProduct->getId() != $product->getId()) {
+                return $this->handleView($this->view(['error' => 'This name is already used.'], Response::HTTP_BAD_REQUEST));
+            }
+        }
+
         $form->submit($request->request->all());
         if ($form->isSubmitted()) {
-            $product->setUpdateAt(new \DateTime());
-            $productItemsData = $requestData['items'];
-
+            $productItemsData = (json_decode($requestData['items'][0], true));
             foreach ($productItemsData as $productItemData) {
+                if(intval($productItemData['amount']) < 0) {
+                    return $this->handleView($this->view([
+                        'error' => 'Amount items must be unsigned integer.'
+                    ], Response::HTTP_BAD_REQUEST));
+                }
                 $productItem = $this->productItemRepository->find($productItemData['id']);
                 $productItem->setAmount($productItemData['amount']);
                 $this->productItemRepository->add($productItem);
                 $product->addItem($productItem);
             }
+
+            $galleryData = $request->files->get('gallery');
+            if(count($galleryData) != 5 && count($galleryData) > 0) {
+                return $this->handleView($this->view([
+                    'error' => 'You must choose five images to upload for product.'
+                ], Response::HTTP_BAD_REQUEST));
+            }
+            if(count($galleryData) == 5) {
+                $gallery = $product->getGallery();
+                foreach ($galleryData as $i => $image) {
+                    $saveFile = $fileUploader->upload($image);
+                    $pathImage = self::PATH . $saveFile;
+                    $gallery[$i]->setPath($pathImage);
+                    $this->galleryRepository->add($gallery[$i]);
+                    $product->addGallery($gallery[$i]);
+                }
+            }
+
+            $product->setUpdateAt(new \DateTime());
             $this->productRepository->add($product);
 
             return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
@@ -214,6 +266,7 @@ class ProductController extends AbstractFOSRestController
                         Response::HTTP_BAD_REQUEST
                     ));
                 }
+
             }
 
             $product->setDeleteAt(new \DateTime());
