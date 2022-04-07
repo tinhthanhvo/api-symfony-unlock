@@ -84,7 +84,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         if ($form->isSubmitted()) {
             $cartItemsData = $this->userLoginInfo->getCarts();
             $amountItemCart = count($cartItemsData);
-            if($amountItemCart > 0) {
+            if($amountItemCart == 0) {
                 return $this->handleView($this->view(['error' => 'Nothing in cart!'], Response::HTTP_BAD_REQUEST));
             }
             foreach ($cartItemsData as $cartItemData){
