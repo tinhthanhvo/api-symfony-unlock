@@ -84,14 +84,14 @@ class ProductRepository extends ServiceEntityRepository
 
         if (isset($orderBy['createAt'])) {
             $queryBuilder
-                ->orderBy('p.createAt', $orderBy['createAt']);
+                ->addOrderBy('p.createAt', $orderBy['createAt']);
         }
         if (!empty($orderBy)) {
             $keyOrderList = array_keys($orderBy);
             $column = 'p.' . $keyOrderList[0];
             $valueSort = $orderBy[$keyOrderList[0]];
             $queryBuilder
-                ->orderBy($column, $valueSort);
+                ->addOrderBy($column, $valueSort);
         }
 
         $products = $queryBuilder->getQuery()->getScalarResult();
