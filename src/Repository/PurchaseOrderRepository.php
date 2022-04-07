@@ -57,10 +57,13 @@ class PurchaseOrderRepository extends ServiceEntityRepository
 
         if (!empty($orderBy)) {
             $keyOrderList = array_keys($orderBy);
-            $column = 'o.' . $keyOrderList[0];
-            $valueSort = $orderBy[$keyOrderList[0]];
-            $queryBuilder
-                ->orderBy($column, $valueSort);
+            foreach ($keyOrderList as $keyOrder) {
+                $column = 'o.' . $keyOrder;
+                $valueSort = $orderBy[$keyOrder];
+                $queryBuilder
+                    ->addOrderBy($column, $valueSort);
+            }
+
         }
 
         $purchaseOrders = $queryBuilder->getQuery()->getScalarResult();

@@ -51,7 +51,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
         $offset = $limit * ($page - 1);
         $filterByStatus = $request->get('status', 0);
-        $orders = $this->purchaseOrderRepository->findByConditions(['deleteAt' => null, 'customer' => $userId, 'status' => $filterByStatus], ['status' => 'ASC'], $limit, $offset);
+        $orders = $this->purchaseOrderRepository->findByConditions(['deleteAt' => null, 'customer' => $userId, 'status' => $filterByStatus], ['status' => 'ASC', 'id' => 'DESC'], $limit, $offset);
         $orders['data'] = array_map('self::dataTransferOrderObject', $orders['data']);
 
         return $this->handleView($this->view($orders, Response::HTTP_OK));
@@ -83,6 +83,10 @@ class PurchaseOrderController extends AbstractFOSRestController
         $totalAmount = 0;
         if ($form->isSubmitted()) {
             $cartItemsData = $this->userLoginInfo->getCarts();
+            $amountItemCart = count($cartItemsData);
+            if($amountItemCart > 0) {
+                return $this->handleView($this->view(['error' => 'Nothing in cart!'], Response::HTTP_BAD_REQUEST));
+            }
             foreach ($cartItemsData as $cartItemData){
                 $productItem = $cartItemData->getProductItem();
                 $amount = intval($cartItemData->getAmount());
@@ -103,12 +107,17 @@ class PurchaseOrderController extends AbstractFOSRestController
                 $orderDetail->setProductItem($productItem);
 
                 $order->addOrderItem($orderDetail);
-                $this->cartRepository->remove($cartItemData);
             }
             $order->setTotalPrice($totalPrice);
             $order->setAmount($totalAmount);
 
             $this->purchaseOrderRepository->add($order);
+
+            if($amountItemCart == count($order->getOrderItems())) {
+                foreach ($cartItemsData as $cartItemData){
+                    $this->cartRepository->remove($cartItemData);
+                }
+            }
             $transferPurchaseOrder = self::dataTransferOrderObject($order);
 
             return $this->handleView($this->view($transferPurchaseOrder, Response::HTTP_CREATED));
