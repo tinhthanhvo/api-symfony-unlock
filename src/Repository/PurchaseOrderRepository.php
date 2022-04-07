@@ -63,7 +63,6 @@ class PurchaseOrderRepository extends ServiceEntityRepository
                 $queryBuilder
                     ->addOrderBy($column, $valueSort);
             }
-
         }
 
         $purchaseOrders = $queryBuilder->getQuery()->getScalarResult();

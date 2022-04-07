@@ -104,7 +104,7 @@ class HomePageController extends AbstractFOSRestController
      */
     public function getProductListFilter(Request $request): Response
     {
-        $filterOptions = json_decode($request->getContent(), true);
+        $filterOptions = (json_decode($request->getContent(), true)) ?? [];
 
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);

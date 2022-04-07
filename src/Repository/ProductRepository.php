@@ -76,16 +76,12 @@ class ProductRepository extends ServiceEntityRepository
                 ->setParameter('categoryId', $param['category']);
         }
 
-        if (isset($param['color']) && $param['color'] != 0) {
+        if (isset($param['color']) && count($param['color']) > 0) {
             $queryBuilder
-                ->andWhere('p.color = :colorId')
-                ->setParameter('colorId', $param['color']);
+                ->andWhere('p.color IN (:colorList)')
+                ->setParameter('colorList', $param['color']);
         }
 
-        if (isset($orderBy['createAt'])) {
-            $queryBuilder
-                ->addOrderBy('p.createAt', $orderBy['createAt']);
-        }
         if (!empty($orderBy)) {
             $keyOrderList = array_keys($orderBy);
             $column = 'p.' . $keyOrderList[0];
@@ -97,6 +93,7 @@ class ProductRepository extends ServiceEntityRepository
         $products = $queryBuilder->getQuery()->getScalarResult();
 
         $productPerPage = $queryBuilder
+            ->addOrderBy('p.id', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset)
             ->getQuery()
