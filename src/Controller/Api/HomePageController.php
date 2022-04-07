@@ -4,17 +4,27 @@ namespace App\Controller\Api;
 
 use App\Entity\Product;
 use App\Entity\ProductItem;
+use App\Entity\PurchaseOrder;
 use App\Entity\User;
+use App\Event\PurchaseOrderEvent;
 use App\Repository\CartRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Service\GetUserInfo;
+use App\Service\MailerService;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mime\Email;
+use Monolog\Handler\SendGridHandler;
+use SendGrid;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class HomePageController extends AbstractFOSRestController
 {
@@ -31,18 +41,21 @@ class HomePageController extends AbstractFOSRestController
      * @var CartRepository
      */
     private $cartRepository;
+    private $eventDispatcher;
 
     public function __construct(
         ProductRepository $productRepository,
         GetUserInfo $userLogin,
         CategoryRepository $categoryRepository,
-        CartRepository $cartRepository
+        CartRepository $cartRepository,
+        EventDispatcherInterface $eventDispatcher
     )
     {
         $this->productRepository = $productRepository;
         $this->userLoginInfo = $userLogin->getUserLoginInfo();
         $this->categoryRepository = $categoryRepository;
         $this->cartRepository = $cartRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -206,5 +219,18 @@ class HomePageController extends AbstractFOSRestController
         );
 
         return $serializer->deserialize($convertToJson, 'array', 'json');
+    }
+
+    /**
+     * @Rest\Get ("/email")
+     * @return Response
+     */
+    public function sendMail(): Response
+    {
+        $purchaseOrder = new PurchaseOrder(new User());
+        $event = new PurchaseOrderEvent($purchaseOrder);
+        $this->eventDispatcher->dispatch($event);
+
+        return $this->handleView($this->view(['success' => 'Send successfully']));
     }
 }
