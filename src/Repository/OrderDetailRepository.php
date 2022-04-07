@@ -45,6 +45,18 @@ class OrderDetailRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function clear(): void
+    {
+        $this->_em->remove($entity);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
+
     // /**
     //  * @return OrderDetail[] Returns an array of OrderDetail objects
     //  */
