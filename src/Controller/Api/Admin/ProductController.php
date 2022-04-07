@@ -11,6 +11,8 @@ use App\Repository\ProductItemRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SizeRepository;
 use App\Service\FileUploader;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\Serializer\SerializationContext;
@@ -180,6 +182,73 @@ class ProductController extends AbstractFOSRestController
         }
 
         return $this->handleView($this->view($form->getErrors(), Response::HTTP_BAD_REQUEST));
+    }
+
+    /**
+     * @Rest\Delete("products/{id}")
+     * @param int $id
+     * @return Response
+     */
+    public function deleteProduct(int $id): Response
+    {
+        try {
+            $product = $this->productRepository->find($id);
+            if (!$product) {
+                return $this->handleView($this->view(
+                    ['error' => 'This product is not existed.'],
+                    Response::HTTP_NOT_FOUND
+                ));
+            }
+
+            $productItems = $product->getItems();
+            foreach ($productItems as $productItem) {
+                if (!self::deleteItem($productItem)) {
+                    self::rollbackDeleteItems($productItems);
+                    return $this->handleView($this->view(
+                        ['error' => 'Deleted product is unsuccessful.'],
+                        Response::HTTP_BAD_REQUEST
+                    ));
+                }
+            }
+
+            $product->setDeleteAt(new \DateTime());
+            $this->productRepository->add($product);
+
+            return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
+        } catch (\Exception $e) {
+            //Need to add log the error message
+        }
+
+        return $this->handleView($this->view(
+            ['error' => 'Something went wrong! Please contact support.'],
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        ));
+    }
+
+    /**
+     * @param ProductItem $item
+     * @return bool
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function deleteItem(ProductItem $item): bool
+    {
+        $item->setDeleteAt(new \DateTime());
+        $this->productItemRepository->add($item);
+        return true;
+    }
+
+    /**
+     * @param array $items
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function rollbackDeleteItems(array $items): void
+    {
+        foreach ($items as $item) {
+            $item->setDeleteAt(null);
+            $this->productItemRepository->add($item);
+        }
     }
 
     /**
