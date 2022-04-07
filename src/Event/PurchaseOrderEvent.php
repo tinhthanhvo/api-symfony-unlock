@@ -12,6 +12,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PurchaseOrderEvent extends Event
 {
+    const TEMPLATE_CONTACT = "email/invoice.html.twig";
     /**
      * @var PurchaseOrder
      */

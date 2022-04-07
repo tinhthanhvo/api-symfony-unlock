@@ -4,12 +4,14 @@ namespace App\Controller\Api;
 
 use App\Entity\OrderDetail;
 use App\Entity\PurchaseOrder;
+use App\Event\PurchaseOrderEvent;
 use App\Form\PurchaseOrderType;
 use App\Repository\CartRepository;
 use App\Repository\ProductItemRepository;
 use App\Repository\PurchaseOrderRepository;
 use App\Service\GetUserInfo;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -26,18 +28,21 @@ class PurchaseOrderController extends AbstractFOSRestController
     private $productItemRepository;
     private $userLoginInfo;
     private $cartRepository;
+    private $eventDispatcher;
 
     public function __construct(
         PurchaseOrderRepository $purchaseOrderRepository,
         GetUserInfo $userLogin,
         ProductItemRepository $productItemRepository,
-        CartRepository $cartRepository
+        CartRepository $cartRepository,
+        EventDispatcherInterface $eventDispatcher
     )
     {
         $this->purchaseOrderRepository = $purchaseOrderRepository;
         $this->userLoginInfo = $userLogin->getUserLoginInfo();
         $this->productItemRepository = $productItemRepository;
         $this->cartRepository = $cartRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -111,6 +116,9 @@ class PurchaseOrderController extends AbstractFOSRestController
             $this->purchaseOrderRepository->add($order);
             $transferPurchaseOrder = self::dataTransferOrderObject($order);
 
+            $event = new PurchaseOrderEvent($order);
+            $this->eventDispatcher->dispatch($event);
+            
             return $this->handleView($this->view($transferPurchaseOrder, Response::HTTP_CREATED));
         }
 

@@ -2,10 +2,10 @@
 
 namespace App\EventSubscriber;
 
+use App\Event\OrderEvent;
 use App\Event\PurchaseOrderEvent;
 use App\Service\MailerService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class OrderSubscriber implements EventSubscriberInterface
 {
@@ -19,21 +19,23 @@ class OrderSubscriber implements EventSubscriberInterface
         $this->mailerService = $mailerService;
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     */
     public function onSendOrder(PurchaseOrderEvent $event)
     {
         $order = $event->getPurchaseOrder();
 
+        $params = [
+            "order" => $order
+        ];
+
         $this->mailerService->send(
-            'Hello',
+            'Confirm order information',
             'tinhthanh2210@gmail.com',
-            'votinhthanh.dev@gmail.com',
-            'Hello world'
+            $order->getRecipientEmail(),
+            PurchaseOrderEvent::TEMPLATE_CONTACT,
+            $params
         );
     }
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents()
     {
         return[
             PurchaseOrderEvent::class => [
