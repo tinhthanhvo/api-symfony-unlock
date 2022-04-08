@@ -36,8 +36,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         ProductItemRepository $productItemRepository,
         CartRepository $cartRepository,
         EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
         $this->purchaseOrderRepository = $purchaseOrderRepository;
         $this->userLoginInfo = $userLogin->getUserLoginInfo();
         $this->productItemRepository = $productItemRepository;
@@ -89,14 +88,14 @@ class PurchaseOrderController extends AbstractFOSRestController
         if ($form->isSubmitted()) {
             $cartItemsData = $this->userLoginInfo->getCarts();
             $amountItemCart = count($cartItemsData);
-            if($amountItemCart == 0) {
+            if ($amountItemCart == 0) {
                 return $this->handleView($this->view(['error' => 'Nothing in cart!'], Response::HTTP_BAD_REQUEST));
             }
-            foreach ($cartItemsData as $cartItemData){
+            foreach ($cartItemsData as $cartItemData) {
                 $productItem = $cartItemData->getProductItem();
                 $amount = intval($cartItemData->getAmount());
 
-                if($amount > $productItem->getAmount()) {
+                if ($amount > $productItem->getAmount()) {
                     return $this->handleView($this->view(['error' => 'Amount of available product is not enough!'], Response::HTTP_BAD_REQUEST));
                 }
 
@@ -118,8 +117,8 @@ class PurchaseOrderController extends AbstractFOSRestController
 
             $this->purchaseOrderRepository->add($order);
 
-            if($amountItemCart == count($order->getOrderItems())) {
-                foreach ($cartItemsData as $cartItemData){
+            if ($amountItemCart == count($order->getOrderItems())) {
+                foreach ($cartItemsData as $cartItemData) {
                     $this->cartRepository->remove($cartItemData);
                 }
             }
@@ -127,7 +126,7 @@ class PurchaseOrderController extends AbstractFOSRestController
 
             $event = new PurchaseOrderEvent($order);
             $this->eventDispatcher->dispatch($event);
-            
+
             return $this->handleView($this->view($transferPurchaseOrder, Response::HTTP_CREATED));
         }
 
@@ -165,14 +164,13 @@ class PurchaseOrderController extends AbstractFOSRestController
             return $this->handleView($this->view([
                 'error' => 'This order is approved. So, your request is failed.'
             ], Response::HTTP_BAD_REQUEST));
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             //write to log
         }
 
         return $this->handleView($this->view([
             'error' => 'Something went wrong! Please contact support.'
-        ],Response::HTTP_INTERNAL_SERVER_ERROR));
+        ], Response::HTTP_INTERNAL_SERVER_ERROR));
     }
 
     private function dataTransferOrderObject(PurchaseOrder $purchaseOrder): array
@@ -228,7 +226,7 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $statusResponse = 'Pending';
         switch ($status) {
-           case '2':
+            case '2':
                 $statusResponse = 'Approved';
                 break;
             case '3':

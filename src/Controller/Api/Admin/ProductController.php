@@ -124,8 +124,7 @@ class ProductController extends AbstractFOSRestController
             $existedProduct &&
             $existedProduct->getColor()->getId() == $requestData['color'] &&
             $existedProduct->getCategory()->getId() == $requestData['category']
-        )
-        {
+        ) {
             return $this->handleView($this->view(['error' => 'This product is existed.'], Response::HTTP_BAD_REQUEST));
         }
 
@@ -133,16 +132,24 @@ class ProductController extends AbstractFOSRestController
         if ($form->isSubmitted()) {
             $product->setCreateAt(new \DateTime());
 
+            $galleryData = $request->files->get('gallery');
+            foreach ($galleryData as $image) {
+                $saveFile = $fileUploader->upload($image);
+                $saveFile = self::PATH . $saveFile;
+                $gallery = new Gallery();
+                $gallery->setPath($saveFile);
+                $product->addGallery($gallery);
+            }
+
             $productItemsData = (json_decode($requestData['items'][0], true));
             foreach ($productItemsData as $productItemData) {
-                if($productItemData['amount'] < 0) {
+                if ($productItemData['amount'] < 0) {
                     return $this->handleView($this->view([
                         'error' => 'Amount items must be unsigned integer.'
                     ], Response::HTTP_BAD_REQUEST));
                 }
 
                 $productItem = new ProductItem();
-                $productItem->setCreateAt(new \DateTime());
                 $size = $this->sizeRepository->find($productItemData['size']);
                 $productItem->setSize($size);
                 $productItem->setProduct($product);
@@ -151,7 +158,7 @@ class ProductController extends AbstractFOSRestController
             }
 
             $galleryData = $request->files->get('gallery');
-            if(count($galleryData) != 5) {
+            if (count($galleryData) != 5) {
                 return $this->handleView($this->view([
                     'error' => 'You must choose five images to upload for product.'
                 ], Response::HTTP_BAD_REQUEST));
@@ -195,7 +202,7 @@ class ProductController extends AbstractFOSRestController
         ]);
 
         foreach ($existedProducts as $existedProduct) {
-            if($existedProduct->getId() != $product->getId()) {
+            if ($existedProduct->getId() != $product->getId()) {
                 return $this->handleView($this->view(['error' => 'This name is already used.'], Response::HTTP_BAD_REQUEST));
             }
         }
@@ -204,7 +211,7 @@ class ProductController extends AbstractFOSRestController
         if ($form->isSubmitted()) {
             $productItemsData = (json_decode($requestData['items'][0], true));
             foreach ($productItemsData as $productItemData) {
-                if(intval($productItemData['amount']) < 0) {
+                if (intval($productItemData['amount']) < 0) {
                     return $this->handleView($this->view([
                         'error' => 'Amount items must be unsigned integer.'
                     ], Response::HTTP_BAD_REQUEST));
@@ -216,12 +223,12 @@ class ProductController extends AbstractFOSRestController
             }
 
             $galleryData = $request->files->get('gallery');
-            if(count($galleryData) != 5 && count($galleryData) > 0) {
+            if (count($galleryData) != 5 && count($galleryData) > 0) {
                 return $this->handleView($this->view([
                     'error' => 'You must choose five images to upload for product.'
                 ], Response::HTTP_BAD_REQUEST));
             }
-            if(count($galleryData) == 5) {
+            if (count($galleryData) == 5) {
                 $gallery = $product->getGallery();
                 foreach ($galleryData as $i => $image) {
                     $saveFile = $fileUploader->upload($image);
@@ -266,7 +273,6 @@ class ProductController extends AbstractFOSRestController
                         Response::HTTP_BAD_REQUEST
                     ));
                 }
-
             }
 
             $product->setDeleteAt(new \DateTime());

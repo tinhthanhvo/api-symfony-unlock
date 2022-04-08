@@ -62,7 +62,7 @@ class ProductItem
     private $size;
 
     /**
-     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="productItem", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="productItem", orphanRemoval=true)
      */
     private $orderDetails;
 
@@ -70,6 +70,7 @@ class ProductItem
     {
         $this->cart = new ArrayCollection();
         $this->orderDetails = new ArrayCollection();
+        $this->createAt = new \DateTime("now");
     }
 
     public function getId(): ?int
@@ -94,9 +95,9 @@ class ProductItem
         return $this->createAt;
     }
 
-    public function setCreateAt(): self
+    public function setCreateAt(?\DateTimeInterface $createAt): self
     {
-        $this->createAt = new \DateTime('now');;
+        $this->createAt = $createAt;
 
         return $this;
     }

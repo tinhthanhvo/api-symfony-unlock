@@ -69,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $deleteAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="user", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="user", orphanRemoval=true)
      */
     private $carts;
 
@@ -82,6 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->carts = new ArrayCollection();
         $this->orders = new ArrayCollection();
+        $this->createAt = new \DateTime("now");
     }
 
     public function getId(): ?int
@@ -202,9 +203,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->createAt;
     }
 
-    public function setCreateAt(): self
+    public function setCreateAt(?\DateTimeInterface $createAt): self
     {
-        $this->createAt = new \DateTime('now');;
+        $this->createAt = $createAt;
 
         return $this;
     }

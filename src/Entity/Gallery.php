@@ -46,6 +46,11 @@ class Gallery
      */
     private $product;
 
+    public function __construct()
+    {
+        $this->createAt = new \DateTime("now");
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -68,9 +73,9 @@ class Gallery
         return $this->createAt;
     }
 
-    public function setCreateAt(): self
+    public function setCreateAt(?\DateTimeInterface $createAt): self
     {
-        $this->createAt = new \DateTime('now');;
+        $this->createAt = $createAt;
 
         return $this;
     }

@@ -84,6 +84,7 @@ class Product
     {
         $this->items = new ArrayCollection();
         $this->gallery = new ArrayCollection();
+        $this->createAt = new \DateTime("now");
     }
 
     public function getId(): ?int
@@ -132,9 +133,9 @@ class Product
         return $this->createAt;
     }
 
-    public function setCreateAt(): self
+    public function setCreateAt(?\DateTimeInterface $createAt): self
     {
-        $this->createAt = new \DateTime('now');;
+        $this->createAt = $createAt;
 
         return $this;
     }

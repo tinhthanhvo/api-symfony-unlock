@@ -45,6 +45,29 @@ class ProductItemRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param int|null $product_id
+     * @return array
+     */
+    public function getDataForReport(?int $product_id): array
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->andWhere('p.deleteAt IS NULL')
+            ->leftJoin('p.product', 'pr')
+            ->leftJoin('pr.category', 'c')
+            ->orderBy('c.name', 'ASC')
+            ->addOrderBy('pr.id', 'ASC')
+            ->addOrderBy('pr.color', 'ASC')
+            ->addOrderBy('p.size', 'ASC');
+
+        if (!empty($product_id)) {
+            $queryBuilder->andWhere('p.product = :product')
+                ->setParameter('product', $product_id);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     // /**
     //  * @return ProductItem[] Returns an array of ProductItem objects
     //  */

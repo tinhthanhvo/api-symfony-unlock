@@ -131,4 +131,35 @@ class ApiController extends AbstractFOSRestController
 
         return $request;
     }
+
+    /**
+     * @param Form $form
+     * @return array
+     */
+    protected function getFormErrorMessage(Form $form): array
+    {
+        $errorMessage = [];
+
+        foreach ($form as $child) {
+            /** @var FormInterface $child */
+            if ($child->isSubmitted() && $child->isValid()) {
+                continue;
+            }
+
+            $errorList = $child->getErrors(true, true);
+            if (0 === count($errorList)) {
+                continue;
+            } else {
+                $firstErrorMessage = "";
+                foreach ($errorList as $error) {
+                    $firstErrorMessage = $error->getMessage();
+                    break;
+                }
+
+                $errorMessage[$child->getName()] = $firstErrorMessage;
+            }
+        }
+
+        return $errorMessage;
+    }
 }
