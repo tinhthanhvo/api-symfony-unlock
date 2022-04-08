@@ -81,7 +81,7 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $order = new PurchaseOrder($this->userLoginInfo);
         $form = $this->createForm(PurchaseOrderType::class, $order);
-        $requestData = $request->request->all();
+        $requestData = json_decode($request->getContent(), true);
         $form->submit($requestData);
 
         $totalPrice = 0;
