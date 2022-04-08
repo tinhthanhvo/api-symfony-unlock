@@ -134,7 +134,7 @@ class Product
 
     public function setCreateAt(): self
     {
-        $this->createAt = new \DateTime('now');;
+        $this->createAt = new \DateTime('now');
 
         return $this;
     }

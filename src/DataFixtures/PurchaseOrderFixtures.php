@@ -6,14 +6,16 @@ use App\Entity\Cart;
 use App\Entity\Category;
 use App\Entity\Color;
 use App\Entity\Gallery;
+use App\Entity\OrderDetail;
 use App\Entity\Product;
 use App\Entity\ProductItem;
+use App\Entity\PurchaseOrder;
 use App\Entity\Size;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
-class CartFixtures extends Fixture
+class PurchaseOrderFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
@@ -38,12 +40,12 @@ class CartFixtures extends Fixture
         $size->setCreateAt();
 
         $firstProduct = new Product();
+        $firstProduct->setCreateAt();
         $firstProduct->setCategory($category);
         $firstProduct->setColor($color);
         $firstProduct->setName('Product name 1');
         $firstProduct->setDescription('Product description 1');
-        $firstProduct->setPrice(300000);
-        $firstProduct->setCreateAt();
+        $firstProduct->setPrice(30);
 
         $firstProductGallery = new Gallery();
         $firstProductGallery->setProduct($firstProduct);
@@ -51,39 +53,43 @@ class CartFixtures extends Fixture
         $firstProductGallery->setCreateAt();
 
         $firstProductItem = new ProductItem();
+        $firstProductItem->setCreateAt();
         $firstProductItem->setProduct($firstProduct);
         $firstProductItem->setSize($size);
         $firstProductItem->setAmount(10);
-        $firstProductItem->setCreateAt();
 
         $firstCartItem = new Cart();
+        $firstCartItem->setCreateAt();
         $firstCartItem->setProductItem($firstProductItem);
         $firstCartItem->setUser($user);
         $firstCartItem->setAmount(1);
         $firstCartItem->setPrice($firstProduct->getPrice());
-        $firstCartItem->setCreateAt();
 
-        $manager->persist($firstCartItem);
+        $firstOrderDetail = new OrderDetail();
+        $firstOrderDetail->setCreateAt();
+        $firstOrderDetail->setProductItem($firstProductItem);
+        $firstOrderDetail->setAmount($firstCartItem->getAmount());
+        $firstOrderDetail->setPrice($firstCartItem->getAmount()*$firstProductItem->getProduct()->getPrice());
 
         // Second product
         $secondProduct = new Product();
+        $secondProduct->setCreateAt();
         $secondProduct->setCategory($category);
         $secondProduct->setColor($color);
         $secondProduct->setName('Product name 2');
         $secondProduct->setDescription('Product description 2');
-        $secondProduct->setPrice(500000);
-        $secondProduct->setCreateAt();
+        $secondProduct->setPrice(50);
 
         $secondProductGallery = new Gallery();
+        $secondProductGallery->setCreateAt();
         $secondProductGallery->setProduct($secondProduct);
         $secondProductGallery->setPath('second-cover.jpg');
-        $secondProductGallery->setCreateAt();
 
         $secondProductItem = new ProductItem();
+        $secondProductItem->setCreateAt();
         $secondProductItem->setProduct($secondProduct);
         $secondProductItem->setSize($size);
         $secondProductItem->setAmount(5);
-        $secondProductItem->setCreateAt();
 
         $secondCartItem = new Cart();
         $secondCartItem->setProductItem($secondProductItem);
@@ -92,7 +98,26 @@ class CartFixtures extends Fixture
         $secondCartItem->setPrice($secondProduct->getPrice());
         $secondCartItem->setCreateAt();
 
-        $manager->persist($secondCartItem);
+        $secondOrderDetail = new OrderDetail();
+        $secondOrderDetail->setCreateAt();
+        $secondOrderDetail->setProductItem($secondProductItem);
+        $secondOrderDetail->setAmount($secondCartItem->getAmount());
+        $secondOrderDetail->setPrice($secondCartItem->getAmount()*$secondProductItem->getProduct()->getPrice());
+
+
+        $purchaseOrder = new PurchaseOrder($user);
+        $purchaseOrder->setCreateAt();
+        $purchaseOrder->setRecipientName('Recipient Name');
+        $purchaseOrder->setRecipientEmail('Recipient Email');
+        $purchaseOrder->setRecipientPhone('0123456789');
+        $purchaseOrder->setAddressDelivery('Cai Khe, Ninh Kieu');
+        $purchaseOrder->setStatus('1');
+        $purchaseOrder->addOrderItem($firstOrderDetail);
+        $purchaseOrder->addOrderItem($secondOrderDetail);
+        $purchaseOrder->setAmount(2);
+        $purchaseOrder->setTotalPrice(80);
+
+        $manager->persist($purchaseOrder);
         $manager->flush();
     }
 }

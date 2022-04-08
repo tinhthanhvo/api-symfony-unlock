@@ -69,7 +69,7 @@ class CartController extends AbstractFOSRestController
             $offset = $limit * ($page - 1);
             $carts = $this->cartRepository->findBy(
                 ['deleteAt' => null, 'user' => $this->userLoginInfo->getId()],
-                ['createAt' => 'DESC'],
+                ['id' => 'DESC'],
                 $limit,
                 $offset
             );

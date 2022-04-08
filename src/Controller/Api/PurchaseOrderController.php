@@ -100,7 +100,7 @@ class PurchaseOrderController extends AbstractFOSRestController
                     return $this->handleView($this->view(['error' => 'Amount of available product is not enough!'], Response::HTTP_BAD_REQUEST));
                 }
 
-                $price = intval($cartItemData->getPrice()) * $amount;
+                $price = intval($productItem->getProduct()->getPrice()) * $amount;
                 $totalPrice += intval($price);
                 $totalAmount += $amount;
                 $orderDetail = new OrderDetail();
