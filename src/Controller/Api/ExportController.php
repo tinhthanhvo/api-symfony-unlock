@@ -3,13 +3,9 @@
 namespace App\Controller\Api;
 
 use App\Controller\BaseController;
-use App\Entity\Order;
-use App\Form\OrderExportType;
-use App\Repository\PurchaseOrderRepository;
 use App\Service\ExportData;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -19,28 +15,27 @@ use Symfony\Component\HttpFoundation\Response;
 class ExportController extends BaseController
 {
     /**
-     * @Rest\Get("/users/orders/export")
+     * @Rest\Get("/users/orders/{id}/export-pdf")
+     * @param int $id
      * @return Response
      */
-    public function exportPdfForUser(): Response
+    public function exportInvoice($id): Response
     {
         try {
-            $order = new Order();
-
-            $form = $this->createForm(OrderExportType::class, $order);
-            $form->submit(json_decode($request->getContent(), true));
-            if ($form->isSubmitted() && $form->isValid()) {
-                $cartItem = $this->cartRepository->findOneBy([
-                    'productItem' => $payload['productItem'],
-                    'user' => $this->userLoginInfo->getId()
-                ]);
-
-                $this->exportPdf->generate_pdf();
+            $order = $this->purchaseOrderRepository->findOneBy([
+                'id' => $id,
+                'customer_id' => $this->userLoginInfo->getId(),
+                'status' => 1,
+                'deleteAt' => null
+            ]);
+            if ($order) {
+                $this->exportPdf->exportCustomerInvoiceToPdf($order);
             }
 
-            $errorsMessage = $this->getFormErrorMessage($form);
-
-            return $this->handleView($this->view(['error' => $errorsMessage], Response::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view(
+                ['error' => 'No item in cart was found with this id.'],
+                Response::HTTP_NOT_FOUND
+            ));
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }

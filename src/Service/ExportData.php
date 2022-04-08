@@ -2,13 +2,14 @@
 
 namespace App\Service;
 
+use App\Entity\PurchaseOrder;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ExportData extends AbstractController
 {
-    public function generate_pdf(): void
+    public function exportCustomerInvoiceToPdf(PurchaseOrder $customerPO): void
     {
 
         $options = new Options();
