@@ -87,6 +87,7 @@ class CartControllerTest extends BaseWebTestCase
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $data = json_decode($this->client->getResponse()->getContent(), true);
+
         $this->assertIsArray($data);
         $this->assertCount(1, $data);
 

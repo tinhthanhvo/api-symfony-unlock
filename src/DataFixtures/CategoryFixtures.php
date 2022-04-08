@@ -12,7 +12,6 @@ class CategoryFixtures extends Fixture
     {
         $category = new Category();
         $category->setName('Category name');
-        $category->setCreateAt(new \DateTime("now"));
 
         $manager->persist($category);
         $manager->flush();

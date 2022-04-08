@@ -30,7 +30,7 @@ class HomePageController extends AbstractFOSRestController
 {
     public const PRODUCT_PER_PAGE = 9;
     public const PRODUCT_PAGE_NUMBER = 1;
-    public const ORDER_BY_DEFAULT = ['createAt' => 'DESC'];
+    public const ORDER_BY_DEFAULT = ['id' => 'DESC'];
     
     /** @var CategoryRepository */
     private $categoryRepository;

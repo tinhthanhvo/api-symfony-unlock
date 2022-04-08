@@ -43,13 +43,13 @@ class ProductControllerTest extends BaseWebTestCase
         );
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $data = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertIsArray($data);
-        $this->assertCount(2, $data);
+        $products = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($products);
+        $this->assertCount(2, $products['data']);
 
-        $product = $data[0];
-        $this->assertSame('Product name 1', $product['name']);
-        $this->assertSame('300000', $product['price']);
+        $product = $products['data'][0];
+        $this->assertSame('Product name 2', $product['name']);
+        $this->assertSame('500000', $product['price']);
     }
 
     public function testGetProduct(): void
@@ -76,10 +76,8 @@ class ProductControllerTest extends BaseWebTestCase
         $data = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertIsArray($data);
         $this->assertSame('Product name 1', $data['name']);
-        $this->assertIsArray($data['category']);
-        $this->assertSame('Category name', $data['category']['name']);
-        $this->assertIsArray($data['color']);
-        $this->assertSame('Color name', $data['color']['name']);
+        $this->assertSame('Category name', $data['category']);
+        $this->assertSame('Color name', $data['color']);
         $this->assertSame('Product description 1', $data['description']);
         $this->assertIsArray($data['items']);
         $this->assertIsArray($data['gallery']);
