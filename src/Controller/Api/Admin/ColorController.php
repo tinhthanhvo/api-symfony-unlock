@@ -2,44 +2,28 @@
 
 namespace App\Controller\Api\Admin;
 
-use App\Repository\ColorRepository;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
-use JMS\Serializer\SerializationContext;
-use JMS\Serializer\SerializerBuilder;
-use Symfony\Component\HttpFoundation\Response;
+use App\Controller\BaseController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @IsGranted("ROLE_ADMIN")
  */
-class ColorController extends AbstractFOSRestController
+class ColorController extends BaseController
 {
-    /**
-     * @var ColorRepository
-     */
-    private $colorRepository;
-
-    public function __construct(ColorRepository $colorRepository)
-    {
-        $this->colorRepository = $colorRepository;
-    }
-
     /**
      * @Rest\Get("/colors")
      * @return Response
      */
     public function getColorsAction(): Response
     {
-        $colors = $this->colorRepository->findBy(['deleteAt' => null], ['createAt' => 'DESC']);
-
-        $serializer = SerializerBuilder::create()->build();
-        $convertToJson = $serializer->serialize(
-            $colors,
-            'json',
-            SerializationContext::create()->setGroups(array('getColorList'))
+        $colors = $this->colorRepository->findBy(
+            self::CONDITION_DEFAULT,
+            ['name' => 'ASC']
         );
-        $transferData = $serializer->deserialize($convertToJson, 'array', 'json');
-        return $this->handleView($this->view($transferData, Response::HTTP_OK));
+        $colors = $this->transferDataGroup($colors, 'getColorList');
+
+        return $this->handleView($this->view($colors, Response::HTTP_OK));
     }
 }

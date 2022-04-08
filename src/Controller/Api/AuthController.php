@@ -51,7 +51,7 @@ class AuthController extends ApiController
                 $this->userRepository->add($user);
 
                 return $this->handleView($this->view(
-                    ['success' => 'Insert user successfully'],
+                    ['success' => 'Insert user successfully.'],
                     Response::HTTP_CREATED
                 ));
             }

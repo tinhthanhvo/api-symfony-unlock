@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\CartRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\ColorRepository;
 use App\Repository\ProductRepository;
 use App\Repository\PurchaseOrderRepository;
 use App\Repository\UserRepository;
@@ -28,6 +29,9 @@ class BaseController extends AbstractFOSRestController
     /** @var CategoryRepository */
     protected $categoryRepository;
 
+    /** @var ColorRepository */
+    protected $colorRepository;
+
     /** @var ProductRepository */
     protected $productRepository;
 
@@ -48,6 +52,7 @@ class BaseController extends AbstractFOSRestController
     public function __construct(
         CartRepository $cartRepository,
         CategoryRepository $categoryRepository,
+        ColorRepository $colorRepository,
         ProductRepository $productRepository,
         PurchaseOrderRepository $purchaseOrderRepository,
         UserRepository $userRepository,
@@ -57,6 +62,7 @@ class BaseController extends AbstractFOSRestController
     ) {
         $this->cartRepository = $cartRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->colorRepository = $colorRepository;
         $this->productRepository = $productRepository;
         $this->purchaseOrderRepository = $purchaseOrderRepository;
         $this->userRepository = $userRepository;
@@ -100,7 +106,7 @@ class BaseController extends AbstractFOSRestController
             if (0 === count($errorList)) {
                 continue;
             } else {
-                $firstErrorMessage = "";
+                $firstErrorMessage = '';
                 foreach ($errorList as $error) {
                     $firstErrorMessage = $error->getMessage();
                     break;

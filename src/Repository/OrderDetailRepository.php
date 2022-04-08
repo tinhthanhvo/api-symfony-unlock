@@ -56,7 +56,7 @@ class OrderDetailRepository extends ServiceEntityRepository
             $this->_em->flush();
         }
     }
-    
+
     /**
      * @param int|null $product_id
      * @return array

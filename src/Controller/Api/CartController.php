@@ -86,7 +86,7 @@ class CartController extends BaseController
         $formattedCart['price'] = $cart->getPrice();
         $formattedCart['unitPrice'] = $cart->getProductItem()->getProduct()->getPrice();
 
-        $formattedCart['gallery'] = "";
+        $formattedCart['gallery'] = '';
         $gallery = $cart->getProductItem()->getProduct()->getGallery();
         if (count($gallery) > 0) {
             $formattedCart['gallery'] = $gallery[0]->getPath();
@@ -115,8 +115,7 @@ class CartController extends BaseController
             $form = $this->createForm(CartItemType::class, $cartItem);
             $form->submit($payload);
             if ($form->isSubmitted() && $form->isValid()) {
-                $cartItem->setUser($this->userLoginInfo);
-
+                // If this product item is already have in customer cart
                 if ($cartItem->getId()) {
                     $cartItem->setUpdateAt(new \DateTime("now"));
                     $cartItem->setDeleteAt(null);
@@ -129,6 +128,7 @@ class CartController extends BaseController
                     $cartItem->setAmount($newCartItemAmount);
                 }
 
+                $cartItem->setUser($this->userLoginInfo);
                 $this->cartRepository->add($cartItem);
 
                 return $this->handleView($this->view(
@@ -168,12 +168,12 @@ class CartController extends BaseController
 
             if ($cartItem) {
                 $form = $this->createForm(CartItemType::class, $cartItem);
+
                 $payload['productItem'] = $cartItem->getProductItem()->getId();
                 $form->submit($payload);
                 if ($form->isSubmitted() && $form->isValid()) {
                     $cartItem->setUpdateAt(new \DateTime("now"));
                     $cartItem->setDeleteAt(null);
-
                     $this->cartRepository->add($cartItem);
 
                     return $this->handleView($this->view(
