@@ -86,6 +86,11 @@ class PurchaseOrder
      */
     private $customer;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $shoppingCost;
+
     public function __construct(User $user)
     {
         $this->setCreateAt();
@@ -271,6 +276,18 @@ class PurchaseOrder
     public function setCustomer(?User $customer): self
     {
         $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getShoppingCost(): ?int
+    {
+        return $this->shoppingCost;
+    }
+
+    public function setShoppingCost(int $shoppingCost): self
+    {
+        $this->shoppingCost = $shoppingCost;
 
         return $this;
     }
