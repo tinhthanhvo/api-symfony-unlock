@@ -38,7 +38,6 @@ class ProductController extends AbstractFOSRestController
      * @var ProductItemRepository
      */
     private $productItemRepository;
-    private $cartRepository;
     private $galleryRepository;
 
     public function __construct(
@@ -51,7 +50,6 @@ class ProductController extends AbstractFOSRestController
         $this->productRepository = $productRepository;
         $this->sizeRepository = $sizeRepository;
         $this->productItemRepository = $productItemRepository;
-        $this->cartRepository = $cartRepository;
         $this->galleryRepository = $galleryRepository;
     }
 
@@ -120,18 +118,25 @@ class ProductController extends AbstractFOSRestController
         $existedProduct = $this->productRepository->findOneBy([
             'name' => $requestData['name']
         ]);
+
         if (
             $existedProduct &&
             $existedProduct->getColor()->getId() == $requestData['color'] &&
             $existedProduct->getCategory()->getId() == $requestData['category']
         ) {
-            return $this->handleView($this->view(['error' => 'This product is existed.'], Response::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view([
+                'error' => 'This product is existed.'
+            ], Response::HTTP_BAD_REQUEST));
         }
 
-        $form->submit($request->request->all());
+        $form->submit($requestData);
         if ($form->isSubmitted()) {
-
             $galleryData = $request->files->get('gallery');
+            if (count($galleryData) != 5) {
+                return $this->handleView($this->view([
+                    'error' => 'You must choose five images to upload for product.'
+                ], Response::HTTP_BAD_REQUEST));
+            }
             foreach ($galleryData as $image) {
                 $saveFile = $fileUploader->upload($image);
                 $saveFile = self::PATH . $saveFile;
@@ -140,7 +145,7 @@ class ProductController extends AbstractFOSRestController
                 $product->addGallery($gallery);
             }
 
-            $productItemsData = (json_decode($requestData['items'][0], true));
+            $productItemsData = json_decode($requestData['items'][0], true);
             foreach ($productItemsData as $productItemData) {
                 if ($productItemData['amount'] < 0) {
                     return $this->handleView($this->view([
@@ -154,20 +159,6 @@ class ProductController extends AbstractFOSRestController
                 $productItem->setProduct($product);
                 $productItem->setAmount($productItemData['amount']);
                 $product->addItem($productItem);
-            }
-
-            $galleryData = $request->files->get('gallery');
-            if (count($galleryData) != 5) {
-                return $this->handleView($this->view([
-                    'error' => 'You must choose five images to upload for product.'
-                ], Response::HTTP_BAD_REQUEST));
-            }
-            foreach ($galleryData as $image) {
-                $saveFile = $fileUploader->upload($image);
-                $saveFile = self::PATH . $saveFile;
-                $gallery = new Gallery();
-                $gallery->setPath($saveFile);
-                $product->addGallery($gallery);
             }
 
             $this->productRepository->add($product);
@@ -188,11 +179,18 @@ class ProductController extends AbstractFOSRestController
     /**
      * @Rest\Post("/products/{id}")
      * @param Request $request
-     * @param Product $product
+     * @param int $id
      * @return Response
      */
-    public function updateProductAction(Product $product, Request $request, FileUploader $fileUploader): Response
+    public function updateProductAction(int $id, Request $request, FileUploader $fileUploader): Response
     {
+        $product = $this->productRepository->find($id);
+        if (!$product) {
+            return $this->handleView($this->view(
+                ['error' => 'Product is not found.'],
+                Response::HTTP_NOT_FOUND
+            ));
+        }
         $form = $this->createForm(ProductUpdateType::class, $product);
         $requestData = $request->request->all();
         $existedProducts = $this->productRepository->findBy([
@@ -204,12 +202,11 @@ class ProductController extends AbstractFOSRestController
                 return $this->handleView($this->view(['error' => 'This name is already used.'], Response::HTTP_BAD_REQUEST));
             }
         }
-
         $form->submit($request->request->all());
         if ($form->isSubmitted()) {
-            $productItemsData = (json_decode($requestData['items'][0], true));
+            $productItemsData = json_decode($requestData['items'][0], true);
             foreach ($productItemsData as $productItemData) {
-                if (intval($productItemData['amount']) < 0) {
+                if ($productItemData['amount'] < 0) {
                     return $this->handleView($this->view([
                         'error' => 'Amount items must be unsigned integer.'
                     ], Response::HTTP_BAD_REQUEST));

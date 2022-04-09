@@ -28,9 +28,14 @@ bin/console doctrine:migrations:migrate
 ```
 ### Step 5: Generate the SSL keys
 ```bash
-bin/console lexik:jwt:generate-keypair
+bin/console lexik:jwt:generate-keypair --overwrite
 ```
-### Step 6: Example - call api
+### Step 6: User send mail feature
+```bash
+bin/console messenger:consume async
+```
+
+### Step 7: Example - call api
 #### 1. Example - Get Product list without filter options: 
 #####GET http://127.0.0.1:8080/api/products
 ``Response:``

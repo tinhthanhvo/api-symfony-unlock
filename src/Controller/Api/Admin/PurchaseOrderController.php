@@ -68,12 +68,14 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $formattedPurchaseOrder = [];
         $formattedPurchaseOrder['id'] = $purchaseOrder->getId();
+        $formattedPurchaseOrder['createAt'] = $purchaseOrder->getCreateAt()->format('d-m-Y');
         $formattedPurchaseOrder['recipientName'] = $purchaseOrder->getRecipientName();
         $formattedPurchaseOrder['recipientEmail'] = $purchaseOrder->getRecipientEmail();
         $formattedPurchaseOrder['recipientPhone'] = $purchaseOrder->getRecipientPhone();
         $formattedPurchaseOrder['addressDelivery'] = $purchaseOrder->getAddressDelivery();
         $formattedPurchaseOrder['status'] = self::formattedStatusOrderResponse($purchaseOrder->getStatus());
         $formattedPurchaseOrder['amount'] = $purchaseOrder->getAmount();
+        $formattedPurchaseOrder['shippingCost'] = $purchaseOrder->getShippingCost();
         $formattedPurchaseOrder['totalPrice'] = $purchaseOrder->getTotalPrice();
 
         $cartItems = $purchaseOrder->getOrderItems();

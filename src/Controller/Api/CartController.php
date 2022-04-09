@@ -173,7 +173,6 @@ class CartController extends BaseController
                 $form->submit($payload);
                 if ($form->isSubmitted() && $form->isValid()) {
                     $cartItem->setUpdateAt(new \DateTime("now"));
-                    $cartItem->setDeleteAt(null);
                     $this->cartRepository->add($cartItem);
 
                     return $this->handleView($this->view(

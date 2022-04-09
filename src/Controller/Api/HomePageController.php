@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Color;
 use App\Entity\Product;
 use App\Entity\ProductItem;
 use App\Entity\PurchaseOrder;
@@ -9,6 +10,7 @@ use App\Entity\User;
 use App\Event\PurchaseOrderEvent;
 use App\Repository\CartRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\ColorRepository;
 use App\Repository\ProductRepository;
 use App\Service\GetUserInfo;
 use App\Service\MailerService;
@@ -31,7 +33,8 @@ class HomePageController extends AbstractFOSRestController
     public const PRODUCT_PER_PAGE = 9;
     public const PRODUCT_PAGE_NUMBER = 1;
     public const ORDER_BY_DEFAULT = ['id' => 'DESC'];
-    
+    const CONDITION_DEFAULT = ['deleteAt' => null];
+
     /** @var CategoryRepository */
     private $categoryRepository;
 
@@ -45,9 +48,14 @@ class HomePageController extends AbstractFOSRestController
 
     /** @var User|null */
     private $userLoginInfo;
+    /**
+     * @var ColorRepository
+     */
+    private $colorRepository;
 
     public function __construct(
         CategoryRepository $categoryRepository,
+        ColorRepository $colorRepository,
         CartRepository $cartRepository,
         EventDispatcherInterface $eventDispatcher,
         GetUserInfo $userLogin,
@@ -58,6 +66,7 @@ class HomePageController extends AbstractFOSRestController
         $this->eventDispatcher = $eventDispatcher;
         $this->userLoginInfo = $userLogin->getUserLoginInfo();
         $this->productRepository = $productRepository;
+        $this->colorRepository = $colorRepository;
     }
 
     /**
@@ -70,6 +79,21 @@ class HomePageController extends AbstractFOSRestController
         $categories = $this->transferDataGroup($categories, 'getListCategory');
 
         return $this->handleView($this->view($categories, Response::HTTP_OK));
+    }
+
+    /**
+     * @Rest\Get("/colors")
+     * @return Response
+     */
+    public function getColors(): ?Response
+    {
+        $colors = $this->colorRepository->findBy(
+            self::CONDITION_DEFAULT,
+            ['name' => 'ASC']
+        );
+        $colors = $this->transferDataGroup($colors, 'getColorList');
+
+        return $this->handleView($this->view($colors, Response::HTTP_OK));
     }
 
     /**
@@ -225,7 +249,7 @@ class HomePageController extends AbstractFOSRestController
      */
     public function sendMail(): Response
     {
-        $purchaseOrder = new PurchaseOrder(new User());
+        $purchaseOrder = new PurchaseOrder(new User(), 0);
         $event = new PurchaseOrderEvent($purchaseOrder);
         $this->eventDispatcher->dispatch($event);
 

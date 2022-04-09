@@ -91,7 +91,7 @@ class PurchaseOrderFixtures extends Fixture
         $secondOrderDetail->setPrice($secondCartItem->getAmount()*$secondProductItem->getProduct()->getPrice());
 
 
-        $purchaseOrder = new PurchaseOrder($user);
+        $purchaseOrder = new PurchaseOrder($user, 0);
         $purchaseOrder->setRecipientName('Recipient Name');
         $purchaseOrder->setRecipientEmail('Recipient Email');
         $purchaseOrder->setRecipientPhone('0123456789');

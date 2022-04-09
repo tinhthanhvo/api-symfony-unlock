@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * @ORM\Entity(repositoryClass=PurchaseOrderRepository::class)
@@ -56,7 +57,7 @@ class PurchaseOrder
     private $amount;
 
     /**
-     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="purchaseOrder", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="purchaseOrder", orphanRemoval=true, cascade={"persist"})
      */
     private $orderItems;
 
@@ -87,7 +88,7 @@ class PurchaseOrder
     private $customer;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $shippingCost;
 
@@ -99,6 +100,7 @@ class PurchaseOrder
         $this->setTotalPrice(0);
         $this->orderItems = new ArrayCollection();
         $this->createAt = new \DateTime("now");
+        $this->shippingCost = 0;
     }
 
     public function getId(): ?int
@@ -285,7 +287,7 @@ class PurchaseOrder
         return $this->shippingCost;
     }
 
-    public function setShippingCost(int $shippingCost): self
+    public function setShippingCost(?int $shippingCost): self
     {
         $this->shippingCost = $shippingCost;
 
