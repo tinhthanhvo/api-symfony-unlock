@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @IsGranted("ROLE_ADMIN")
@@ -31,6 +32,7 @@ class PurchaseOrderController extends AbstractFOSRestController
     /**
      * @Rest\Get("/orders")
      * @return Response
+     * @throws \Exception
      */
     public function getPurchaseOrdersAction(Request $request): Response
     {
@@ -38,7 +40,16 @@ class PurchaseOrderController extends AbstractFOSRestController
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
         $offset = $limit * ($page - 1);
 
-        $purchaseOrders = $this->purchaseOrderRepository->findByConditions([], ['status' => 'ASC'], $limit, $offset);
+        $today = new \DateTime("now");
+        $fromDateRequest = $request->get('fromDate', '1900-01-01');
+        $fromDate = new \DateTime($fromDateRequest);
+        $toDateRequest = $request->get('toDate', $today).' 23:59:59.999999';
+        $toDate = new \DateTime($toDateRequest);
+
+        if($fromDate > $toDate || $fromDate > $today) {
+            return $this->handleView($this->view(['error' => 'Request is unsuccessful.'], Response::HTTP_BAD_REQUEST));
+        }
+        $purchaseOrders = $this->purchaseOrderRepository->findByConditions(['fromDate' => $fromDate, 'toDate' => $toDate], ['status' => 'ASC'], $limit, $offset);
         $purchaseOrders['data'] = array_map('self::dataTransferOrderObject', $purchaseOrders['data']);
         return $this->handleView($this->view($purchaseOrders, Response::HTTP_OK));
     }

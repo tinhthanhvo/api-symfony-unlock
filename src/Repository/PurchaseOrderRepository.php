@@ -55,6 +55,18 @@ class PurchaseOrderRepository extends ServiceEntityRepository
                 ->setParameter('status', $param['status']);
         }
 
+        if (isset($param['fromDate']) && $param['fromDate'] != '') {
+            $queryBuilder
+                ->andWhere('o.createAt >= :fromDate')
+                ->setParameter('fromDate', $param['fromDate']);
+        }
+
+        if (isset($param['toDate']) && $param['toDate'] != '') {
+            $queryBuilder
+                ->andWhere('o.createAt <= :toDate')
+                ->setParameter('toDate', $param['toDate']);
+        }
+
         if (!empty($orderBy)) {
             $keyOrderList = array_keys($orderBy);
             foreach ($keyOrderList as $keyOrder) {
