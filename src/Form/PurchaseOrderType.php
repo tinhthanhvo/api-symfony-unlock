@@ -53,6 +53,16 @@ class PurchaseOrderType extends AbstractType
                     ])
                 ]
             ])
+            ->add('shoppingCost', NumberType::class, [
+                'constraints' => [
+                    new Length([
+                        'max' => 100,
+                        'maxMessage' => 'The shipping cost cannot be longer than 100 characters',
+                        'min' => 0,
+                        'minMessage' => 'The shipping cost cannot be short than 0 characters',
+                    ])
+                ]
+            ])
             ->add('addressDelivery', TextareaType::class)
             ->add('shoppingCost', NumberType::class, [
                 'constraints' => [
