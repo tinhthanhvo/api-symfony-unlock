@@ -31,6 +31,8 @@ class ProductController extends AbstractFOSRestController
 {
     public const PRODUCT_PER_PAGE = 10;
     public const PRODUCT_PAGE_NUMBER = 1;
+    public const ORDER_BY_DEFAULT = ['id' => 'DESC'];
+    const CONDITION_DEFAULT = ['deleteAt' => null];
     public const PATH = 'http://127.0.0.1:8080/uploads/images/';
     private $productRepository;
     private $sizeRepository;
@@ -101,6 +103,28 @@ class ProductController extends AbstractFOSRestController
         $dataResponse = $serializer->deserialize($convertToJson, 'array', 'json');
 
         return $this->handleView($this->view($dataResponse, Response::HTTP_OK));
+    }
+
+    /**
+     * @Rest\Post("/products/filter")
+     * @param Request $request
+     * @return Response
+     */
+    public function getProductListFilter(Request $request): Response
+    {
+        $filterOptions = (json_decode($request->getContent(), true)) ?? [];
+
+        $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
+        $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
+        $orderBy = $request->get('order', self::ORDER_BY_DEFAULT);
+        $offset = $limit * ($page - 1);
+
+        $products = $this->productRepository->findByConditions($filterOptions, $orderBy, $limit, $offset);
+
+        $transferData = array_map('self::dataTransferObject', $products['data']);
+        $products['data'] = $this->transferDataGroup($transferData, 'getProductListAdmin');
+
+        return $this->handleView($this->view($products, Response::HTTP_OK));
     }
 
     /**
@@ -320,6 +344,7 @@ class ProductController extends AbstractFOSRestController
         $formattedProduct['id'] = $product->getId();
         $formattedProduct['name'] = $product->getName();
         $formattedProduct['price'] = $product->getPrice();
+        $formattedProduct['createAt'] = $product->getCreateAt()->format('d-m-Y');
         $formattedProduct['description'] = $product->getDescription();
         $formattedProduct['category'] = $product->getCategory();
         $formattedProduct['color'] = $product->getColor();
@@ -374,5 +399,22 @@ class ProductController extends AbstractFOSRestController
         $item['size'] = $productItem->getSize()->getValue();
 
         return $item;
+    }
+
+    /**
+     * @param array $data
+     * @param string $group
+     * @return array
+     */
+    private function transferDataGroup(array $data, string $group): array
+    {
+        $serializer = SerializerBuilder::create()->build();
+        $convertToJson = $serializer->serialize(
+            $data,
+            'json',
+            SerializationContext::create()->setGroups(array($group))
+        );
+
+        return $serializer->deserialize($convertToJson, 'array', 'json');
     }
 }

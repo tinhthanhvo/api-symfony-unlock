@@ -64,6 +64,13 @@ class ProductRepository extends ServiceEntityRepository
                 ->setParameter('minPrice', $param['priceFrom']);
         }
 
+        if (isset($param['name']) && $param['name'] != '') {
+            $param['name'] = '%'.$param['name'].'%';
+            $queryBuilder
+                ->andWhere('p.name LIKE :name')
+                ->setParameter('name', $param['name']);
+        }
+
         if (isset($param['priceTo']) && $param['priceTo'] != '') {
             $queryBuilder
                 ->andWhere('p.price <= :maxPrice')
