@@ -54,6 +54,24 @@ class PurchaseOrderController extends AbstractFOSRestController
         return $this->handleView($this->view($purchaseOrders, Response::HTTP_OK));
     }
 
+    /**
+     * @Rest\Get("/summery")
+     * @return Response
+     * @throws \Exception
+     */
+    public function getSummery(): Response
+    {
+        $today = new \DateTime("now");
+        $today = $today->format('Y-m-d');
+        $fromDate = new \DateTime($today);
+        $toDate = new \DateTime($today.' 23:59:59.999999');
+        $summery['revenue'] = $this->purchaseOrderRepository->getRevenue($fromDate, $toDate);
+        $summery['amountOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 0);
+        $summery['amountPendingOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 1);
+        $summery['amountApprovedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 2);
+
+        return $this->handleView($this->view($summery, Response::HTTP_OK));
+    }
 
     /**
      * @Rest\Put("/orders/{id}")

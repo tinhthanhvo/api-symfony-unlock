@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\PurchaseOrder;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -96,7 +99,7 @@ class PurchaseOrderRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('o')
             ->andWhere('o.deleteAt IS NULL')
-            ->orderBy('o.createAt', 'ASC');
+            ->orderBy('o.id', 'ASC');
 
         if (isset($param['status']) && !empty($param['status'])) {
             $queryBuilder->andWhere('o.status = :status')
@@ -116,22 +119,68 @@ class PurchaseOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    // /**
-    //  * @return PurchaseOrder[] Returns an array of PurchaseOrder objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param DateTime|null $fromDate
+     * @param DateTime|null $toDate
+     * @return float|int|mixed|string
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function getRevenue(?\DateTime $fromDate = null, ?\DateTime $toDate = null)
     {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('o.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $queryBuilder = $this->createQueryBuilder('o')
+            ->select('SUM(o.totalPrice) as total')
+            ->andWhere('o.status >= :status')
+            ->setParameter('status', 4);
+
+        if ($fromDate != '') {
+            $queryBuilder
+                ->andWhere('o.createAt >= :fromDate')
+                ->setParameter('fromDate', $fromDate);
+        }
+
+        if ($toDate != '') {
+            $queryBuilder
+                ->andWhere('o.createAt <= :toDate')
+                ->setParameter('toDate', $toDate);
+        }
+
+        return $queryBuilder->getQuery()->getSingleScalarResult() ?? 0;
     }
-    */
+
+    /**
+     * @param DateTime|null $fromDate
+     * @param DateTime|null $toDate
+     * @param int $status
+     * @return float|int|mixed|string
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function getCountPurchaseOrder(?\DateTime $fromDate = null, ?\DateTime $toDate = null, int $status)
+    {
+        $queryBuilder = $this->createQueryBuilder('o')
+            ->select('COUNT(o.id) as total');
+
+        if ($status != 0) {
+            $queryBuilder
+                ->andWhere('o.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        if ($fromDate != '') {
+            $queryBuilder
+                ->andWhere('o.createAt >= :fromDate')
+                ->setParameter('fromDate', $fromDate);
+        }
+
+        if ($toDate != '') {
+            $queryBuilder
+                ->andWhere('o.createAt <= :toDate')
+                ->setParameter('toDate', $toDate);
+        }
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
+    }
 
     /*
     public function findOneBySomeField($value): ?PurchaseOrder
