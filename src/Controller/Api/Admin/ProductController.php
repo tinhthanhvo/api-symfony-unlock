@@ -242,12 +242,12 @@ class ProductController extends AbstractFOSRestController
             }
 
             $galleryData = $request->files->get('gallery');
-            if (count($galleryData) != 5 && count($galleryData) > 0) {
-                return $this->handleView($this->view([
-                    'error' => 'You must choose five images to upload for product.'
-                ], Response::HTTP_BAD_REQUEST));
-            }
-            if (count($galleryData) == 5) {
+            if($galleryData != null) {
+                if (count($galleryData) != 5) {
+                    return $this->handleView($this->view([
+                        'error' => 'You must choose five images to upload for product.'
+                    ], Response::HTTP_BAD_REQUEST));
+                }
                 $gallery = $product->getGallery();
                 foreach ($galleryData as $i => $image) {
                     $saveFile = $fileUploader->upload($image);
