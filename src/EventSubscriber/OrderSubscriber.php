@@ -47,7 +47,7 @@ class OrderSubscriber implements EventSubscriberInterface
         $this->mailerService->send(
             'Confirm order information',
             'tinhthanh2210@gmail.com',
-            'tinhthanh.vo@nfq.asia',
+            'nguyenthilananh0606@gmail.com',
             PurchaseOrderEvent::TEMPLATE_CONTACT,
             $params
         );

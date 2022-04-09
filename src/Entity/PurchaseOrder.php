@@ -86,14 +86,19 @@ class PurchaseOrder
      */
     private $customer;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $shippingCost;
+
     public function __construct(User $user)
     {
-        $this->setCreateAt();
         $this->setCustomer($user);
         $this->setStatus('1');
         $this->setAmount(0);
         $this->setTotalPrice(0);
         $this->orderItems = new ArrayCollection();
+        $this->createAt = new \DateTime("now");
     }
 
     public function getId(): ?int
@@ -118,9 +123,9 @@ class PurchaseOrder
         return $this->createAt;
     }
 
-    public function setCreateAt(): self
+    public function setCreateAt(?\DateTimeInterface $createAt): self
     {
-        $this->createAt = new \DateTime("now");
+        $this->createAt = $createAt;
 
         return $this;
     }
@@ -271,6 +276,18 @@ class PurchaseOrder
     public function setCustomer(?User $customer): self
     {
         $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getShippingCost(): ?int
+    {
+        return $this->shippingCost;
+    }
+
+    public function setShippingCost(int $shippingCost): self
+    {
+        $this->shippingCost = $shippingCost;
 
         return $this;
     }

@@ -16,7 +16,6 @@ class UserFixtures extends Fixture
         $user->setPassword('Abc123');
         $user->setPhoneNumber('0123456789');
         $user->setRoles($role);
-        $user->setCreateAt(new \DateTime("now"));
 
         $manager->persist($user);
         $manager->flush();

@@ -51,7 +51,7 @@ class CartController extends BaseController
             $offset = $limit * ($page - 1);
             $carts = $this->cartRepository->findBy(
                 ['deleteAt' => null, 'user' => $this->userLoginInfo->getId()],
-                self::ORDER_BY_DEFAULT,
+                ['id' => 'DESC'],
                 $limit,
                 $offset
             );

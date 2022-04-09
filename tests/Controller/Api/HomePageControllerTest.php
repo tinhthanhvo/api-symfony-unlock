@@ -81,7 +81,7 @@ class HomePageControllerTest extends BaseWebTestCase
 
         $payload = [
             'category' => 1,
-            'color' => 1,
+            'color' => [1],
             'priceFrom' => 400000,
             'priceTo' => 500000,
         ];

@@ -64,7 +64,7 @@ class ProductController extends AbstractFOSRestController
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
         $offset = $limit * ($page - 1);
-        $products = $this->productRepository->findByConditions(['deleteAt' => null], ['createAt' => 'DESC'], $limit, $offset);
+        $products = $this->productRepository->findByConditions(['deleteAt' => null], ['id' => 'DESC'], $limit, $offset);
 
         $transferData = array_map('self::dataTransferObject', $products['data']);
         $serializer = SerializerBuilder::create()->build();
@@ -130,7 +130,6 @@ class ProductController extends AbstractFOSRestController
 
         $form->submit($request->request->all());
         if ($form->isSubmitted()) {
-            $product->setCreateAt(new \DateTime());
 
             $galleryData = $request->files->get('gallery');
             foreach ($galleryData as $image) {
@@ -167,7 +166,6 @@ class ProductController extends AbstractFOSRestController
                 $saveFile = $fileUploader->upload($image);
                 $saveFile = self::PATH . $saveFile;
                 $gallery = new Gallery();
-                $gallery->setCreateAt();
                 $gallery->setPath($saveFile);
                 $product->addGallery($gallery);
             }
