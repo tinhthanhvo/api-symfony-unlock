@@ -64,7 +64,7 @@ class PurchaseOrderType extends AbstractType
                 ]
             ])
             ->add('addressDelivery', TextareaType::class)
-            ->add('shoppingCost', NumberType::class, [
+            ->add('shippingCost', NumberType::class, [
                 'constraints' => [
                     new Length([
                         'max' => 100,

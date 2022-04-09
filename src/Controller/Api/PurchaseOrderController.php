@@ -112,7 +112,7 @@ class PurchaseOrderController extends AbstractFOSRestController
 
                 $order->addOrderItem($orderDetail);
             }
-            $totalPrice -= $requestData['shoppingCost'];
+            $totalPrice -= $requestData['shippingCost'];
             $order->setTotalPrice($totalPrice);
             $order->setAmount($totalAmount);
 
