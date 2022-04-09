@@ -3,7 +3,6 @@
 namespace App\Controller\Api;
 
 use App\Controller\BaseController;
-use App\Service\ExportData;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,30 +14,35 @@ use Symfony\Component\HttpFoundation\Response;
 class ExportController extends BaseController
 {
     /**
-     * @Rest\Get("/users/orders/{id}/export-pdf")
+     * @Rest\Get("/users/orders/{id}/export")
      * @param int $id
      * @return Response
      */
-    public function exportInvoice($id): Response
+    public function exportCustomerInvoice(int $id): Response
     {
-        try {
+        // try {
             $order = $this->purchaseOrderRepository->findOneBy([
                 'id' => $id,
-                'customer_id' => $this->userLoginInfo->getId(),
-                'status' => 1,
+                'customer' => $this->userLoginInfo->getId(),
+                'status' => 4,
                 'deleteAt' => null
             ]);
-            if ($order) {
-                $this->exportPdf->exportCustomerInvoiceToPdf($order);
-            }
+        if ($order) {
+            $pdfPathFile = $this->exportData->exportCustomerInvoiceToPdf($order);
 
             return $this->handleView($this->view(
-                ['error' => 'No item in cart was found with this id.'],
+                ['success' => $pdfPathFile],
+                Response::HTTP_OK
+            ));
+        }
+
+            return $this->handleView($this->view(
+                ['error' => 'No order was found with this id.'],
                 Response::HTTP_NOT_FOUND
             ));
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     $this->logger->error($e->getMessage());
+        // }
 
         return $this->handleView($this->view(
             ['error' => 'Something went wrong! Please contact support.'],

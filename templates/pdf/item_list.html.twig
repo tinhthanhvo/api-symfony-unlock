@@ -1,0 +1,28 @@
+<table>
+    <thead>
+        <tr>
+            <th class="col1">NO.</th>
+            <th class="col2">DESCRIPTION</th>
+            <th class="col3">UNIT PRICE</th>
+            <th class="col4">QUANTITY</th>
+            <th class="col5">AMOUNT</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for item in invoice.orderItems %}
+        <tr>
+            <td>#{{ loop.index }}</td>
+            <td>
+                {{ item.productItem.product.name }} <br />
+                Category: {{ item.productItem.product.category.name }} <br />
+                Color: {{ item.productItem.product.color.name }} 
+                Size: {{ item.productItem.size.value }}
+            </td>
+            <td class="col3">{{ item.productItem.product.price }}</td>
+            <td class="col4">{{ item.amount }}</td>
+            <td class="col5">{{ item.price }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -16,6 +16,8 @@ class ReportProductCommand extends Command
     protected static $defaultName = 'report:product';
     protected static $defaultDescription = '(Admin) Export information of product to CSV file.';
 
+    protected const FILE_UPLOAD_PATH = 'http://127.0.0.1:8080/';
+
     /** @var OrderDetailRepository */
     private $orderDetailRepository;
 
@@ -150,7 +152,7 @@ class ReportProductCommand extends Command
             }
             fclose($outputBuffer);
 
-            $output->write('Export product data successfully!');
+            $output->write(self::FILE_UPLOAD_PATH . $fileName);
 
             return Command::SUCCESS;
         } catch (\Exception $e) {

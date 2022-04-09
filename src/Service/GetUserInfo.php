@@ -3,8 +3,10 @@
 namespace App\Service;
 
 use App\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class GetUserInfo
 {
@@ -19,6 +21,9 @@ class GetUserInfo
         $this->tokenStorage = $tokenStorage;
     }
 
+    /**
+     * @return User|null
+     */
     public function getUserLoginInfo()
     {
         $token = $this->tokenStorage->getToken();
@@ -30,5 +35,23 @@ class GetUserInfo
         }
 
         return null;
+    }
+
+    /**
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param UserInterface $user
+     * @param string $compareString
+     * @return bool
+     */
+    public function isPasswordEqual(
+        UserPasswordHasherInterface $passwordHasher,
+        UserInterface $user,
+        string $compareString
+    ): bool {
+        if ($passwordHasher->isPasswordValid($user, $compareString)) {
+            return true;
+        }
+
+        return false;
     }
 }

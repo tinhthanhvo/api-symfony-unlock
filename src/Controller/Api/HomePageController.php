@@ -220,7 +220,7 @@ class HomePageController extends AbstractFOSRestController
                 $item['amountInCart'] = $cartItems->getAmount();
             }
         }
-        
+
         $item['size'] = $productItem->getSize()->getValue();
 
         return $item;

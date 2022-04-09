@@ -82,4 +82,65 @@ class UserControllerTest extends BaseWebTestCase
         $this->assertSame('Full name', $data['full_name']);
         $this->assertSame('0123456789', $data['phone_number']);
     }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserLoginInfo(): void
+    {
+        $userFixture = new UserFixtures();
+        $this->loadFixture($userFixture, ['ROLE_USER']);
+
+        $user = $this->userRepository->findOneBy(['email' => 'user@gmail.com']);
+        $payload = [
+            "fullName" => 'New Full name',
+            "phoneNumber" => '0908677833'
+        ];
+        $this->client->request(
+            Request::METHOD_PUT,
+            '/api/users/profile',
+            [],
+            [],
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ],
+            json_encode($payload)
+        );
+
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        $this->entityManager->refresh($user);
+        $this->assertEquals($payload['fullName'], $user->getFullName());
+        $this->assertEquals($payload['phoneNumber'], $user->getPhoneNumber());
+    }
+
+    // /**
+    //  * @return void
+    //  */
+    // public function testUpdateUserPassword(): void
+    // {
+    //     $userFixture = new UserFixtures();
+    //     $this->loadFixture($userFixture, ['ROLE_USER']);
+
+    //     $user = $this->userRepository->findOneBy(['email' => 'user@gmail.com']);
+    //     $payload = [
+    //         "oldPassword" => 'Abc123',
+    //         "newPassword" => 'Abc456'
+    //     ];
+    //     $this->client->request(
+    //         Request::METHOD_PUT,
+    //         '/api/users/password',
+    //         [],
+    //         [],
+    //         [
+    //             'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+    //             'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+    //         ],
+    //         json_encode($payload)
+    //     );
+
+    //     $this->assertEquals(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+    //     $this->entityManager->refresh($user);
+    //     $this->assertNotNull($user->getUpdateAt());
+    // }
 }

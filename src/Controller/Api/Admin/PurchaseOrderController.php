@@ -43,10 +43,10 @@ class PurchaseOrderController extends AbstractFOSRestController
         $today = new \DateTime("now");
         $fromDateRequest = $request->get('fromDate', '1900-01-01');
         $fromDate = new \DateTime($fromDateRequest);
-        $toDateRequest = $request->get('toDate', $today).' 23:59:59.999999';
+        $toDateRequest = $request->get('toDate', $today) . ' 23:59:59.999999';
         $toDate = new \DateTime($toDateRequest);
 
-        if($fromDate > $toDate || $fromDate > $today) {
+        if ($fromDate > $toDate || $fromDate > $today) {
             return $this->handleView($this->view(['error' => 'Request is unsuccessful.'], Response::HTTP_BAD_REQUEST));
         }
         $purchaseOrders = $this->purchaseOrderRepository->findByConditions(['fromDate' => $fromDate, 'toDate' => $toDate], ['status' => 'ASC'], $limit, $offset);

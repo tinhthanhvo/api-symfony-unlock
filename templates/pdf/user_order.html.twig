@@ -1,0 +1,48 @@
+{% extends 'pdf/base.html.twig' %}
+
+{% block content %}
+    
+
+    <div id="seller">
+    {% if invoice.deleteAt is not empty %}
+        <img src="{{ invoice.deleteAt }}" alt="">
+    {% endif %}
+        
+    </div>
+
+    <div id="invoice">
+        <dl>
+            <dd>{{ invoice.id }}</dd>
+            <dt>Facture #</dt>
+
+            <dd>{{ invoice.createAt|date('F j, Y') }}</dd>
+            <dt>Facture Date</dt>
+        </dl>
+    </div>
+
+    {% if invoice.customer is not empty %}
+    <div id="buyer">
+        <p>{{ invoice.recipientName }}</p>
+        <p>{{ invoice.addressDelivery }}</p>
+    </div>
+    {% endif %}
+
+    {% include 'pdf/item_list.html.twig' %}
+
+    <hr>
+
+    <div id="invoice-total">
+        <dl>
+            <dt><strong>Total</strong></dt>
+            <dd><strong>{{ invoice.totalPrice }}</strong></dd>
+
+        {% if invoice.deleteAt is not empty %}
+            <dt>Coupon used</dt>
+            <dd>{{ invoice.deleteAt }} (-{{ invoice.deleteAt }})</dd>
+        {% endif %}
+
+            <dt>Amount Paid</dt>
+            <dd>-{{ invoice.totalPrice|default('0.00') }}</dd>
+        </dl>
+    </div>
+{% endblock %}
