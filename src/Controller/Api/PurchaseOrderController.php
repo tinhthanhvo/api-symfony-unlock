@@ -78,7 +78,7 @@ class PurchaseOrderController extends AbstractFOSRestController
      */
     public function addOrderAction(Request $request): Response
     {
-        $order = new PurchaseOrder($this->userLoginInfo);
+        $order = new PurchaseOrder($this->userLoginInfo, 0);
         $form = $this->createForm(PurchaseOrderType::class, $order);
         $requestData = $request->request->all();
         $form->submit($requestData);
@@ -178,12 +178,14 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $formattedPurchaseOrder = [];
         $formattedPurchaseOrder['id'] = $purchaseOrder->getId();
+        $formattedPurchaseOrder['createAt'] = $purchaseOrder->getCreateAt()->format('d-m-y');
         $formattedPurchaseOrder['recipientName'] = $purchaseOrder->getRecipientName();
         $formattedPurchaseOrder['recipientEmail'] = $purchaseOrder->getRecipientEmail();
         $formattedPurchaseOrder['recipientPhone'] = $purchaseOrder->getRecipientPhone();
         $formattedPurchaseOrder['addressDelivery'] = $purchaseOrder->getAddressDelivery();
         $formattedPurchaseOrder['status'] = self::formattedStatusOrderResponse($purchaseOrder->getStatus());
         $formattedPurchaseOrder['amount'] = $purchaseOrder->getAmount();
+        $formattedPurchaseOrder['shippingCost'] = $purchaseOrder->getShippingCost();
         $formattedPurchaseOrder['totalPrice'] = $purchaseOrder->getTotalPrice();
 
         $cartItems = $purchaseOrder->getOrderItems();

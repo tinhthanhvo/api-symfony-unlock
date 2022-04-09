@@ -19,7 +19,7 @@ use Symfony\Component\Form\Form;
 
 class BaseController extends AbstractFOSRestController
 {
-    protected const ORDER_BY_DEFAULT = ['createAt' => 'DESC'];
+    protected const ORDER_BY_DEFAULT = ['id' => 'DESC'];
     protected const CONDITION_DEFAULT = ['deleteAt' => null];
     protected const ITEMS_PAGE_NUMBER_DEFAULT = 1;
 
