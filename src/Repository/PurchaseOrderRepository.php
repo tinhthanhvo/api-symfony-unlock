@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\PurchaseOrder;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
@@ -130,7 +131,49 @@ class PurchaseOrderRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('o')
             ->select('SUM(o.totalPrice) as total')
-            ->andWhere('o.status >= :status')
+            ->andWhere('o.status = :status')
+            ->setParameter('status', 4);
+
+        if ($fromDate != '') {
+            $queryBuilder
+                ->andWhere('o.createAt >= :fromDate')
+                ->setParameter('fromDate', $fromDate);
+        }
+
+        if ($toDate != '') {
+            $queryBuilder
+                ->andWhere('o.createAt <= :toDate')
+                ->setParameter('toDate', $toDate);
+        }
+
+        return $queryBuilder->getQuery()->getSingleScalarResult() ?? 0;
+    }
+
+    /**
+     * @param DateTime|null $fromDate
+     * @param DateTime|null $toDate
+     * @param string $field
+     * @return float|int|mixed|string
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function getReport(?\DateTime $fromDate = null, ?\DateTime $toDate = null, string $field)
+    {
+        $queryBuilder = $this->createQueryBuilder('o');
+
+        switch ($field) {
+            case 'shippingCost':
+                $queryBuilder->select('SUM(o.shippingCost) as total');
+                break;
+            case 'totalPrice':
+                $queryBuilder->select('SUM(o.totalPrice) as total');
+                break;
+            case 'totalItem':
+                $queryBuilder->select('SUM(o.amount) as total');
+                break;
+        }
+        $queryBuilder
+            ->andWhere('o.status = :status')
             ->setParameter('status', 4);
 
         if ($fromDate != '') {
@@ -180,6 +223,28 @@ class PurchaseOrderRepository extends ServiceEntityRepository
         }
 
         return $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @return array[]
+     * @throws Exception
+     */
+    public function getDataToChart(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT MONTH(create_at) as month,
+                       YEAR(create_at) as year ,
+                       CONCAT(MONTH(create_at), '/', YEAR(create_at)) as date,
+                       (SUM(total_price)-SUM(shipping_cost)) as revenue, COUNT(id) as amountCompletedOrder
+                FROM `purchase_order`
+                WHERE delete_at IS NULL and status like 4
+                GROUP BY MONTH(create_at), YEAR(create_at), CONCAT(MONTH(create_at), '/', YEAR(create_at))
+                ORDER BY YEAR(create_at) DESC, MONTH(create_at) DESC
+                LIMIT 6;";
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery()->fetchAllAssociative();
     }
 
     /*
