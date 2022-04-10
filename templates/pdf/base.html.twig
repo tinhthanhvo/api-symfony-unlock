@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}KVAT - Facture #{{ invoice.id }}{% endblock %}</title>
+    </head>
+
+<style type="text/css" media="all">
+{% block style %}
+    body { margin: 0px; padding: 0; font: 16px Arial }
+
+   .table-row:after { content: ""; display: table; clear: both; } 
+   .table-column { float: left; padding: 15px; height: 50px; }
+
+
+
+
+    #container { margin: 5px; width: auto }
+
+    #seller { margin: 25px; width: 620px; clear: both;}
+
+    #invoice, #invoice-total {float: right; width: 300px; margin-bottom: 30px}
+    #invoice dt, #invoice-total dt {float: left; width: 100px; margin-bottom: 4px}
+    #invoice dd, #invoice-total dd {float: right; width: 184px; margin: 0 0 4px; text-align: right}
+    .invoice-total {float: left;font-weight: bold;margin: 0;padding: 5px 8px;border-top: 1px solid #f1f1f1;background:#e3e3e3}
+
+    #buyer {float: left; width: 300px}
+
+    #invoice-total {clear: both;}
+
+    #terms, #notes {float: left;width: 100%;margin: 10px 0}
+
+    table {width: 100%}
+    table thead tr {padding: 10px 5px;border: 1px solid #c7c7c7;font-weight: bold;}
+    table thead th {border-top: 1px solid #f1f1f1;background:#e3e3e3}
+
+    table tbody tr {padding: 10px 5px;border-bottom:1px solid #e5e5e5;}
+
+    .col1 {width: 5%; text-align: left}
+    .col2 {width: 50%; text-align: left}
+    .col3 {}
+    .col4 {}
+    .col5 {}
+    .col3, .col4, .col5 {width: 15%; text-align: right}
+{% endblock %}
+</style>
+
+<body>
+    <div class="table-row">
+        <div class="table-column" style="width: 30%">
+            AAAAAAAA
+        </div>
+        
+        <div class="table-column" style="width: 60%">
+            <p style="float: right;">Issued at: {{ exportDate|date('Y-m-d H:i:s') }}</p><br />
+            <p style="float: right;">KVAT Team</p>
+        </div>
+    </div>
+    
+
+    <div id="container">
+    {% block content %}
+    {% endblock %}
+    </div>
+</body>
+</html>

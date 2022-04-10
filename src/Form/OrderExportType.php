@@ -24,7 +24,7 @@ class OrderExportType extends AbstractType
                 'constraints' => [
                     new Regex([
                         'pattern' => '/^[a-zA-Z0-9]{0,30}$/',
-                        'message' => "CSV file name is incorrect."
+                        'message' => 'CSV file name is incorrect.'
                     ]),
                 ],
             ])

@@ -36,8 +36,8 @@ class UserRegisterType extends AbstractType
                         'message' => 'Full name cannot be null.',
                     ]),
                     new Length([
-                        'max' => 100,
-                        'maxMessage' => 'Full name cannot be longer than 100 characters.',
+                        'max' => 150,
+                        'maxMessage' => 'Full name cannot be longer than 150 characters.',
                     ]),
                 ],
             ])
@@ -48,12 +48,12 @@ class UserRegisterType extends AbstractType
                         'message' => 'Email cannot be null.',
                     ]),
                     new Length([
-                        'max' => 150,
-                        'maxMessage' => 'Email cannot be longer than 150 characters.',
+                        'max' => 180,
+                        'maxMessage' => 'Email cannot be longer than 180 characters.',
                     ]),
                     new Regex([
                         'pattern' => '/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix',
-                        'message' => "Email is incorrect."
+                        'message' => 'Email is incorrect.'
                     ]),
                 ],
             ])
@@ -64,8 +64,8 @@ class UserRegisterType extends AbstractType
                         'message' => 'Phone number cannot be null.',
                     ]),
                     new Regex([
-                        'pattern' => '/^[0-9]{10,20}$/',
-                        'message' => "Phone number is incorrect."
+                        'pattern' => '/^[0-9]{10,11}$/',
+                        'message' => 'Phone number is incorrect.'
                     ]),
                 ],
             ])
@@ -77,7 +77,7 @@ class UserRegisterType extends AbstractType
                     ]),
                     new Regex([
                         'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/',
-                        'message' => "Password is incorrect."
+                        'message' => 'Password is incorrect.'
                     ]),
                 ],
             ])

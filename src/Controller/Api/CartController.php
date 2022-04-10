@@ -51,7 +51,7 @@ class CartController extends BaseController
             $offset = $limit * ($page - 1);
             $carts = $this->cartRepository->findBy(
                 ['deleteAt' => null, 'user' => $this->userLoginInfo->getId()],
-                ['id' => 'DESC'],
+                self::ORDER_BY_DEFAULT,
                 $limit,
                 $offset
             );
@@ -120,6 +120,7 @@ class CartController extends BaseController
                     $cartItem->setUpdateAt(new \DateTime("now"));
                     $cartItem->setDeleteAt(null);
 
+                    //Calculating the quantity of product need to add to cart
                     $storageAmount = $cartItem->getProductItem()->getAmount();
                     $newCartItemAmount = $cartItem->getAmount() + intval($payload['amount']);
                     if ($storageAmount < $newCartItemAmount) {
@@ -173,6 +174,7 @@ class CartController extends BaseController
                 $form->submit($payload);
                 if ($form->isSubmitted() && $form->isValid()) {
                     $cartItem->setUpdateAt(new \DateTime("now"));
+                    $cartItem->setDeleteAt(null);
                     $this->cartRepository->add($cartItem);
 
                     return $this->handleView($this->view(

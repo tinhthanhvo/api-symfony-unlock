@@ -38,18 +38,19 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
+        $filterByStatus = $request->get('status', 0);
         $offset = $limit * ($page - 1);
 
         $today = new \DateTime("now");
         $fromDateRequest = $request->get('fromDate', '1900-01-01');
         $fromDate = new \DateTime($fromDateRequest);
-        $toDateRequest = $request->get('toDate', $today).' 23:59:59.999999';
+        $toDateRequest = $request->get('toDate', $today) . ' 23:59:59.999999';
         $toDate = new \DateTime($toDateRequest);
 
-        if($fromDate > $toDate || $fromDate > $today) {
+        if ($fromDate > $toDate || $fromDate > $today) {
             return $this->handleView($this->view(['error' => 'Request is unsuccessful.'], Response::HTTP_BAD_REQUEST));
         }
-        $purchaseOrders = $this->purchaseOrderRepository->findByConditions(['fromDate' => $fromDate, 'toDate' => $toDate], ['status' => 'ASC'], $limit, $offset);
+        $purchaseOrders = $this->purchaseOrderRepository->findByConditions(['fromDate' => $fromDate, 'toDate' => $toDate, 'status' => $filterByStatus], ['status' => 'ASC'], $limit, $offset);
         $purchaseOrders['data'] = array_map('self::dataTransferOrderObject', $purchaseOrders['data']);
         return $this->handleView($this->view($purchaseOrders, Response::HTTP_OK));
     }

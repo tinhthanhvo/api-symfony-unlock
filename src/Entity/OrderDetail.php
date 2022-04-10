@@ -57,7 +57,7 @@ class OrderDetail
 
     public function __construct()
     {
-        $this->setCreateAt();
+        $this->createAt = new \DateTime("now");
     }
 
     public function getId(): ?int
@@ -94,9 +94,9 @@ class OrderDetail
         return $this->createAt;
     }
 
-    public function setCreateAt(): self
+    public function setCreateAt(?\DateTimeInterface $createAt): self
     {
-        $this->createAt = new \DateTime("now");
+        $this->createAt = $createAt;
 
         return $this;
     }

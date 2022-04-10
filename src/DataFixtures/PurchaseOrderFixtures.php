@@ -60,7 +60,7 @@ class PurchaseOrderFixtures extends Fixture
         $firstOrderDetail = new OrderDetail();
         $firstOrderDetail->setProductItem($firstProductItem);
         $firstOrderDetail->setAmount($firstCartItem->getAmount());
-        $firstOrderDetail->setPrice($firstCartItem->getAmount()*$firstProductItem->getProduct()->getPrice());
+        $firstOrderDetail->setPrice($firstCartItem->getAmount() * $firstProductItem->getProduct()->getPrice());
 
         // Second product
         $secondProduct = new Product();
@@ -88,8 +88,7 @@ class PurchaseOrderFixtures extends Fixture
         $secondOrderDetail = new OrderDetail();
         $secondOrderDetail->setProductItem($secondProductItem);
         $secondOrderDetail->setAmount($secondCartItem->getAmount());
-        $secondOrderDetail->setPrice($secondCartItem->getAmount()*$secondProductItem->getProduct()->getPrice());
-
+        $secondOrderDetail->setPrice($secondCartItem->getAmount() * $secondProductItem->getProduct()->getPrice());
 
         $purchaseOrder = new PurchaseOrder($user, 0);
         $purchaseOrder->setRecipientName('Recipient Name');

@@ -59,9 +59,7 @@ class HomePageControllerTest extends BaseWebTestCase
             '/api/products',
             [],
             [],
-            [
-                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE
-            ]
+            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE]
         );
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -70,8 +68,8 @@ class HomePageControllerTest extends BaseWebTestCase
         $this->assertCount(2, $data);
 
         $product = $data[0];
-        $this->assertSame('Product name 1', $product['name']);
-        $this->assertSame('300000', $product['price']);
+        $this->assertSame('Product name 2', $product['name']);
+        $this->assertEquals(500000, $product['price']);
     }
 
     public function testFilterByCondition(): void
