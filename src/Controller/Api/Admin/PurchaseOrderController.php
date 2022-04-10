@@ -90,7 +90,7 @@ class PurchaseOrderController extends AbstractFOSRestController
      */
     public function getDataToChart(): Response
     {
-        $dataChart = $this->purchaseOrderRepository->getDataToChart();
+        $dataChart = $this->purchaseOrderRepository->reportDataCompletedOrders();
 
         return $this->handleView($this->view($dataChart, Response::HTTP_OK));
     }

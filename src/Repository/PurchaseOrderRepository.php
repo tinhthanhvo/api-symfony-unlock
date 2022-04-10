@@ -229,19 +229,37 @@ class PurchaseOrderRepository extends ServiceEntityRepository
      * @return array[]
      * @throws Exception
      */
-    public function getDataToChart(): array
+    public function reportDataCompletedOrders(): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        $sql = "SELECT MONTH(create_at) as month,
-                       YEAR(create_at) as year ,
-                       CONCAT(MONTH(create_at), '/', YEAR(create_at)) as date,
+        $sql = "SELECT CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at)) as date,
                        (SUM(total_price)-SUM(shipping_cost)) as revenue, COUNT(id) as amountCompletedOrder
                 FROM `purchase_order`
                 WHERE delete_at IS NULL and status like 4
-                GROUP BY MONTH(create_at), YEAR(create_at), CONCAT(MONTH(create_at), '/', YEAR(create_at))
-                ORDER BY YEAR(create_at) DESC, MONTH(create_at) DESC
-                LIMIT 6;";
+                GROUP BY DAY(create_at), CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at))
+                ORDER BY DAY(create_at) ASC
+                LIMIT 14;";
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @return array[]
+     * @throws Exception
+     */
+    public function reportDataCountOrders(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at)) as date,
+                       COUNT(id) as amountOrder
+                FROM `purchase_order`
+                WHERE delete_at IS NULL AND status in (3,4)
+                GROUP BY DAY(create_at), CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at))
+                ORDER BY DAY(create_at) ASC
+                LIMIT 14;";
         $stmt = $conn->prepare($sql);
 
         return $stmt->executeQuery()->fetchAllAssociative();
