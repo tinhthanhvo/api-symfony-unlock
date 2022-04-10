@@ -178,7 +178,7 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $formattedPurchaseOrder = [];
         $formattedPurchaseOrder['id'] = $purchaseOrder->getId();
-        $formattedPurchaseOrder['createAt'] = $purchaseOrder->getCreateAt()->format('d-m-y');
+        $formattedPurchaseOrder['createAt'] = $purchaseOrder->getCreateAt()->format('d-m-Y');
         $formattedPurchaseOrder['recipientName'] = $purchaseOrder->getRecipientName();
         $formattedPurchaseOrder['recipientEmail'] = $purchaseOrder->getRecipientEmail();
         $formattedPurchaseOrder['recipientPhone'] = $purchaseOrder->getRecipientPhone();
