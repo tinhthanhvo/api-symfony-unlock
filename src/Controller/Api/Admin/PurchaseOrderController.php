@@ -5,6 +5,7 @@ namespace App\Controller\Api\Admin;
 use App\Entity\OrderDetail;
 use App\Entity\PurchaseOrder;
 use App\Repository\PurchaseOrderRepository;
+use Doctrine\DBAL\Exception;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
@@ -68,14 +69,30 @@ class PurchaseOrderController extends AbstractFOSRestController
         $fromDate = new \DateTime($fromDateRequest);
         $toDate = new \DateTime($fromDateRequest.' 23:59:59.999999');
 
-        $summery['revenue'] = $this->purchaseOrderRepository->getRevenue($fromDate, $toDate);
+//        $revenue = $this->purchaseOrderRepository->getRevenue($fromDate, $toDate);
+        $revenue = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'totalPrice');
         $summery['amountOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 0);
+        $summery['totalShippingCost'] = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'shippingCost');
+        $summery['revenue'] = $revenue - $summery['totalShippingCost'];
+        $summery['totalItem'] = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'totalItem');
         $summery['amountPendingOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 1);
         $summery['amountApprovedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 2);
         $summery['amountCanceledOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 3);
         $summery['amountCompletedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 4);
 
         return $this->handleView($this->view($summery, Response::HTTP_OK));
+    }
+
+    /**
+     * @Rest\Get("/chart")
+     * @return Response
+     * @throws Exception
+     */
+    public function getDataToChart(): Response
+    {
+        $dataChart = $this->purchaseOrderRepository->getDataToChart();
+
+        return $this->handleView($this->view($dataChart, Response::HTTP_OK));
     }
 
     /**
