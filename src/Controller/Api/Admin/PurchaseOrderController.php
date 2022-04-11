@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api\Admin;
 
+use App\Controller\BaseController;
 use App\Entity\OrderDetail;
 use App\Entity\PurchaseOrder;
 use App\Event\PurchaseOrderEvent;
@@ -51,7 +52,7 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
-        $filterByStatus = $request->get('status', 0);
+        $filterByStatus = $request->get('status', BaseController::STATUS_DEFAULT_NULL);
         $offset = $limit * ($page - 1);
 
         $today = new \DateTime("now");
@@ -82,14 +83,14 @@ class PurchaseOrderController extends AbstractFOSRestController
         $toDate = new \DateTime($fromDateRequest . ' 23:59:59.999999');
 
         $revenue = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'totalPrice');
-        $summery['amountOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 0);
+        $summery['amountOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_DEFAULT_NULL);
         $summery['totalShippingCost'] = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'shippingCost');
         $summery['revenue'] = $revenue - $summery['totalShippingCost'];
         $summery['totalItem'] = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'totalItem');
-        $summery['amountPendingOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 1);
-        $summery['amountApprovedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 2);
-        $summery['amountCanceledOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 3);
-        $summery['amountCompletedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 4);
+        $summery['amountPendingOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_PENDING);
+        $summery['amountApprovedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_APPROVED);
+        $summery['amountCanceledOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_CANCELED);
+        $summery['amountCompletedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_COMPLETED);
 
         return $this->handleView($this->view($summery, Response::HTTP_OK));
     }
@@ -161,8 +162,8 @@ class PurchaseOrderController extends AbstractFOSRestController
         try {
             $status = $purchaseOrder->getStatus();
 
-            if ($status == '1') {
-                $purchaseOrder->setStatus('3');
+            if ($status == BaseController::STATUS_PENDING) {
+                $purchaseOrder->setStatus(BaseController::STATUS_CANCELED);
                 $purchaseOrder->setUpdateAt(new \DateTime());
 
                 $items = $purchaseOrder->getOrderItems();
@@ -275,7 +276,7 @@ class PurchaseOrderController extends AbstractFOSRestController
             return ['messageError' => 'The new status same with the current status.'];
         }
 
-        if($previousStatus == 3) {
+        if($previousStatus == BaseController::STATUS_CANCELED) {
             return ['messageError' => 'The purchase order was canceled.'];
         }
 

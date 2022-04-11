@@ -69,18 +69,20 @@ class PurchaseOrderControllerTest extends BaseWebTestCase
             'recipientName' => 'Vo Tinh Thanh',
             'recipientEmail' => 'votinhthanh.dev@gmail.com',
             'recipientPhone' => '0939456886',
-            'addressDelivery' => 'NFQ Can Tho, Xuan Khanh, Ninh Kieu, CT'
+            'addressDelivery' => 'NFQ Can Tho, Xuan Khanh, Ninh Kieu, CT',
+            'shippingCost' => 10
         ];
 
         $this->client->request(
             Request::METHOD_POST,
             'api/users/orders',
-            [$payload],
+            [],
             [],
             [
                 'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
                 'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
-            ]
+            ],
+            json_encode($payload)
         );
 
         $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
@@ -93,7 +95,7 @@ class PurchaseOrderControllerTest extends BaseWebTestCase
         $this->assertSame('Pending', $order['status']);
         $this->assertCount(2, $order['items']);
         $this->assertEquals(2, $order['amount']);
-        $this->assertEquals(800000, $order['totalPrice']);
+        $this->assertEquals(800010, $order['totalPrice']);
     }
 
     public function testCancelPurchaseOrderAction(): void

@@ -22,6 +22,12 @@ class BaseController extends AbstractFOSRestController
     protected const ORDER_BY_DEFAULT = ['id' => 'DESC'];
     protected const CONDITION_DEFAULT = ['deleteAt' => null];
     protected const ITEMS_PAGE_NUMBER_DEFAULT = 1;
+    public const DEFAULT_NULL = 0;
+    public const STATUS_DEFAULT_NULL = 0;
+    public const STATUS_PENDING = 1;
+    public const STATUS_APPROVED = 2;
+    public const STATUS_CANCELED = 3;
+    public const STATUS_COMPLETED = 4;
 
     /** @var CartRepository */
     protected $cartRepository;

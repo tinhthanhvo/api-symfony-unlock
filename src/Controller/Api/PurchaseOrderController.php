@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Controller\BaseController;
 use App\Entity\OrderDetail;
 use App\Entity\PurchaseOrder;
 use App\Event\PurchaseOrderEvent;
@@ -54,7 +55,7 @@ class PurchaseOrderController extends AbstractFOSRestController
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
         $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
         $offset = $limit * ($page - 1);
-        $filterByStatus = $request->get('status', 0);
+        $filterByStatus = $request->get('status', BaseController::STATUS_DEFAULT_NULL);
         $orders = $this->purchaseOrderRepository->findByConditions(['deleteAt' => null, 'customer' => $userId, 'status' => $filterByStatus], ['status' => 'ASC', 'id' => 'DESC'], $limit, $offset);
         $orders['data'] = array_map('self::dataTransferOrderObject', $orders['data']);
 
@@ -80,7 +81,7 @@ class PurchaseOrderController extends AbstractFOSRestController
     {
         $order = new PurchaseOrder($this->userLoginInfo);
         $form = $this->createForm(PurchaseOrderType::class, $order);
-        $requestData = $request->request->all();
+        $requestData = json_decode($request->getContent(), true);
         $form->submit($requestData);
 
         $totalPrice = 0;
@@ -144,8 +145,8 @@ class PurchaseOrderController extends AbstractFOSRestController
         try {
             $status = $purchaseOrder->getStatus();
 
-            if ($status == '1') {
-                $purchaseOrder->setStatus('3');
+            if ($status == BaseController::STATUS_PENDING) {
+                $purchaseOrder->setStatus(BaseController::STATUS_CANCELED);
                 $purchaseOrder->setUpdateAt(new \DateTime());
 
                 $items = $purchaseOrder->getOrderItems();
@@ -158,7 +159,7 @@ class PurchaseOrderController extends AbstractFOSRestController
                 }
                 $this->purchaseOrderRepository->add($purchaseOrder);
 
-                $event = new PurchaseOrderEvent($purchaseOrder, 1, "USER");
+                $event = new PurchaseOrderEvent($purchaseOrder, BaseController::STATUS_PENDING, "USER");
                 $this->eventDispatcher->dispatch($event);
 
                 return $this->handleView($this->view(['success' => 'Order is canceled!'], Response::HTTP_NO_CONTENT));

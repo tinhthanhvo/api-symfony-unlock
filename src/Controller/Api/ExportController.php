@@ -24,7 +24,7 @@ class ExportController extends BaseController
             $order = $this->purchaseOrderRepository->findOneBy([
                 'id' => $id,
                 'customer' => $this->userLoginInfo->getId(),
-                'status' => 4,
+                'status' => self::STATUS_COMPLETED,
                 'deleteAt' => null
             ]);
             if ($order) {

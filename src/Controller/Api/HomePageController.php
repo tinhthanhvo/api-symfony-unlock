@@ -249,7 +249,7 @@ class HomePageController extends AbstractFOSRestController
      */
     public function sendMail(): Response
     {
-        $purchaseOrder = new PurchaseOrder(new User(), 0);
+        $purchaseOrder = new PurchaseOrder(new User());
         $event = new PurchaseOrderEvent($purchaseOrder);
         $this->eventDispatcher->dispatch($event);
 

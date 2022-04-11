@@ -48,9 +48,9 @@ class ReportController extends BaseController
                 $input = new ArrayInput([
                     'command' => 'report:purchase-order',
                     '--name' => (!empty($payload['fileName'])) ? $payload['fileName'] : 'Report_Order_' . date('YmdHis'),
-                    'status' => (!empty($payload['status'])) ? $payload['status'] : 0,
-                    'fromDate' => (!empty($payload['fromDate'])) ? $payload['fromDate'] : 0,
-                    'toDate' => (!empty($payload['toDate'])) ? $payload['toDate'] : 0
+                    'status' => (!empty($payload['status'])) ? $payload['status'] : self::DEFAULT_NULL,
+                    'fromDate' => (!empty($payload['fromDate'])) ? $payload['fromDate'] : self::DEFAULT_NULL,
+                    'toDate' => (!empty($payload['toDate'])) ? $payload['toDate'] : self::DEFAULT_NULL
                 ]);
 
                 $output = new BufferedOutput();
@@ -92,9 +92,9 @@ class ReportController extends BaseController
                 $input = new ArrayInput([
                     'command' => 'report:product',
                     '--name' => (!empty($payload['fileName'])) ? $payload['fileName'] : 'Report_Product_' . date('YmdHis'),
-                    'product_id' => (!empty($payload['productId'])) ? $payload['productId'] : 0,
-                    'fromDate' => (!empty($payload['fromDate'])) ? $payload['fromDate'] : 0,
-                    'toDate' => (!empty($payload['toDate'])) ? $payload['toDate'] : 0
+                    'product_id' => (!empty($payload['productId'])) ? $payload['productId'] : self::DEFAULT_NULL,
+                    'fromDate' => (!empty($payload['fromDate'])) ? $payload['fromDate'] : self::DEFAULT_NULL,
+                    'toDate' => (!empty($payload['toDate'])) ? $payload['toDate'] : self::DEFAULT_NULL
                 ]);
 
                 $output = new BufferedOutput();

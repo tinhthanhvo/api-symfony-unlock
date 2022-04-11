@@ -30,6 +30,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class ProductController extends AbstractFOSRestController
 {
     public const PRODUCT_PER_PAGE = 10;
+    public const AMOUNT_IMAGE_REQUIRE = 5;
     public const PRODUCT_PAGE_NUMBER = 1;
     public const ORDER_BY_DEFAULT = ['id' => 'DESC'];
     const CONDITION_DEFAULT = ['deleteAt' => null];
@@ -156,7 +157,7 @@ class ProductController extends AbstractFOSRestController
         $form->submit($requestData);
         if ($form->isSubmitted()) {
             $galleryData = $request->files->get('gallery');
-            if (count($galleryData) != 5) {
+            if (count($galleryData) != self::AMOUNT_IMAGE_REQUIRE) {
                 return $this->handleView($this->view([
                     'error' => 'You must choose five images to upload for product.'
                 ], Response::HTTP_BAD_REQUEST));
@@ -243,7 +244,7 @@ class ProductController extends AbstractFOSRestController
 
             $galleryData = $request->files->get('gallery');
             if ($galleryData != null) {
-                if (count($galleryData) != 5) {
+                if (count($galleryData) != self::AMOUNT_IMAGE_REQUIRE) {
                     return $this->handleView($this->view([
                         'error' => 'You must choose five images to upload for product.'
                     ], Response::HTTP_BAD_REQUEST));
