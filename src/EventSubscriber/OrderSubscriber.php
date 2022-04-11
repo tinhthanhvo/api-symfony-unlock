@@ -87,8 +87,8 @@ class OrderSubscriber implements EventSubscriberInterface
         if ($status != $previousStatus) {
             $this->mailerService->send(
                 'Update Status To Order',
-                'tinhthanh2210@gmail.com',
-                'nguyenthilananh0606@gmail.com',
+                'tinhthanh.vo@nfq.asia',
+                'ntlananhh99@gmail.com',
                 PurchaseOrderEvent::TEMPLATE_UPDATE_STATUS,
                 $params
             );
