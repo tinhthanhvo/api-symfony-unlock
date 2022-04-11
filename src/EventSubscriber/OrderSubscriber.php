@@ -14,6 +14,7 @@ class OrderSubscriber implements EventSubscriberInterface
      */
     protected $mailerService;
     public const ADDRESS_SEND_MAIL_DEFAULT = 'tinhthanh2210@gmail.com';
+    public const ADDRESS_EMAIL_ADMIN = 'ntlananhh99@gmail.com';
 
     public function __construct(MailerService $mailerService)
     {
@@ -79,7 +80,7 @@ class OrderSubscriber implements EventSubscriberInterface
             $this->mailerService->send(
                 'Confirm order information',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
-                'nguyenthilananh0606@gmail.com',
+                self::ADDRESS_EMAIL_ADMIN,
                 PurchaseOrderEvent::TEMPLATE_CONFIRM,
                 $params
             );
@@ -89,7 +90,7 @@ class OrderSubscriber implements EventSubscriberInterface
             $this->mailerService->send(
                 'Update Status To Order',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
-                'ntlananhh99@gmail.com',
+                self::ADDRESS_EMAIL_ADMIN,
                 PurchaseOrderEvent::TEMPLATE_UPDATE_STATUS,
                 $params
             );
