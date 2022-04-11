@@ -242,7 +242,7 @@ class ProductController extends AbstractFOSRestController
             }
 
             $galleryData = $request->files->get('gallery');
-            if($galleryData != null) {
+            if ($galleryData != null) {
                 if (count($galleryData) != 5) {
                     return $this->handleView($this->view([
                         'error' => 'You must choose five images to upload for product.'

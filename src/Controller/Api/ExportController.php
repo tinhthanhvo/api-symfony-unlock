@@ -20,29 +20,29 @@ class ExportController extends BaseController
      */
     public function exportCustomerInvoice(int $id): Response
     {
-        // try {
+        try {
             $order = $this->purchaseOrderRepository->findOneBy([
                 'id' => $id,
                 'customer' => $this->userLoginInfo->getId(),
                 'status' => 4,
                 'deleteAt' => null
             ]);
-        if ($order) {
-            $pdfPathFile = $this->exportData->exportCustomerInvoiceToPdf($order);
+            if ($order) {
+                $pdfPathFile = $this->exportData->exportCustomerInvoiceToPdf($order);
 
-            return $this->handleView($this->view(
-                ['success' => $pdfPathFile],
-                Response::HTTP_OK
-            ));
-        }
+                return $this->handleView($this->view(
+                    ['success' => $pdfPathFile],
+                    Response::HTTP_OK
+                ));
+            }
 
             return $this->handleView($this->view(
                 ['error' => 'No order was found with this id.'],
                 Response::HTTP_NOT_FOUND
             ));
-        // } catch (\Exception $e) {
-        //     $this->logger->error($e->getMessage());
-        // }
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
 
         return $this->handleView($this->view(
             ['error' => 'Something went wrong! Please contact support.'],

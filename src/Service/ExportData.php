@@ -6,7 +6,6 @@ use App\Entity\PurchaseOrder;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 
 class ExportData extends AbstractController
 {
@@ -17,32 +16,24 @@ class ExportData extends AbstractController
      */
     public function exportCustomerInvoiceToPdf(PurchaseOrder $purchaseOrder): string
     {
-        // dd($purchaseOrder);
+        $fileName = 'Invoice_' . date('YmdHis') . '.pdf';
 
         $options = new Options();
-        $options->set('defaultFont', 'Roboto');
+        $options->setIsRemoteEnabled(true);
+        $options->setIsHtml5ParserEnabled(true);
         $dompdf = new Dompdf($options);
-
-        // $data = [
-        //     'headline' => 'my headline'
-        // ];
-        // $html = $this->renderView('pdf/user_order.html.twig', [
-        //     'headline' => "Test pdf generator"
-        // ]);
 
         $html = $this->renderView('pdf/user_order.html.twig', [
             'invoice' => $purchaseOrder,
             'exportDate' => new \DateTime("now")
         ]);
-
-
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->stream("testpdf.pdf", [
+        $dompdf->stream($fileName, [
             "Attachment" => true
         ]);
 
-        return "";
+        return 'http://127.0.0.1:8080/' . $fileName;
     }
 }
