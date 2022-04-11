@@ -8,13 +8,13 @@
                 <table style="width:100%;max-width:960px;border-spacing:0;border-collapse:separate;margin:0">
                     <tbody>
                     <tr>
-                        <td style="padding:15px;border:1px solid #dfe1e6;border-radius:4px">
+                        <td style="padding:20px 40px;border:1px solid #dfe1e6;border-radius:4px">
                             <table style="width:100%;max-width:910px;border-collapse:collapse;border-spacing:0;margin:0">
                                 <thead>
                                 <tr>
                                     <td colspan="3" style="padding:0">
                                         <div style="margin:6px 0 0 0;padding:0;font-size:20px;font-weight:400;line-height:24px">
-                                            <p>Update status</p>
+                                            <p><strong>[UPDATE STATUS]</strong></p>
                                             <p> Order code: #{{ order.getId() }}</p>
                                         </div>
                                     </td>
@@ -33,7 +33,7 @@
                                         Status:
                                     </td>
                                     <td style="padding:0 10px">
-                                <span style="font-size:20px;display:inline-block;padding:5px 12px;border-radius:4px;background:#ffebe6;text-decoration:line-through">
+                                <span style="font-size:18px;display:inline-block;padding:10px 12px;border-radius:4px;background:#ffebe6;text-decoration:line-through">
                                     {% if previousStatus == 1 %}
                                         <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
                                     {% elseif previousStatus == 2 %}
@@ -45,7 +45,7 @@
                                     {% endif %}
                                 </span>
                                         <span>→</span>
-                                        <span style="display:inline-block;padding:5px 12px;border-radius:4px;background:#e3fcef">
+                                        <span style="font-size:18px;display:inline-block;padding:5px 12px;border-radius:4px;background:#e3fcef">
                                     {% if order.getStatus() == 1 %}
                                         <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
                                     {% elseif order.getStatus() == 2 %}

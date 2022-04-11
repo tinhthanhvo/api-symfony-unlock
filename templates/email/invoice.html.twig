@@ -15,7 +15,7 @@
         <td colspan="2" style="border: solid 1px #ddd; padding:10px 20px;">
             <p style="font-size:14px;margin:0 0 6px 0;"><span style="font-weight:bold;display:inline-block;min-width:150px">Order status</span>
                 {% if order.getStatus() == 1 %}
-                    <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
+                    <b style="color:cadetblue;font-weight:bold;margin:0;">PENDING</b>
                 {% elseif order.getStatus() == 2 %}
                     <b style="color:lawngreen;font-weight:normal;margin:0">APPROVED</b>
                 {% elseif order.getStatus() == 3 %}
@@ -24,7 +24,7 @@
                     <b style="color:darkgreen;font-weight:normal;margin:0">COMPLETED</b>
                 {% endif %}
             </p>
-            <p style="font-size:14px;margin:0 0 6px 0;"><span style="font-weight:bold;display:inline-block;min-width:146px">Invoice ID</span> {{ order.getId() }}</p>
+            <p style="font-size:14px;margin:0 0 6px 0;"><span style="font-weight:bold;display:inline-block;min-width:146px">Order code:</span> #{{ order.getId() }}</p>
         </td>
     </tr>
     <tr>
@@ -45,9 +45,6 @@
     </tr>
     <tr>
         {% for orderDetail in order.getOrderItems() %}
-            <td colspan="2" style="padding:15px;">
-                <img src="{{ order.getGallery()[0] }}" alt="cover image" style="width: 100px; height: 100px; text-indent: -9999px;">
-            </td>
             <td colspan="2">
                 <p style="font-size:14px;margin:0;padding:10px;border:solid 1px #ddd;font-weight:bold;"><span style="display:block;font-size:13px;font-weight:normal;">
                         {{ orderDetail.getProductItem().getProduct().getName() }}</span>
