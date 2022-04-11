@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api\Admin;
 
+use App\Controller\BaseController;
 use App\Entity\Cart;
 use App\Entity\Gallery;
 use App\Entity\Product;
@@ -27,7 +28,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 /**
  * @IsGranted("ROLE_ADMIN")
  */
-class ProductController extends AbstractFOSRestController
+class ProductController extends BaseController
 {
     public const PRODUCT_PER_PAGE = 10;
     public const AMOUNT_IMAGE_REQUIRE = 5;
@@ -35,26 +36,6 @@ class ProductController extends AbstractFOSRestController
     public const ORDER_BY_DEFAULT = ['id' => 'DESC'];
     const CONDITION_DEFAULT = ['deleteAt' => null];
     public const PATH = 'http://127.0.0.1:8080/uploads/images/';
-    private $productRepository;
-    private $sizeRepository;
-    /**
-     * @var ProductItemRepository
-     */
-    private $productItemRepository;
-    private $galleryRepository;
-
-    public function __construct(
-        ProductRepository $productRepository,
-        SizeRepository $sizeRepository,
-        ProductItemRepository $productItemRepository,
-        CartRepository $cartRepository,
-        GalleryRepository $galleryRepository
-    ) {
-        $this->productRepository = $productRepository;
-        $this->sizeRepository = $sizeRepository;
-        $this->productItemRepository = $productItemRepository;
-        $this->galleryRepository = $galleryRepository;
-    }
 
     /**
      * @Rest\Get("/products")
@@ -400,22 +381,5 @@ class ProductController extends AbstractFOSRestController
         $item['size'] = $productItem->getSize()->getValue();
 
         return $item;
-    }
-
-    /**
-     * @param array $data
-     * @param string $group
-     * @return array
-     */
-    private function transferDataGroup(array $data, string $group): array
-    {
-        $serializer = SerializerBuilder::create()->build();
-        $convertToJson = $serializer->serialize(
-            $data,
-            'json',
-            SerializationContext::create()->setGroups(array($group))
-        );
-
-        return $serializer->deserialize($convertToJson, 'array', 'json');
     }
 }

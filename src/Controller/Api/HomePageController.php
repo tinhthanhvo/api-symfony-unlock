@@ -2,22 +2,17 @@
 
 namespace App\Controller\Api;
 
+use App\Controller\BaseController;
 use App\Entity\Color;
 use App\Entity\Product;
 use App\Entity\ProductItem;
 use App\Entity\PurchaseOrder;
 use App\Entity\User;
 use App\Event\PurchaseOrderEvent;
-use App\Repository\CartRepository;
-use App\Repository\CategoryRepository;
-use App\Repository\ColorRepository;
-use App\Repository\ProductRepository;
 use App\Service\GetUserInfo;
 use App\Service\MailerService;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\Serializer\SerializationContext;
-use JMS\Serializer\SerializerBuilder;
 use Monolog\Handler\SendGridHandler;
 use SendGrid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -28,46 +23,12 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
 
-class HomePageController extends AbstractFOSRestController
+class HomePageController extends BaseController
 {
     public const PRODUCT_PER_PAGE = 9;
     public const PRODUCT_PAGE_NUMBER = 1;
     public const ORDER_BY_DEFAULT = ['id' => 'DESC'];
     const CONDITION_DEFAULT = ['deleteAt' => null];
-
-    /** @var CategoryRepository */
-    private $categoryRepository;
-
-    /** @var CartRepository */
-    private $cartRepository;
-
-    private $eventDispatcher;
-
-    /** @var ProductRepository */
-    private $productRepository;
-
-    /** @var User|null */
-    private $userLoginInfo;
-    /**
-     * @var ColorRepository
-     */
-    private $colorRepository;
-
-    public function __construct(
-        CategoryRepository $categoryRepository,
-        ColorRepository $colorRepository,
-        CartRepository $cartRepository,
-        EventDispatcherInterface $eventDispatcher,
-        GetUserInfo $userLogin,
-        ProductRepository $productRepository
-    ) {
-        $this->categoryRepository = $categoryRepository;
-        $this->cartRepository = $cartRepository;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->userLoginInfo = $userLogin->getUserLoginInfo();
-        $this->productRepository = $productRepository;
-        $this->colorRepository = $colorRepository;
-    }
 
     /**
      * @Rest\Get("/categories")
@@ -224,23 +185,6 @@ class HomePageController extends AbstractFOSRestController
         $item['size'] = $productItem->getSize()->getValue();
 
         return $item;
-    }
-
-    /**
-     * @param array $data
-     * @param string $group
-     * @return array
-     */
-    private function transferDataGroup(array $data, string $group): array
-    {
-        $serializer = SerializerBuilder::create()->build();
-        $convertToJson = $serializer->serialize(
-            $data,
-            'json',
-            SerializationContext::create()->setGroups(array($group))
-        );
-
-        return $serializer->deserialize($convertToJson, 'array', 'json');
     }
 
     /**

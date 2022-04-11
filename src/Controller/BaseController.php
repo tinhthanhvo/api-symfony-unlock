@@ -2,11 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ColorRepository;
+use App\Repository\GalleryRepository;
+use App\Repository\ProductItemRepository;
 use App\Repository\ProductRepository;
 use App\Repository\PurchaseOrderRepository;
+use App\Repository\SizeRepository;
 use App\Repository\UserRepository;
 use App\Service\ExportData;
 use App\Service\GetUserInfo;
@@ -14,6 +18,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Psr\Log\LoggerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Form;
 
@@ -54,6 +59,22 @@ class BaseController extends AbstractFOSRestController
 
     /** @var User|null */
     protected $userLoginInfo;
+    /**
+     * @var SizeRepository
+     */
+    protected $sizeRepository;
+    /**
+     * @var ProductItemRepository
+     */
+    protected $productItemRepository;
+    /**
+     * @var GalleryRepository
+     */
+    protected $galleryRepository;
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     public function __construct(
         CartRepository $cartRepository,
@@ -64,7 +85,11 @@ class BaseController extends AbstractFOSRestController
         UserRepository $userRepository,
         ExportData $exportData,
         LoggerInterface $logger,
-        GetUserInfo $userLogin
+        GetUserInfo $userLogin,
+        SizeRepository $sizeRepository,
+        ProductItemRepository $productItemRepository,
+        GalleryRepository $galleryRepository,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->cartRepository = $cartRepository;
         $this->categoryRepository = $categoryRepository;
@@ -75,6 +100,10 @@ class BaseController extends AbstractFOSRestController
         $this->exportData = $exportData;
         $this->logger = $logger;
         $this->userLoginInfo = $userLogin->getUserLoginInfo();
+        $this->sizeRepository = $sizeRepository;
+        $this->productItemRepository = $productItemRepository;
+        $this->galleryRepository = $galleryRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**

@@ -25,23 +25,10 @@ use Symfony\Component\Validator\Constraints\Date;
 /**
  * @IsGranted("ROLE_ADMIN")
  */
-class PurchaseOrderController extends AbstractFOSRestController
+class PurchaseOrderController extends BaseController
 {
     public const PRODUCT_PER_PAGE = 10;
     public const PRODUCT_PAGE_NUMBER = 1;
-    private $purchaseOrderRepository;
-    private $eventDispatcher;
-    private $productItemRepository;
-
-    public function __construct(
-        PurchaseOrderRepository $purchaseOrderRepository,
-        ProductItemRepository $productItemRepository,
-        EventDispatcherInterface $eventDispatcher
-    ) {
-        $this->purchaseOrderRepository = $purchaseOrderRepository;
-        $this->productItemRepository = $productItemRepository;
-        $this->eventDispatcher = $eventDispatcher;
-    }
 
     /**
      * @Rest\Get("/orders")

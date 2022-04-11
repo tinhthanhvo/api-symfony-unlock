@@ -21,29 +21,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 /**
 * @IsGranted("ROLE_USER")
 */
-class PurchaseOrderController extends AbstractFOSRestController
+class PurchaseOrderController extends BaseController
 {
     public const PRODUCT_PER_PAGE = 10;
     public const PRODUCT_PAGE_NUMBER = 1;
-    private $purchaseOrderRepository;
-    private $productItemRepository;
-    private $userLoginInfo;
-    private $cartRepository;
-    private $eventDispatcher;
-
-    public function __construct(
-        PurchaseOrderRepository $purchaseOrderRepository,
-        GetUserInfo $userLogin,
-        ProductItemRepository $productItemRepository,
-        CartRepository $cartRepository,
-        EventDispatcherInterface $eventDispatcher
-    ) {
-        $this->purchaseOrderRepository = $purchaseOrderRepository;
-        $this->userLoginInfo = $userLogin->getUserLoginInfo();
-        $this->productItemRepository = $productItemRepository;
-        $this->cartRepository = $cartRepository;
-        $this->eventDispatcher = $eventDispatcher;
-    }
 
     /**
     * @Rest\Get("/users/orders")
