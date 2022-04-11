@@ -4,11 +4,17 @@ namespace App\Controller\Api\Admin;
 
 use App\Entity\OrderDetail;
 use App\Entity\PurchaseOrder;
+use App\Event\PurchaseOrderEvent;
+use App\Repository\ProductItemRepository;
 use App\Repository\PurchaseOrderRepository;
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
+use phpDocumentor\Reflection\Types\Integer;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -23,11 +29,17 @@ class PurchaseOrderController extends AbstractFOSRestController
     public const PRODUCT_PER_PAGE = 10;
     public const PRODUCT_PAGE_NUMBER = 1;
     private $purchaseOrderRepository;
+    private $eventDispatcher;
+    private $productItemRepository;
 
     public function __construct(
-        PurchaseOrderRepository $purchaseOrderRepository
+        PurchaseOrderRepository $purchaseOrderRepository,
+        ProductItemRepository $productItemRepository,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->purchaseOrderRepository = $purchaseOrderRepository;
+        $this->productItemRepository = $productItemRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -69,7 +81,6 @@ class PurchaseOrderController extends AbstractFOSRestController
         $fromDate = new \DateTime($fromDateRequest);
         $toDate = new \DateTime($fromDateRequest . ' 23:59:59.999999');
 
-//        $revenue = $this->purchaseOrderRepository->getRevenue($fromDate, $toDate);
         $revenue = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'totalPrice');
         $summery['amountOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, 0);
         $summery['totalShippingCost'] = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'shippingCost');
@@ -97,22 +108,90 @@ class PurchaseOrderController extends AbstractFOSRestController
 
     /**
      * @Rest\Put("/orders/{id}")
+     * @param int $id
+     * @param Request $request
      * @return Response
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function updateStatusPurchaseOrderAction(PurchaseOrder $purchaseOrder, Request $request): Response
+    public function updateStatusPurchaseOrderAction(int $id, Request $request): Response
     {
-        $status = $request->get('status');
+        $purchaseOrder = $this->purchaseOrderRepository->find($id);
 
-        if ($status != $purchaseOrder->getStatus()) {
-            $purchaseOrder->setStatus($status);
-            $purchaseOrder->setUpdateAt(new \DateTime('now'));
+        if (!$purchaseOrder) {
+            return $this->handleView($this->view(
+                ['error' => 'Order is not found.'],
+                Response::HTTP_NOT_FOUND
+            ));
+        }
+        $status = $request->get('status');
+        $previousStatus = $purchaseOrder->getStatus();
+
+        if(count(self::checkUpdatingOrderCondition($purchaseOrder, $status)) > 0) {
+            return $this->handleView($this->view(
+                self::checkUpdatingOrderCondition($purchaseOrder, $status),
+                Response::HTTP_BAD_REQUEST
+            ));
         }
 
+        if($status == 3) {
+            self::cancelPurchaseOrderAction($purchaseOrder);
+        }
+
+        $purchaseOrder->setStatus($status);
+        $purchaseOrder->setUpdateAt(new \DateTime('now'));
+
         $this->purchaseOrderRepository->add($purchaseOrder);
+
+        $event = new PurchaseOrderEvent($purchaseOrder, $previousStatus);
+        $this->eventDispatcher->dispatch($event);
 
         $purchaseOrder = self::dataTransferOrderObject($purchaseOrder);
 
         return $this->handleView($this->view($purchaseOrder, Response::HTTP_OK));
+    }
+
+    /**
+     * @Rest\Delete("/users/orders/{id}")
+     * @param PurchaseOrder $purchaseOrder
+     * @return void
+     */
+    public function cancelPurchaseOrderAction(PurchaseOrder $purchaseOrder): Response
+    {
+        try {
+            $status = $purchaseOrder->getStatus();
+
+            if ($status == '1') {
+                $purchaseOrder->setStatus('3');
+                $purchaseOrder->setUpdateAt(new \DateTime());
+
+                $items = $purchaseOrder->getOrderItems();
+                foreach ($items as $item) {
+                    $productItem = $item->getProductItem();
+                    $productItem->setAmount($productItem->getAmount() + $item->getAmount());
+                    $productItem->setUpdateAt(new \DateTime());
+
+                    $this->productItemRepository->add($productItem);
+                }
+
+                $this->purchaseOrderRepository->add($purchaseOrder);
+
+                $event = new PurchaseOrderEvent($purchaseOrder);
+                $this->eventDispatcher->dispatch($event);
+
+                return $this->handleView($this->view(['success' => 'Order is canceled!'], Response::HTTP_NO_CONTENT));
+            }
+
+            return $this->handleView($this->view([
+                'error' => 'This order is approved. So, your request is failed.'
+            ], Response::HTTP_BAD_REQUEST));
+        } catch (\Exception $e) {
+            //write to log
+        }
+
+        return $this->handleView($this->view([
+            'error' => 'Something went wrong! Please contact support.'
+        ], Response::HTTP_INTERNAL_SERVER_ERROR));
     }
 
     private function dataTransferOrderObject(PurchaseOrder $purchaseOrder): array
@@ -182,5 +261,27 @@ class PurchaseOrderController extends AbstractFOSRestController
         }
 
         return $statusResponse;
+    }
+
+    /**
+     * @param PurchaseOrder $purchaseOrder
+     * @param int $status
+     * @return array|string[]
+     */
+    private function checkUpdatingOrderCondition(PurchaseOrder $purchaseOrder, int $status) : array
+    {
+        $previousStatus = $purchaseOrder->getStatus();
+        if($status == $previousStatus) {
+            return ['messageError' => 'The new status same with the current status.'];
+        }
+
+        if($previousStatus == 3) {
+            return ['messageError' => 'The purchase order was canceled.'];
+        }
+
+        if($status < $previousStatus) {
+            return ['messageError' => 'Unable to return to previous status.'];
+        }
+        return [];
     }
 }

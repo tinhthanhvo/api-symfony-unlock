@@ -12,25 +12,51 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PurchaseOrderEvent extends Event
 {
-    const TEMPLATE_CONTACT = "email/invoice.html.twig";
+    const TEMPLATE_CONFIRM = "email/invoice.html.twig";
+    const TEMPLATE_UPDATE_STATUS = "email/change_status.html.twig";
+    const TEMPLATE_CANCEL= "email/cancel.html.twig";
+    public const STATUS_PENDING = 1;
+    public const STATUS_APPROVED = 2;
+    public const STATUS_CANCELED = 3;
+    public const STATUS_COMPLETED = 4;
+    public const ROLE_DEFAULT = "ADMIN";
     /**
      * @var PurchaseOrder
      */
     public $order;
 
     /**
+     * @var int
+     */
+    public $previousStatus;
+
+    /**
+     * @var string
+     */
+    public $withRole;
+
+    /**
      * @param PurchaseOrder $order
      */
-    public function __construct(PurchaseOrder $order)
+    public function __construct(
+        PurchaseOrder $order,
+        int $previousStatus = self::STATUS_PENDING,
+        string $withRole = self::ROLE_DEFAULT)
     {
         $this->order = $order;
+        $this->previousStatus = $previousStatus;
+        $this->withRole = $withRole;
     }
 
     /**
-     * @return PurchaseOrder
+     * @return array
      */
-    public function getPurchaseOrder(): PurchaseOrder
+    public function getPurchaseOrder(): array
     {
-        return $this->order;
+        return [
+            'order' => $this->order,
+            'previousStatus' => $this->previousStatus,
+            'withRole' => $this->withRole
+        ];
     }
 }
