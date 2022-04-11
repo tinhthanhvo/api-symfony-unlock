@@ -13,6 +13,7 @@ class OrderSubscriber implements EventSubscriberInterface
      * @var MailerService
      */
     protected $mailerService;
+    public const ADDRESS_SEND_MAIL_DEFAULT = 'tinhthanh.vo@nfq.asia';
 
     public function __construct(MailerService $mailerService)
     {
@@ -35,7 +36,7 @@ class OrderSubscriber implements EventSubscriberInterface
         if($status == PurchaseOrderEvent::STATUS_PENDING) {
             $this->mailerService->send(
                 'Confirm order information',
-                'tinhthanh2210@gmail.com',
+                self::ADDRESS_SEND_MAIL_DEFAULT,
                 $order->getRecipientEmail(),
                 PurchaseOrderEvent::TEMPLATE_CONFIRM,
                 $params
@@ -45,7 +46,7 @@ class OrderSubscriber implements EventSubscriberInterface
         if($status == PurchaseOrderEvent::STATUS_CANCELED && $withRole == PurchaseOrderEvent::ROLE_DEFAULT) {
             $this->mailerService->send(
                 'Cancel Your Order',
-                'tinhthanh2210@gmail.com',
+                self::ADDRESS_SEND_MAIL_DEFAULT,
                 $order->getRecipientEmail(),
                 PurchaseOrderEvent::TEMPLATE_CANCEL,
                 $params
@@ -54,7 +55,7 @@ class OrderSubscriber implements EventSubscriberInterface
         elseif ($status != $previousStatus && $withRole == PurchaseOrderEvent::ROLE_DEFAULT) {
             $this->mailerService->send(
                 'Update Status Your Order',
-                'tinhthanh2210@gmail.com',
+                self::ADDRESS_SEND_MAIL_DEFAULT,
                 $order->getRecipientEmail(),
                 PurchaseOrderEvent::TEMPLATE_UPDATE_STATUS,
                 $params
@@ -77,7 +78,7 @@ class OrderSubscriber implements EventSubscriberInterface
         if($status == PurchaseOrderEvent::STATUS_PENDING) {
             $this->mailerService->send(
                 'Confirm order information',
-                'tinhthanh2210@gmail.com',
+                self::ADDRESS_SEND_MAIL_DEFAULT,
                 'nguyenthilananh0606@gmail.com',
                 PurchaseOrderEvent::TEMPLATE_CONFIRM,
                 $params
@@ -87,7 +88,7 @@ class OrderSubscriber implements EventSubscriberInterface
         if ($status != $previousStatus) {
             $this->mailerService->send(
                 'Update Status To Order',
-                'tinhthanh.vo@nfq.asia',
+                self::ADDRESS_SEND_MAIL_DEFAULT,
                 'ntlananhh99@gmail.com',
                 PurchaseOrderEvent::TEMPLATE_UPDATE_STATUS,
                 $params
