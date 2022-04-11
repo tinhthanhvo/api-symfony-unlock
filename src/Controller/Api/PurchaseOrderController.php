@@ -156,8 +156,10 @@ class PurchaseOrderController extends AbstractFOSRestController
 
                     $this->productItemRepository->add($productItem);
                 }
-
                 $this->purchaseOrderRepository->add($purchaseOrder);
+
+                $event = new PurchaseOrderEvent($purchaseOrder, 1, "USER");
+                $this->eventDispatcher->dispatch($event);
 
                 return $this->handleView($this->view(['success' => 'Order is canceled!'], Response::HTTP_NO_CONTENT));
             }
