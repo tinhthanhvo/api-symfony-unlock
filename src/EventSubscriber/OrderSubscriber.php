@@ -13,7 +13,7 @@ class OrderSubscriber implements EventSubscriberInterface
      * @var MailerService
      */
     protected $mailerService;
-    public const ADDRESS_SEND_MAIL_DEFAULT = 'tinhthanh.vo@nfq.asia';
+    public const ADDRESS_SEND_MAIL_DEFAULT = 'tinhthanh2210@gmail.com';
 
     public function __construct(MailerService $mailerService)
     {
