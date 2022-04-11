@@ -49,9 +49,18 @@ class PurchaseOrderRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array $param
+     * @param $orderBy
+     * @param $limit
+     * @param $offset
+     * @return array
+     */
     public function findByConditions(array $param, $orderBy, $limit, $offset): array
     {
-        $queryBuilder = $this->createQueryBuilder('o');
+        $queryBuilder = $this->createQueryBuilder('o')
+                        ->andWhere('o.customer = :customerId')
+                        ->setParameter('customerId', $param['customer']);
 
         if (isset($param['status']) && $param['status'] != 0) {
             $queryBuilder

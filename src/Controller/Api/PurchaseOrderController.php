@@ -78,7 +78,7 @@ class PurchaseOrderController extends AbstractFOSRestController
      */
     public function addOrderAction(Request $request): Response
     {
-        $order = new PurchaseOrder($this->userLoginInfo, 0);
+        $order = new PurchaseOrder($this->userLoginInfo);
         $form = $this->createForm(PurchaseOrderType::class, $order);
         $requestData = $request->request->all();
         $form->submit($requestData);
