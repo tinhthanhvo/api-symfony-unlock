@@ -70,6 +70,7 @@ class OrderSubscriber implements EventSubscriberInterface
         $order = $data['order'];
         $previousStatus = $data['previousStatus'];
         $status = $order->getStatus();
+        $withRole = $data['withRole'];
 
         $params = [
             "order" => $order,
@@ -86,7 +87,7 @@ class OrderSubscriber implements EventSubscriberInterface
             );
         }
 
-        if ($status != $previousStatus) {
+        if ($status == PurchaseOrderEvent::STATUS_CANCELED && $withRole == "USER") {
             $this->mailerService->send(
                 'Update Status To Order',
                 self::ADDRESS_SEND_MAIL_DEFAULT,

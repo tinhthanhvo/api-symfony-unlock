@@ -1,12 +1,97 @@
 <html>
-Dear {{ order.getRecipientName() }},
-<br><br>
-Thank you for shopping with 4Team.
-Your order {{ order.getId()}} has been declined.
-<br><br>
-If you have any further questions, please contact us at 089-222-654 we are happy to assist you.
-Thank you for choosing 4Team store.
-<br><br>
-Sincerely,
-4Team store
+
+</html>
+<html>
+<body>
+<div style="max-width:1040px;margin:0 auto">
+    <div>
+        Dear {{ order.getRecipientName() }},
+        <br><br>
+        Thank you for shopping with 4Team.
+        Your order {{ order.getId()}} has been declined.
+        <br><br>
+        If you have any further questions, please contact us at 089-222-654 we are happy to assist you.
+        Thank you for choosing 4Team store.
+        <br><br>
+        Sincerely,
+        4Team store
+    </div>
+    <table style="width:100%;margin:0;border-collapse:collapse;border-spacing:0">
+        <tbody>
+        <tr>
+            <td>
+                <table style="width:100%;max-width:960px;border-spacing:0;border-collapse:separate;margin:0">
+                    <tbody>
+                    <tr>
+                        <td style="padding:20px 40px;border:1px solid #dfe1e6;border-radius:4px">
+                            <table style="width:100%;max-width:910px;border-collapse:collapse;border-spacing:0;margin:0">
+                                <thead>
+                                <tr>
+                                    <td colspan="3" style="padding:0">
+                                        <div style="margin:6px 0 0 0;padding:0;font-size:20px;font-weight:400;line-height:24px">
+                                            <p><strong>[UPDATE STATUS]</strong></p>
+                                            <p> Order code: #{{ order.getId() }}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td colspan="2" style="padding:10px 0 0;text-align:center">
+                                        <div>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:500">
+                                        Status:
+                                    </td>
+                                    <td style="padding:0 10px">
+                                <span style="font-size:18px;display:inline-block;padding:10px 12px;border-radius:4px;background:#ffebe6;text-decoration:line-through">
+                                    {% if previousStatus == 1 %}
+                                        <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
+                                    {% elseif previousStatus == 2 %}
+                                        <b style="color:lawngreen;font-weight:normal;margin:0">APPROVED</b>
+                                    {% elseif previousStatus == 3 %}
+                                        <b style="color:red;font-weight:normal;margin:0">CANCELED</b>
+                                    {% elseif previousStatus == 4 %}
+                                        <b style="color:darkgreen;font-weight:normal;margin:0">COMPLETED</b>
+                                    {% endif %}
+                                </span>
+                                        <span>→</span>
+                                        <span style="font-size:18px;display:inline-block;padding:5px 12px;border-radius:4px;background:#e3fcef">
+                                    {% if order.getStatus() == 1 %}
+                                        <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
+                                    {% elseif order.getStatus() == 2 %}
+                                        <b style="color:lawngreen;font-weight:normal;margin:0">APPROVED</b>
+                                    {% elseif order.getStatus() == 3 %}
+                                        <b style="color:red;font-weight:normal;margin:0">CANCELED</b>
+                                    {% elseif order.getStatus() == 4 %}
+                                        <b style="color:darkgreen;font-weight:normal;margin:0">COMPLETED</b>
+                                    {% endif %}
+                                </span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                                <tbody>
+                                <tr>
+                                    <td colspan="2" style="padding:10px 0 0;text-align:center">
+                                        <div>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
 </html>
