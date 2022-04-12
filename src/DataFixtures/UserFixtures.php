@@ -13,7 +13,7 @@ class UserFixtures extends Fixture
         $user = new User();
         $user->setFullName('Full name');
         $user->setEmail('user@gmail.com');
-        $user->setPassword('Abc123');
+        $user->setPassword('$2y$13$ITJw4Lj7Sg4HQI1/lVRNNOyHKzjQ.J4LNclJ5MAoYO2c2FEMY0qVe');
         $user->setPhoneNumber('0123456789');
         $user->setRoles($role);
 

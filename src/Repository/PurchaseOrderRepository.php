@@ -171,7 +171,7 @@ class PurchaseOrderRepository extends ServiceEntityRepository
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getReport(?\DateTime $fromDate = null, ?\DateTime $toDate = null, string $field)
+    public function getReport(string $field, ?\DateTime $fromDate = null, ?\DateTime $toDate = null)
     {
         $queryBuilder = $this->createQueryBuilder('o');
 
@@ -213,7 +213,7 @@ class PurchaseOrderRepository extends ServiceEntityRepository
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getCountPurchaseOrder(?\DateTime $fromDate = null, ?\DateTime $toDate = null, int $status)
+    public function getCountPurchaseOrder(int $status, ?\DateTime $fromDate = null, ?\DateTime $toDate = null)
     {
         $queryBuilder = $this->createQueryBuilder('o')
             ->select('COUNT(o.id) as total');

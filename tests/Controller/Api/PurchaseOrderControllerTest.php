@@ -50,7 +50,7 @@ class PurchaseOrderControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $orderList = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertIsArray($orderList);
-        $this->assertCount(1, $orderList['data']);
+        $this->assertCount(2, $orderList['data']);
         $order = $orderList['data'][0];
         $this->assertSame('Recipient Name', $order['recipientName']);
         $this->assertSame('Recipient Email', $order['recipientEmail']);

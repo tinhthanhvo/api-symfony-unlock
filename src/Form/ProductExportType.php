@@ -24,7 +24,7 @@ class ProductExportType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new Regex([
-                        'pattern' => '/^[a-zA-Z0-9]{0,30}$/',
+                        'pattern' => '/^[a-zA-Z0-9_.-]{0,30}$/',
                         'message' => 'CSV file name is incorrect.'
                     ]),
                 ],

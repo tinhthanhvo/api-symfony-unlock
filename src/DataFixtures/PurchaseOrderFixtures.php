@@ -101,7 +101,41 @@ class PurchaseOrderFixtures extends Fixture
         $purchaseOrder->setAmount(2);
         $purchaseOrder->setTotalPrice(80);
 
+        // Other Purchase order with third product
+        $thirdProduct = new Product();
+        $thirdProduct->setCategory($category);
+        $thirdProduct->setColor($color);
+        $thirdProduct->setName('Product name 3');
+        $thirdProduct->setDescription('Product description 3');
+        $thirdProduct->setPrice(420000);
+
+        $thirdProductGallery = new Gallery();
+        $thirdProductGallery->setProduct($thirdProduct);
+        $thirdProductGallery->setPath('third-cover.jpg');
+
+        $thirdProductItem = new ProductItem();
+        $thirdProductItem->setProduct($thirdProduct);
+        $thirdProductItem->setSize($size);
+        $thirdProductItem->setAmount(2);
+
+        $thirdOrderDetail = new OrderDetail();
+        $thirdOrderDetail->setProductItem($thirdProductItem);
+        $thirdOrderDetail->setAmount(1);
+        $thirdOrderDetail->setPrice(420000);
+
+        $secondPurchaseOrder = new PurchaseOrder($user, 0);
+        $secondPurchaseOrder->setRecipientName('Recipient Name');
+        $secondPurchaseOrder->setRecipientEmail('Recipient Email');
+        $secondPurchaseOrder->setRecipientPhone('0908633533');
+        $secondPurchaseOrder->setAddressDelivery('Tan An, Ninh Kieu');
+        $secondPurchaseOrder->setStatus('4');
+        $secondPurchaseOrder->addOrderItem($thirdOrderDetail);
+        $secondPurchaseOrder->setAmount(1);
+        $secondPurchaseOrder->setTotalPrice(420000);
+
         $manager->persist($purchaseOrder);
+        $manager->persist($secondPurchaseOrder);
+
         $manager->flush();
     }
 }

@@ -47,16 +47,15 @@ class ProductRepository extends ServiceEntityRepository
 
     /**
      * @param array $param
+     * @param $orderBy
      * @param $limit
      * @param $offset
-     * @param $orderBy
      * @return array
      */
-    //edit naming
     public function findByConditions(array $param, $orderBy, $limit, $offset): array
     {
         $queryBuilder = $this->createQueryBuilder('p')
-                             ->andWhere('p.deleteAt IS NULL');
+            ->andWhere('p.deleteAt IS NULL');
 
         if (isset($param['priceFrom']) && $param['priceFrom'] != '') {
             $queryBuilder
@@ -90,21 +89,37 @@ class ProductRepository extends ServiceEntityRepository
         }
 
         if (!empty($orderBy)) {
-            $keyOrderList = array_keys($orderBy);
-            $column = 'p.' . $keyOrderList[0];
-            $valueSort = $orderBy[$keyOrderList[0]];
-            $queryBuilder
-                ->addOrderBy($column, $valueSort);
+            foreach ($orderBy as $field => $orderType) {
+                if ($field == 'inStock') {
+                    $queryBuilder
+                        ->addSelect('(
+                                SELECT SUM(pi.amount) 
+                                FROM App\Entity\ProductItem pi 
+                                WHERE p.id = pi.product 
+                                GROUP BY pi.product
+                            ) AS sum_amount')
+                        ->addOrderBy('sum_amount', $orderType);
+                } else {
+                    $queryBuilder->addOrderBy('p.' . $field, $orderType);
+                }
+            }
         }
 
         $products = $queryBuilder->getQuery()->getScalarResult();
 
         $productPerPage = $queryBuilder
-            ->addOrderBy('p.id', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset)
             ->getQuery()
             ->execute();
+
+        if (isset($orderBy['inStock'])) {
+            $realData = [];
+            foreach ($productPerPage as $rowData) {
+                $realData[] = $rowData[0];
+            }
+            $productPerPage = $realData;
+        }
 
         return ['data' => $productPerPage, 'total' => count($products)];
     }

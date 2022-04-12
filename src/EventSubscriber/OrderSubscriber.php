@@ -34,7 +34,7 @@ class OrderSubscriber implements EventSubscriberInterface
             "previousStatus" => $previousStatus
         ];
 
-        if($status == PurchaseOrderEvent::STATUS_PENDING) {
+        if ($status == PurchaseOrderEvent::STATUS_PENDING) {
             $this->mailerService->send(
                 'Confirm order information',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
@@ -44,7 +44,7 @@ class OrderSubscriber implements EventSubscriberInterface
             );
         }
 
-        if($status == PurchaseOrderEvent::STATUS_CANCELED && $withRole == PurchaseOrderEvent::ROLE_DEFAULT) {
+        if ($status == PurchaseOrderEvent::STATUS_CANCELED && $withRole == PurchaseOrderEvent::ROLE_DEFAULT) {
             $this->mailerService->send(
                 'Cancel Your Order',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
@@ -52,8 +52,7 @@ class OrderSubscriber implements EventSubscriberInterface
                 PurchaseOrderEvent::TEMPLATE_CANCEL,
                 $params
             );
-        }
-        elseif ($status != $previousStatus && $withRole == PurchaseOrderEvent::ROLE_DEFAULT) {
+        } elseif ($status != $previousStatus && $withRole == PurchaseOrderEvent::ROLE_DEFAULT) {
             $this->mailerService->send(
                 'Update Status Your Order',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
@@ -77,7 +76,7 @@ class OrderSubscriber implements EventSubscriberInterface
             "previousStatus" => $previousStatus
         ];
 
-        if($status == PurchaseOrderEvent::STATUS_PENDING) {
+        if ($status == PurchaseOrderEvent::STATUS_PENDING) {
             $this->mailerService->send(
                 'Confirm order information',
                 self::ADDRESS_SEND_MAIL_DEFAULT,

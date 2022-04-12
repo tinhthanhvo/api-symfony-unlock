@@ -30,7 +30,7 @@ class ReportController extends BaseController
     }
 
     /**
-     * @Rest\Post("/orders/export-csv")
+     * @Rest\Post("/orders/export/csv")
      * @param Request $request
      * @return Response
      */
@@ -74,7 +74,7 @@ class ReportController extends BaseController
     }
 
     /**
-     * @Rest\Post("/products/export-csv")
+     * @Rest\Post("/products/export/csv")
      * @param Request $request
      * @return Response
      */
