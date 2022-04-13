@@ -1,86 +1,180 @@
-<html>
-
-</html>
-<html>
-<body>
-<div style="max-width:1040px;margin:0 auto">
-    <div>
-        Dear {{ order.getRecipientName() }},
-        <br><br>
-        Thank you for shopping with 4Team.
-        Your order {{ order.getId()}} has been declined.
-        <br><br>
-        If you have any further questions, please contact us at 089-222-654 we are happy to assist you.
-        Thank you for choosing 4Team store.
-        <br><br>
-        Sincerely,
-        4Team store
-    </div>
-    <table style="width:100%;margin:0;border-collapse:collapse;border-spacing:0">
-        <tbody>
+<!DOCTYPE html>
+<html lang="en" style="width:100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title> Order confirmation </title>
+    <meta name="robots" content="noindex,nofollow">
+    <title>Document</title>
+    <style type="text/css">
+        @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
+        .ExternalClass { width: 100%; background-color: #ffffff; }
+        @media only screen and (max-width: 600px) {
+            body { width: auto !important; }
+            table[class=fullTable] { width: 96% !important; clear: both; }
+            table[class=fullPadding] { width: 85% !important; clear: both; }
+            table[class=col] { width: 45% !important; }
+            .erase { display: none; }
+        }
+        @media only screen and (max-width: 420px) {
+            table[class=fullTable] { width: 100% !important; clear: both; }
+            table[class=fullPadding] { width: 85% !important; clear: both; }
+            table[class=col] { width: 100% !important; clear: both; }
+            table[class=col] td { text-align: left !important; }
+            .erase { display: none; font-size: 0; max-height: 0; line-height: 0; padding: 0; }
+            .visibleMobile { display: block !important; }
+            .hiddenMobile { display: none !important; }
+        }
+    </style>
+</head>
+<body style="background:#e1e1e1;width:100%;height:100%;margin:0;padding:0;-webkit-font-smoothing:antialiased;">
+<div style="-webkit-text-size-adjust:none;">
+    <!-- Header -->
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
         <tr>
-            <td>
-                <table style="width:100%;max-width:960px;border-spacing:0;border-collapse:separate;margin:0">
-                    <tbody>
+            <td height="20" style="-webkit-text-size-adjust:none;"></td>
+        </tr>
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#ffffff" style="border-radius: 10px 10px 0 0;">
+                    <tr class="hiddenMobile" style="display:block;">
+                        <td height="40" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                    <tr class="visibleMobile" style="display:none;">
+                        <td height="30" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
                     <tr>
-                        <td style="padding:20px 40px;border:1px solid #dfe1e6;border-radius:4px">
-                            <table style="width:100%;max-width:910px;border-collapse:collapse;border-spacing:0;margin:0">
-                                <thead>
-                                <tr>
-                                    <td colspan="3" style="padding:0">
-                                        <div style="margin:6px 0 0 0;padding:0;font-size:20px;font-weight:400;line-height:24px">
-                                            <p><strong>[UPDATE STATUS]</strong></p>
-                                            <p> Order code: #{{ order.getId() }}</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </thead>
+                        <td style="-webkit-text-size-adjust:none;">
+                            <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
                                 <tbody>
                                 <tr>
-                                    <td colspan="2" style="padding:10px 0 0;text-align:center">
-                                        <div>
+                                    <td style="-webkit-text-size-adjust:none;">
+                                        <table width="220" border="0" cellpadding="0" cellspacing="0" align="left" class="col">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left" style="-webkit-text-size-adjust:none;"> VTAK SHOP</td>
+                                            </tr>
+                                            <tr class="hiddenMobile" style="display:block;">
+                                                <td height="40" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr class="visibleMobile" style="display:none;">
+                                                <td height="20" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="-webkit-text-size-adjust:none;font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: left;">
+                                                    VTT <br>
+                                                    CT<br>
+                                                    012345667
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <table width="220" border="0" cellpadding="0" cellspacing="0" align="right" class="col">
+                                            <tbody>
+                                            <tr class="visibleMobile" style="display:none;">
+                                                <td height="20" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td height="5" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="-webkit-text-size-adjust:none;font-size: 21px; color: #efc729; letter-spacing: -1px; font-family: 'Open Sans', sans-serif; line-height: 1; vertical-align: top; text-align: right;">
+                                                    Invoice
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                            </tr>
+                                            <tr class="hiddenMobile" style="display:block;">
+                                                <td height="30" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="-webkit-text-size-adjust:none;font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: right;">
+                                                    <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">ORDER</p>
+                                                    #1<br/>
 
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:500">
-                                        Status:
-                                    </td>
-                                    <td style="padding:0 10px">
-                                <span style="font-size:18px;display:inline-block;padding:10px 12px;border-radius:4px;background:#ffebe6;text-decoration:line-through">
-                                    {% if previousStatus == 1 %}
-                                        <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
-                                    {% elseif previousStatus == 2 %}
-                                        <b style="color:lawngreen;font-weight:normal;margin:0">APPROVED</b>
-                                    {% elseif previousStatus == 3 %}
-                                        <b style="color:red;font-weight:normal;margin:0">CANCELED</b>
-                                    {% elseif previousStatus == 4 %}
-                                        <b style="color:darkgreen;font-weight:normal;margin:0">COMPLETED</b>
-                                    {% endif %}
-                                </span>
-                                        <span>→</span>
-                                        <span style="font-size:18px;display:inline-block;padding:5px 12px;border-radius:4px;background:#e3fcef">
-                                    {% if order.getStatus() == 1 %}
-                                        <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
-                                    {% elseif order.getStatus() == 2 %}
-                                        <b style="color:lawngreen;font-weight:normal;margin:0">APPROVED</b>
-                                    {% elseif order.getStatus() == 3 %}
-                                        <b style="color:red;font-weight:normal;margin:0">CANCELED</b>
-                                    {% elseif order.getStatus() == 4 %}
-                                        <b style="color:darkgreen;font-weight:normal;margin:0">COMPLETED</b>
-                                    {% endif %}
-                                </span>
+                                                    <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">11/04/2022</p>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
                                 </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
+        <tbody>
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#ffffff">
+                    <tbody>
+                    <tr>
+                    </tr>
+                    <tr class="hiddenMobile" style="display:block;">
+                        <td height="60" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                    <tr class="visibleMobile" style="display:none;">
+                        <td height="40" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                    <tr>
+                        <td style="-webkit-text-size-adjust:none;">
+                            <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
                                 <tbody>
                                 <tr>
-                                    <td colspan="2" style="padding:10px 0 0;text-align:center">
-                                        <div>
+                                </tr>
+                                <tr>
 
+                                </tr>
+                                <tr>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; font-weight: bold; line-height: 18px;  vertical-align: top; padding:10px 0; text-align: center;" class="article" >
+                                        <div>
+                                            Dear {{ order.getRecipientName() }},
+                                            <br><br>
+                                            Thank you for shopping with VTAK team.
+                                            Your order {{ order.getId()}} has been declined.
+                                            <br><br>
+                                            If you have any further questions, please contact us at 089-222-654 we are happy to assist you.
+                                            Thank you for choosing VTAK team store.
+                                            <br><br>
+                                            Sincerely,
+                                            VTAK team store
                                         </div>
+                                        <span style="font-size:18px;display:inline-block;padding:10px 12px;border-radius:4px;background:#fad2ca;text-decoration:line-through">
+                                                {% if previousStatus == 1 %}
+                                                    <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
+                                                {% elseif previousStatus == 2 %}
+                                                    <b style="color:lawngreen;font-weight:normal;margin:0">APPROVED</b>
+                                                {% elseif previousStatus == 3 %}
+                                                    <b style="color:red;font-weight:normal;margin:0">CANCELED</b>
+                                                {% elseif previousStatus == 4 %}
+                                                    <b style="color:darkgreen;font-weight:normal;margin:0">COMPLETED</b>
+                                                {% endif %}
+                                            </span>
+                                        <span>→</span>
+                                        <span style="font-size:18px;display:inline-block;padding:10px 12px;border-radius:4px;background:#b2f1cf">
+                                                {% if order.getStatus() == 1 %}
+                                                    <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
+                                                {% elseif order.getStatus() == 2 %}
+                                                    <b style="color:lawngreen;font-weight:normal;margin:0">APPROVED</b>
+                                                {% elseif order.getStatus() == 3 %}
+                                                    <b style="color:red;font-weight:normal;margin:0">CANCELED</b>
+                                                {% elseif order.getStatus() == 4 %}
+                                                    <b style="color:darkgreen;font-weight:normal;margin:0">COMPLETED</b>
+                                                {% endif %}
+                                            </span>
                                     </td>
+                                </tr>
+                                <tr>
+
+                                </tr>
+                                <tr>
+
                                 </tr>
                                 </tbody>
                             </table>
@@ -91,6 +185,45 @@
             </td>
         </tr>
         </tbody>
+    </table>
+
+    <!-- Information -->
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
+        <tbody>
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- /Information -->
+
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#ffffff" style="border-radius: 0 0 10px 10px;">
+                    <tr>
+                        <td style="-webkit-text-size-adjust:none;">
+                            <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
+                                <tbody>
+                                <tr>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: left;">
+
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="spacer">
+                        <td height="50" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td height="20" style="-webkit-text-size-adjust:none;"></td>
+        </tr>
     </table>
 </div>
 </body>

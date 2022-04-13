@@ -1,83 +1,280 @@
-<html>
-<body style="background-color:whitesmoke;font-family: Open Sans, sans-serif;font-size:100%;font-weight:400;line-height:1.4;color:#000;">
-<table style="max-width:670px;margin:50px auto 10px;background-color:#fff;padding:50px;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);-moz-box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24); border-top: solid 10px green;">
-    <thead>
-    <tr>
-        <th style="text-align:left;"></th>
-        <th style="text-align:right;font-weight:400;">{{ date().format('U') }}</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td style="height:35px;"></td>
-    </tr>
-    <tr>
-        <td colspan="2" style="border: solid 1px #ddd; padding:10px 20px;">
-            <p style="font-size:14px;margin:0 0 6px 0;"><span style="font-weight:bold;display:inline-block;min-width:150px">Order status</span>
-                {% if order.getStatus() == 1 %}
-                    <b style="color:cadetblue;font-weight:bold;margin:0;">PENDING</b>
-                {% elseif order.getStatus() == 2 %}
-                    <b style="color:lawngreen;font-weight:normal;margin:0">APPROVED</b>
-                {% elseif order.getStatus() == 3 %}
-                    <b style="color:red;font-weight:normal;margin:0">CANCELED</b>
-                {% elseif order.getStatus() == 4 %}
-                    <b style="color:darkgreen;font-weight:normal;margin:0">COMPLETED</b>
-                {% endif %}
-            </p>
-            <p style="font-size:14px;margin:0 0 6px 0;"><span style="font-weight:bold;display:inline-block;min-width:146px">Order code:</span> #{{ order.getId() }}</p>
-        </td>
-    </tr>
-    <tr>
-        <td style="height:35px;"></td>
-    </tr>
-    <tr>
-        <td style="width:50%;padding:20px;vertical-align:top">
-            <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px">Name</span> {{ order.getRecipientName() }}</p>
-            <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px;">Address</span>{{ order.getAddressDelivery() }}</p>
-        </td>
-        <td style="width:50%;padding:20px;vertical-align:top">
-            <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px;">Email</span> {{ order.getRecipientEmail() }}</p>
-            <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px;">Phone</span> {{ order.getRecipientPhone() }}</p>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2" style="font-size:20px;padding:30px 15px 0 15px;">Items</td>
-    </tr>
-    <tr>
-        {% for orderDetail in order.getOrderItems() %}
-            <td colspan="2" style="padding:15px;">
-                <p style="font-size:14px;margin:0;padding:10px;border:solid 1px #ddd;font-weight:bold;"><span style="display:block;font-size:13px;font-weight:normal;">
-                        {{ orderDetail.getProductItem().getProduct().getName() }}</span>
-                    <b style="font-size:12px;font-weight:300;">Quantity {{ orderDetail.getAmount() }} - </b>
-                    <b style="font-size:12px;font-weight:300;"> ${{ orderDetail.getPrice() }}</b>
-                </p>
-            </td>
-        {% endfor %}
-    </tr>
-    <tr>
-        <td colspan="2" style="padding:15px;">
-            <p style="font-size:14px;margin:0;padding:10px;border:solid 1px #ddd;font-weight:bold;"><span style="display:block;font-size:13px;font-weight:normal;">
-                <span style="font-weight:bold;font-size:13px">Shipping: </span>${{ order.getShippingCost() }}
-            </p>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2" style="padding:15px;">
-            <p style="font-size:14px;margin:0;padding:10px;border:solid 1px #ddd;font-weight:bold;"><span style="display:block;font-size:13px;font-weight:normal;">
-                <span style="font-weight:bold;font-size:13px">Total price: </span>${{ order.getTotalPrice() }}
-            </p>
-        </td>
-    </tr>
-    </tbody>
-    <tfooter>
+<!DOCTYPE html>
+<html lang="en" style="width:100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title> Order confirmation </title>
+    <meta name="robots" content="noindex,nofollow">
+    <title>Document</title>
+    <style type="text/css">
+        @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
+        .ExternalClass { width: 100%; background-color: #ffffff; }
+        @media only screen and (max-width: 600px) {
+            body { width: auto !important; }
+            table[class=fullTable] { width: 96% !important; clear: both; }
+            table[class=fullPadding] { width: 85% !important; clear: both; }
+            table[class=col] { width: 45% !important; }
+            .erase { display: none; }
+        }
+        @media only screen and (max-width: 420px) {
+            table[class=fullTable] { width: 100% !important; clear: both; }
+            table[class=fullPadding] { width: 85% !important; clear: both; }
+            table[class=col] { width: 100% !important; clear: both; }
+            table[class=col] td { text-align: left !important; }
+            .erase { display: none; font-size: 0; max-height: 0; line-height: 0; padding: 0; }
+            .visibleMobile { display: block !important; }
+            .hiddenMobile { display: none !important; }
+        }
+    </style>
+</head>
+<body style="background:#e1e1e1;width:100%;height:100%;margin:0;padding:0;-webkit-font-smoothing:antialiased;">
+<div style="-webkit-text-size-adjust:none;">
+    <!-- Header -->
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
         <tr>
-            <td colspan="2" style="font-size:14px;padding:50px 15px 0 15px;">
-                <strong style="display:block;margin:0 0 10px 0;">Regards</strong> 4Team Store<br> Cai Khe, Ninh Kieu, Can Tho<br><br>
-                <b>Phone:</b> 089-222-654<br>
-                <b>Email:</b> leogaodi@giacaphaichang.muanao
+            <td height="20" style="-webkit-text-size-adjust:none;"></td>
+        </tr>
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#ffffff" style="border-radius: 10px 10px 0 0;">
+                    <tr class="hiddenMobile" style="display:block;">
+                        <td height="40" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                    <tr class="visibleMobile" style="display:none;">
+                        <td height="30" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                    <tr>
+                        <td style="-webkit-text-size-adjust:none;">
+                            <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
+                                <tbody>
+                                <tr>
+                                    <td style="-webkit-text-size-adjust:none;">
+                                        <table width="220" border="0" cellpadding="0" cellspacing="0" align="left" class="col">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left" style="-webkit-text-size-adjust:none;"> VTAK SHOP</td>
+                                            </tr>
+                                            <tr class="hiddenMobile" style="display:block;">
+                                                <td height="40" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr class="visibleMobile" style="display:none;">
+                                                <td height="20" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="-webkit-text-size-adjust:none;font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: left;">
+                                                    {{ order.getRecipientName() }} <br>
+                                                    {{ order.getAddressDelivery() }}<br>
+                                                    {{ order.getRecipientPhone() }}
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <table width="220" border="0" cellpadding="0" cellspacing="0" align="right" class="col">
+                                            <tbody>
+                                            <tr class="visibleMobile" style="display:none;">
+                                                <td height="20" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td height="5" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="-webkit-text-size-adjust:none;font-size: 21px; color: #efc729; letter-spacing: -1px; font-family: 'Open Sans', sans-serif; line-height: 1; vertical-align: top; text-align: right;">
+                                                    Invoice
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                            </tr>
+                                            <tr class="hiddenMobile" style="display:block;">
+                                                <td height="30" style="-webkit-text-size-adjust:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="-webkit-text-size-adjust:none;font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: right;">
+                                                    <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">ORDER</p>
+                                                    #{{ order.getId() }}<br/>
+
+                                                    <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">11/04/2022</p>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
-    </tfooter>
-</table>
+    </table>
+    <!-- /Header -->
+    <!-- Order Details -->
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
+        <tbody>
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#ffffff">
+                    <tbody>
+                    <tr>
+                    </tr>
+                    <tr class="hiddenMobile" style="display:block;">
+                        <td height="60" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                    <tr class="visibleMobile" style="display:none;">
+                        <td height="40" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                    <tr>
+                        <td style="-webkit-text-size-adjust:none;">
+                            <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
+                                <tbody>
+                                <tr>
+                                    <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 10px 7px 0;" width="52%" align="left">
+                                        Product Name
+                                    </th>
+                                    <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="left">
+                                        <small>Details</small>
+                                    </th>
+                                    <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="center">
+                                        Quantity
+                                    </th>
+                                    <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #1e2b33; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="right">
+                                        Subtotal
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td height="1" style="-webkit-text-size-adjust:none;background: #bebebe;" colspan="4"></td>
+                                </tr>
+                                <tr>
+                                    <td height="10" colspan="4" style="-webkit-text-size-adjust:none;"></td>
+                                </tr>
+                                {% for orderDetail in order.getOrderItems() %}
+                                    <tr>
+                                        <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; font-weight: bold; line-height: 18px;  vertical-align: top; padding:10px 0;" class="article">
+                                            {{ orderDetail.getProductItem().getProduct().getName() }}
+                                        </td>
+                                        <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e;  line-height: 18px;  vertical-align: top; padding:10px 0;">
+                                            <small>{{ orderDetail.getProductItem().getProduct().getColor().getName() }} | Size {{ orderDetail.getProductItem().getSize.getValue() }}</small>
+                                        </td>
+                                        <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e;  line-height: 18px;  vertical-align: top; padding:10px 0;" align="center">
+                                            {{ orderDetail.getAmount() }}
+                                        </td>
+                                        <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #1e2b33;  line-height: 18px;  vertical-align: top; padding:10px 0;" align="right">
+                                            ${{ orderDetail.getPrice() }}.00
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td height="1" colspan="4" style="-webkit-text-size-adjust:none;border-bottom:1px solid #e4e4e4;"></td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td height="1" colspan="4" style="-webkit-text-size-adjust:none;border-bottom:1px solid #e4e4e4;"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="20" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- /Order Details -->
+    <!-- Total -->
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
+        <tbody>
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#ffffff">
+                    <tbody>
+                    <tr>
+                        <td style="-webkit-text-size-adjust:none;">
+                            <!-- Table Total -->
+                            <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
+                                <tbody>
+                                <tr>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; ;">
+                                        Subtotal
+                                    </td>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; white-space:nowrap;" width="80">
+                                        ${{ order.getTotalPrice() - order.getShippingCost() }}.00
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; ;">
+                                        Shipping Cost
+                                    </td>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; ;">
+                                        ${{ order.getShippingCost() }}.00
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; ;">
+                                        Total
+                                    </td>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; white-space:nowrap;" width="80">
+                                        ${{ order.getTotalPrice() }}.00
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #b0b0b0; line-height: 22px; vertical-align: top; text-align:right; ;"><small></small></td>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; color: #b0b0b0; line-height: 22px; vertical-align: top; text-align:right; ;">
+                                        <small></small>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <!-- /Table Total -->
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- /Total -->
+    <!-- Information -->
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
+        <tbody>
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- /Information -->
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
+        <tr>
+            <td style="-webkit-text-size-adjust:none;">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#ffffff" style="border-radius: 0 0 10px 10px;">
+                    <tr>
+                        <td style="-webkit-text-size-adjust:none;">
+                            <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
+                                <tbody>
+                                <tr>
+                                    <td style="-webkit-text-size-adjust:none;font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: left;">
+                                        Have a nice day.
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="spacer">
+                        <td height="50" style="-webkit-text-size-adjust:none;"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td height="20" style="-webkit-text-size-adjust:none;"></td>
+        </tr>
+    </table>
+</div>
 </body>
 </html>
