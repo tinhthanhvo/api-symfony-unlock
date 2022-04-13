@@ -6,21 +6,13 @@ use App\Controller\BaseController;
 use App\Entity\OrderDetail;
 use App\Entity\PurchaseOrder;
 use App\Event\PurchaseOrderEvent;
-use App\Repository\ProductItemRepository;
-use App\Repository\PurchaseOrderRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
-use JMS\Serializer\SerializationContext;
-use JMS\Serializer\SerializerBuilder;
-use phpDocumentor\Reflection\Types\Integer;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @IsGranted("ROLE_ADMIN")

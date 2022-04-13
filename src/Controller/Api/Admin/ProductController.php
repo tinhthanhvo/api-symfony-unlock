@@ -12,6 +12,8 @@ use App\Service\FileUploader;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -120,7 +122,7 @@ class ProductController extends BaseController
         $form->submit($requestData);
         if ($form->isSubmitted()) {
             $galleryData = $request->files->get('gallery');
-            if (count($galleryData) != self::AMOUNT_IMAGE_REQUIRE) {
+            if (is_null($galleryData) || count($galleryData) != self::AMOUNT_IMAGE_REQUIRE) {
                 return $this->handleView($this->view([
                     'error' => 'You must choose five images to upload for product.'
                 ], Response::HTTP_BAD_REQUEST));
@@ -150,8 +152,14 @@ class ProductController extends BaseController
             }
 
             $this->productRepository->add($product);
-            $product = $this->transferDataGroup($transferData, 'getDetailProductAdmin');
 
+            $serializer = SerializerBuilder::create()->build();
+            $convertToJson = $serializer->serialize(
+                $product,
+                'json',
+                SerializationContext::create()->setGroups(array('getDetailProductAdmin'))
+            );
+            $product = $serializer->deserialize($convertToJson, 'array', 'json');
             return $this->handleView($this->view($product, Response::HTTP_CREATED));
         }
 

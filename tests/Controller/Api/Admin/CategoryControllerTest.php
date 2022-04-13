@@ -12,8 +12,8 @@ class CategoryControllerTest extends BaseWebTestCase
 {
     public function testGetCategoriesAction(): void
     {
-        $cagoryFixtures = new CategoryFixtures();
-        $this->loadFixture($cagoryFixtures);
+        $categoryFixtures = new CategoryFixtures();
+        $this->loadFixture($categoryFixtures);
 
         $userFixtures = new UserFixtures();
         $this->loadFixture($userFixtures);
