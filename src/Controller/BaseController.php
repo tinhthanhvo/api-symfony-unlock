@@ -12,6 +12,7 @@ use App\Repository\ProductRepository;
 use App\Repository\PurchaseOrderRepository;
 use App\Repository\SizeRepository;
 use App\Repository\UserRepository;
+use App\Service\CartService;
 use App\Service\ExportData;
 use App\Service\GetUserInfo;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -79,6 +80,9 @@ class BaseController extends AbstractFOSRestController
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var CartService */
+    protected $cartService;
+
     public function __construct(
         CartRepository $cartRepository,
         CategoryRepository $categoryRepository,
@@ -92,7 +96,8 @@ class BaseController extends AbstractFOSRestController
         SizeRepository $sizeRepository,
         ProductItemRepository $productItemRepository,
         GalleryRepository $galleryRepository,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        CartService $cartService
     ) {
         $this->cartRepository = $cartRepository;
         $this->categoryRepository = $categoryRepository;
@@ -107,6 +112,7 @@ class BaseController extends AbstractFOSRestController
         $this->productItemRepository = $productItemRepository;
         $this->galleryRepository = $galleryRepository;
         $this->eventDispatcher = $eventDispatcher;
+        $this->cartService = $cartService;
     }
 
     /**

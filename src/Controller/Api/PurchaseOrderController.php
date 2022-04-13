@@ -7,12 +7,6 @@ use App\Entity\OrderDetail;
 use App\Entity\PurchaseOrder;
 use App\Event\PurchaseOrderEvent;
 use App\Form\PurchaseOrderType;
-use App\Repository\CartRepository;
-use App\Repository\ProductItemRepository;
-use App\Repository\PurchaseOrderRepository;
-use App\Service\GetUserInfo;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -100,11 +94,11 @@ class PurchaseOrderController extends BaseController
 
             $this->purchaseOrderRepository->add($order);
 
-//            if ($amountItemCart == count($order->getOrderItems())) {
-//                foreach ($cartItemsData as $cartItemData) {
-//                    $this->cartRepository->remove($cartItemData);
-//                }
-//            }
+            if ($amountItemCart == count($order->getOrderItems())) {
+                foreach ($cartItemsData as $cartItemData) {
+                    $this->cartRepository->remove($cartItemData);
+                }
+            }
             $transferPurchaseOrder = self::dataTransferOrderObject($order);
 
             $event = new PurchaseOrderEvent($order);
@@ -156,6 +150,51 @@ class PurchaseOrderController extends BaseController
         return $this->handleView($this->view([
             'error' => 'Something went wrong! Please contact support.'
         ], Response::HTTP_INTERNAL_SERVER_ERROR));
+    }
+
+    /**
+     * @Rest\get("/users/orders/{id}/repurchase")
+     * @return Response
+     */
+    public function rePurchase(int $id): Response
+    {
+        try {
+            $user = $this->userLoginInfo;
+            $order = $this->purchaseOrderRepository->findOneBy(['id' => $id, 'customer' => $user->getId()]);
+            if($order->getStatus() != BaseController::STATUS_COMPLETED && $order->getStatus() != BaseController::STATUS_CANCELED) {
+                return $this->handleView($this->view(
+                    ['error' => 'This order is in process.'],
+                    Response::HTTP_BAD_REQUEST
+                ));
+            }
+
+            $orderDetail = $order->getOrderItems();
+            $countItemsAddCart = 0;
+
+            foreach ($orderDetail as $item) {
+                $recordCart = [
+                    'productItem' => $item->getProductItem()->getId(),
+                    'amount' => $item->getAmount(),
+                    'price' => $item->getProductItem()->getProduct()->getPrice(),
+                ];
+
+                $check = $this->cartService->addCart($recordCart);
+                if ($check)
+                    $countItemsAddCart += 1;
+            }
+            if ($countItemsAddCart == 0) {
+                return $this->handleView($this->view(['error' => 'Can not add product to cart'], Response::HTTP_BAD_REQUEST));
+            }
+
+            return $this->handleView($this->view(['message' => 'Add ' . $countItemsAddCart . ' items to cart'], Response::HTTP_CREATED));
+
+        } catch (\Exception $e) {
+        }
+
+        return $this->handleView($this->view(
+            ['error' => 'Something went wrong! Please contact support.'],
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        ));
     }
 
     private function dataTransferOrderObject(PurchaseOrder $purchaseOrder): array
