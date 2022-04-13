@@ -253,7 +253,7 @@ class PurchaseOrderRepository extends ServiceEntityRepository
                 WHERE delete_at IS NULL and status like 4
                 GROUP BY DAY(create_at), CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at))
                 ORDER BY DAY(create_at) ASC
-                LIMIT 14;";
+                LIMIT 30;";
         $stmt = $conn->prepare($sql);
 
         return $stmt->executeQuery()->fetchAllAssociative();
