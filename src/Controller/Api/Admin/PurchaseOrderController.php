@@ -69,8 +69,8 @@ class PurchaseOrderController extends BaseController
         $summery['totalShippingCost'] = $this->purchaseOrderRepository->getReport('shippingCost', $fromDate, $toDate);
         $summery['revenue'] = $revenue - $summery['totalShippingCost'];
         $summery['totalItem'] = $this->purchaseOrderRepository->getReport('totalItem', $fromDate, $toDate);
-        $summery['amountPendingOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_PENDING, $fromDate, $toDate);
         $summery['amountApprovedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_APPROVED, $fromDate, $toDate);
+        $summery['amountDeliveryOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_DELIVERY, $fromDate, $toDate);
         $summery['amountCanceledOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_CANCELED, $fromDate, $toDate);
         $summery['amountCompletedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_COMPLETED, $fromDate, $toDate);
 
@@ -147,7 +147,7 @@ class PurchaseOrderController extends BaseController
         try {
             $status = $purchaseOrder->getStatus();
 
-            if ($status == BaseController::STATUS_PENDING) {
+            if ($status == BaseController::STATUS_APPROVED) {
                 $purchaseOrder->setStatus(BaseController::STATUS_CANCELED);
                 $purchaseOrder->setUpdateAt(new \DateTime());
 
@@ -234,10 +234,10 @@ class PurchaseOrderController extends BaseController
      */
     private function formattedStatusOrderResponse(string $status): string
     {
-        $statusResponse = 'Pending';
+        $statusResponse = 'Approved';
         switch ($status) {
             case '2':
-                $statusResponse = 'Approved';
+                $statusResponse = 'Delivery';
                 break;
             case '3':
                 $statusResponse = 'Canceled';

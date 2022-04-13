@@ -21,8 +21,8 @@ class PurchaseOrderControllerTest extends BaseWebTestCase
     private $cartRepository;
     private $purchaseOrderRepository;
     protected const STATUS_DEFAULT_NULL = 0;
-    protected const STATUS_PENDING = 1;
-    protected const STATUS_APPROVED = 2;
+    protected const STATUS_APPROVED = 1;
+    protected const STATUS_DELIVERY = 2;
     protected const STATUS_CANCELED = 3;
     protected const STATUS_COMPLETED = 4;
 

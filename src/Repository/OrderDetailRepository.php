@@ -53,7 +53,7 @@ class OrderDetailRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('o')
             ->andWhere('o.deleteAt IS NULL')
-            ->orderBy('o.createAt', 'ASC');
+            ->orderBy('o.id', 'ASC');
 
         if (!empty($product_id)) {
             $queryBuilder->innerJoin('o.productItem', 'pi', 'WITH', 'pi.product = :product')

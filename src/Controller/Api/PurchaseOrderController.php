@@ -121,7 +121,7 @@ class PurchaseOrderController extends BaseController
             $status = $purchaseOrder->getStatus();
             $data = json_decode($request->getContent(), true);
 
-            if ($status == BaseController::STATUS_PENDING) {
+            if ($status == BaseController::STATUS_APPROVED) {
                 $purchaseOrder->setStatus(BaseController::STATUS_CANCELED);
                 $purchaseOrder->setUpdateAt(new \DateTime());
                 if(isset($data['reason'])) {
@@ -139,7 +139,7 @@ class PurchaseOrderController extends BaseController
                 }
                 $this->purchaseOrderRepository->add($purchaseOrder);
 
-                $event = new PurchaseOrderEvent($purchaseOrder, BaseController::STATUS_PENDING, "USER");
+                $event = new PurchaseOrderEvent($purchaseOrder, BaseController::STATUS_APPROVED, "USER");
                 $this->eventDispatcher->dispatch($event);
 
                 return $this->handleView($this->view(['success' => 'Order is canceled!'], Response::HTTP_NO_CONTENT));
@@ -191,7 +191,7 @@ class PurchaseOrderController extends BaseController
                 return $this->handleView($this->view(['error' => 'Can not add product to cart'], Response::HTTP_BAD_REQUEST));
             }
 
-            return $this->handleView($this->view(['success' => 'Add ' . $countItemsAddCart . ' items to cart'], Response::HTTP_CREATED));
+            return $this->handleView($this->view(['success' => $countItemsAddCart . ' items is added to cart.'], Response::HTTP_CREATED));
 
         } catch (\Exception $e) {
         }

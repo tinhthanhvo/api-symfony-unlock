@@ -34,7 +34,7 @@ class OrderSubscriber implements EventSubscriberInterface
             "previousStatus" => $previousStatus
         ];
 
-        if ($status == PurchaseOrderEvent::STATUS_PENDING) {
+        if ($status == PurchaseOrderEvent::STATUS_APPROVED) {
             $this->mailerService->send(
                 'Confirm order information',
                 self::ADDRESS_SEND_MAIL_DEFAULT,

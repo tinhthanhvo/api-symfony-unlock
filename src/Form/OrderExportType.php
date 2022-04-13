@@ -30,8 +30,8 @@ class OrderExportType extends AbstractType
             ])
             ->add('status', ChoiceType::class, [
                 'choices'  => [
-                    'Pending' => 1,
-                    'Approved' => 2,
+                    'Approved' => 1,
+                    'Delivery' => 2,
                     'Canceled' => 3,
                     'Completed' => 4
                 ],
