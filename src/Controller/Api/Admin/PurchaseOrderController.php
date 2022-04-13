@@ -69,15 +69,15 @@ class PurchaseOrderController extends BaseController
         $fromDate = new \DateTime($fromDateRequest);
         $toDate = new \DateTime($fromDateRequest . ' 23:59:59.999999');
 
-        $revenue = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'totalPrice');
-        $summery['amountOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_DEFAULT_NULL);
-        $summery['totalShippingCost'] = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'shippingCost');
+        $revenue = $this->purchaseOrderRepository->getReport('totalPrice', $fromDate, $toDate);
+        $summery['amountOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_DEFAULT_NULL, $fromDate, $toDate);
+        $summery['totalShippingCost'] = $this->purchaseOrderRepository->getReport('shippingCost', $fromDate, $toDate);
         $summery['revenue'] = $revenue - $summery['totalShippingCost'];
-        $summery['totalItem'] = $this->purchaseOrderRepository->getReport($fromDate, $toDate, 'totalItem');
-        $summery['amountPendingOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_PENDING);
-        $summery['amountApprovedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_APPROVED);
-        $summery['amountCanceledOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_CANCELED);
-        $summery['amountCompletedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder($fromDate, $toDate, BaseController::STATUS_COMPLETED);
+        $summery['totalItem'] = $this->purchaseOrderRepository->getReport('totalItem', $fromDate, $toDate);
+        $summery['amountPendingOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_PENDING, $fromDate, $toDate);
+        $summery['amountApprovedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_APPROVED, $fromDate, $toDate);
+        $summery['amountCanceledOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_CANCELED, $fromDate, $toDate);
+        $summery['amountCompletedOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_COMPLETED, $fromDate, $toDate);
 
         return $this->handleView($this->view($summery, Response::HTTP_OK));
     }
@@ -115,14 +115,14 @@ class PurchaseOrderController extends BaseController
         $status = $request->get('status');
         $previousStatus = $purchaseOrder->getStatus();
 
-        if(count(self::checkUpdatingOrderCondition($purchaseOrder, $status)) > 0) {
+        if (count(self::checkUpdatingOrderCondition($purchaseOrder, $status)) > 0) {
             return $this->handleView($this->view(
                 self::checkUpdatingOrderCondition($purchaseOrder, $status),
                 Response::HTTP_BAD_REQUEST
             ));
         }
 
-        if($status == 3) {
+        if ($status == 3) {
             self::cancelPurchaseOrderAction($purchaseOrder);
         }
 
@@ -256,18 +256,18 @@ class PurchaseOrderController extends BaseController
      * @param int $status
      * @return array|string[]
      */
-    private function checkUpdatingOrderCondition(PurchaseOrder $purchaseOrder, int $status) : array
+    private function checkUpdatingOrderCondition(PurchaseOrder $purchaseOrder, int $status): array
     {
         $previousStatus = $purchaseOrder->getStatus();
-        if($status == $previousStatus) {
+        if ($status == $previousStatus) {
             return ['messageError' => 'The new status same with the current status.'];
         }
 
-        if($previousStatus == BaseController::STATUS_CANCELED) {
+        if ($previousStatus == BaseController::STATUS_CANCELED) {
             return ['messageError' => 'The purchase order was canceled.'];
         }
 
-        if($status < $previousStatus) {
+        if ($status < $previousStatus) {
             return ['messageError' => 'Unable to return to previous status.'];
         }
         return [];

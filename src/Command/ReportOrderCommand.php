@@ -94,20 +94,20 @@ class ReportOrderCommand extends Command
 
             $outputBuffer = fopen($fileName, 'w');
             fputcsv($outputBuffer, [
-                'Order_id',
-                'Order_date',
+                'Order ID',
+                'Order date',
                 'Customer',
                 'Phone',
                 'Email',
                 'Address',
                 'Category',
-                'Product_item_id',
+                'Product item ID',
                 'Product',
                 'Color',
                 'Size',
-                'Unit_price',
+                'Unit price',
                 'Amount',
-                'Total_price',
+                'Total price',
                 'Status'
             ], ',');
 

@@ -60,14 +60,14 @@ class ReportProductCommand extends Command
             $secondHeader = [
                 'No.',
                 'Category',
-                'Product_item_id',
+                'Product item ID',
                 'Product',
                 'Color',
                 'Size',
-                'Unit_price',
-                'Total_sale_quantity',
-                'Total_amount',
-                'Quantity_in_stock'
+                'Unit price',
+                'Total sale quantity',
+                'Total amount',
+                'Quantity in stock'
             ];
             foreach ($dateOrdered as $date) {
                 $dateConvert = $date->getCreateAt()->format('Y-m');

@@ -30,9 +30,8 @@ class ExportData extends AbstractController
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->stream($fileName, [
-            "Attachment" => true
-        ]);
+        $output = $dompdf->output();
+        file_put_contents($fileName, $output);
 
         return 'http://127.0.0.1:8080/' . $fileName;
     }

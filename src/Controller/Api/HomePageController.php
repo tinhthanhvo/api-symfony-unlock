@@ -3,15 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Controller\BaseController;
-use App\Entity\Color;
 use App\Entity\Product;
 use App\Entity\ProductItem;
 use App\Entity\PurchaseOrder;
 use App\Entity\User;
 use App\Event\PurchaseOrderEvent;
-use App\Service\GetUserInfo;
 use App\Service\MailerService;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Monolog\Handler\SendGridHandler;
 use SendGrid;
@@ -26,9 +23,6 @@ use Symfony\Component\Mime\Email;
 class HomePageController extends BaseController
 {
     public const PRODUCT_PER_PAGE = 9;
-    public const PRODUCT_PAGE_NUMBER = 1;
-    public const ORDER_BY_DEFAULT = ['id' => 'DESC'];
-    const CONDITION_DEFAULT = ['deleteAt' => null];
 
     /**
      * @Rest\Get("/categories")
@@ -36,7 +30,10 @@ class HomePageController extends BaseController
      */
     public function getCategories(): ?Response
     {
-        $categories = $this->categoryRepository->findBy(['deleteAt' => null], ['name' => 'ASC']);
+        $categories = $this->categoryRepository->findBy(
+            self::CONDITION_DEFAULT,
+            ['name' => 'ASC']
+        );
         $categories = $this->transferDataGroup($categories, 'getListCategory');
 
         return $this->handleView($this->view($categories, Response::HTTP_OK));
@@ -65,7 +62,11 @@ class HomePageController extends BaseController
     public function getProducts(Request $request): Response
     {
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
-        $products = $this->productRepository->findBy(['deleteAt' => null], self::ORDER_BY_DEFAULT, $limit);
+        $products = $this->productRepository->findBy(
+            self::CONDITION_DEFAULT,
+            self::ORDER_BY_DEFAULT,
+            $limit
+        );
         $transferData = array_map('self::dataTransferProductListObject', $products);
         $products = $this->transferDataGroup($transferData, 'getProductList');
 
@@ -101,10 +102,10 @@ class HomePageController extends BaseController
     public function getProductListFilter(Request $request): Response
     {
         $filterOptions = (json_decode($request->getContent(), true)) ?? [];
+        $orderBy = ($filterOptions['order']) ?? self::ORDER_BY_DEFAULT;
 
         $limit = $request->get('limit', self::PRODUCT_PER_PAGE);
-        $page = $request->get('page', self::PRODUCT_PAGE_NUMBER);
-        $orderBy = $request->get('order', self::ORDER_BY_DEFAULT);
+        $page = $request->get('page', self::ITEMS_PAGE_NUMBER_DEFAULT);
         $offset = $limit * ($page - 1);
 
         $products = $this->productRepository->findByConditions($filterOptions, $orderBy, $limit, $offset);
@@ -188,7 +189,7 @@ class HomePageController extends BaseController
     }
 
     /**
-     * @Rest\Get ("/email")
+     * @Rest\Get("/email")
      * @return Response
      */
     public function sendMail(): Response

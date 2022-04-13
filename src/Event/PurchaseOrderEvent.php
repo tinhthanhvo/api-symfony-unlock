@@ -14,7 +14,7 @@ class PurchaseOrderEvent extends Event
 {
     const TEMPLATE_CONFIRM = "email/invoice.html.twig";
     const TEMPLATE_UPDATE_STATUS = "email/change_status.html.twig";
-    const TEMPLATE_CANCEL= "email/cancel.html.twig";
+    const TEMPLATE_CANCEL = "email/cancel.html.twig";
     public const STATUS_PENDING = 1;
     public const STATUS_APPROVED = 2;
     public const STATUS_CANCELED = 3;
@@ -41,8 +41,8 @@ class PurchaseOrderEvent extends Event
     public function __construct(
         PurchaseOrder $order,
         int $previousStatus = self::STATUS_PENDING,
-        string $withRole = self::ROLE_DEFAULT)
-    {
+        string $withRole = self::ROLE_DEFAULT
+    ) {
         $this->order = $order;
         $this->previousStatus = $previousStatus;
         $this->withRole = $withRole;
