@@ -100,11 +100,11 @@ class PurchaseOrderController extends BaseController
 
             $this->purchaseOrderRepository->add($order);
 
-            if ($amountItemCart == count($order->getOrderItems())) {
-                foreach ($cartItemsData as $cartItemData) {
-                    $this->cartRepository->remove($cartItemData);
-                }
-            }
+//            if ($amountItemCart == count($order->getOrderItems())) {
+//                foreach ($cartItemsData as $cartItemData) {
+//                    $this->cartRepository->remove($cartItemData);
+//                }
+//            }
             $transferPurchaseOrder = self::dataTransferOrderObject($order);
 
             $event = new PurchaseOrderEvent($order);
