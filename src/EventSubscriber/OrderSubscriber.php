@@ -36,7 +36,7 @@ class OrderSubscriber implements EventSubscriberInterface
 
         if ($status == PurchaseOrderEvent::STATUS_APPROVED) {
             $this->mailerService->send(
-                'Confirm order information',
+                '[Order#' . $order->getId() . '] Confirm information',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
                 $order->getRecipientEmail(),
                 PurchaseOrderEvent::TEMPLATE_CONFIRM,
@@ -46,7 +46,7 @@ class OrderSubscriber implements EventSubscriberInterface
 
         if ($status == PurchaseOrderEvent::STATUS_CANCELED && $withRole == PurchaseOrderEvent::ROLE_DEFAULT) {
             $this->mailerService->send(
-                'Cancel Your Order',
+                '[Order#' . $order->getId() . '] Cancel order',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
                 $order->getRecipientEmail(),
                 PurchaseOrderEvent::TEMPLATE_CANCEL,
@@ -54,7 +54,7 @@ class OrderSubscriber implements EventSubscriberInterface
             );
         } elseif ($status != $previousStatus && $withRole == PurchaseOrderEvent::ROLE_DEFAULT) {
             $this->mailerService->send(
-                'Update Status Your Order',
+                '[Order#' . $order->getId() . '] Update status',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
                 $order->getRecipientEmail(),
                 PurchaseOrderEvent::TEMPLATE_UPDATE_STATUS,
@@ -76,9 +76,9 @@ class OrderSubscriber implements EventSubscriberInterface
             "previousStatus" => $previousStatus
         ];
 
-        if ($status == PurchaseOrderEvent::STATUS_PENDING) {
+        if ($status == PurchaseOrderEvent::STATUS_APPROVED) {
             $this->mailerService->send(
-                'Confirm order information',
+                '[Order#' . $order->getId() . '] Confirm information',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
                 self::ADDRESS_EMAIL_ADMIN,
                 PurchaseOrderEvent::TEMPLATE_CONFIRM,
@@ -88,7 +88,7 @@ class OrderSubscriber implements EventSubscriberInterface
 
         if ($status == PurchaseOrderEvent::STATUS_CANCELED && $withRole == "USER") {
             $this->mailerService->send(
-                'Update Status To Order',
+                '[Order#' . $order->getId() . '] Update status',
                 self::ADDRESS_SEND_MAIL_DEFAULT,
                 self::ADDRESS_EMAIL_ADMIN,
                 PurchaseOrderEvent::TEMPLATE_UPDATE_STATUS,

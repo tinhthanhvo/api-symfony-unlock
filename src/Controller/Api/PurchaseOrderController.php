@@ -124,7 +124,7 @@ class PurchaseOrderController extends BaseController
             if ($status == BaseController::STATUS_APPROVED) {
                 $purchaseOrder->setStatus(BaseController::STATUS_CANCELED);
                 $purchaseOrder->setUpdateAt(new \DateTime());
-                if(isset($data['reason'])) {
+                if (isset($data['reason'])) {
                     $purchaseOrder->setCanceledReason($data['reason']);
                     $purchaseOrder->setUserCancel($this->userLoginInfo);
                 }
@@ -166,9 +166,10 @@ class PurchaseOrderController extends BaseController
         try {
             $user = $this->userLoginInfo;
             $order = $this->purchaseOrderRepository->findOneBy(['id' => $id, 'customer' => $user->getId()]);
-            if($order->getStatus() != BaseController::STATUS_COMPLETED && $order->getStatus() != BaseController::STATUS_CANCELED) {
+
+            if (is_null($order) || ($order->getStatus() != BaseController::STATUS_COMPLETED && $order->getStatus() != BaseController::STATUS_CANCELED)) {
                 return $this->handleView($this->view(
-                    ['error' => 'This order is in process.'],
+                    ['error' => 'This order is not exist or in progress.'],
                     Response::HTTP_BAD_REQUEST
                 ));
             }
@@ -184,15 +185,15 @@ class PurchaseOrderController extends BaseController
                 ];
 
                 $check = $this->cartService->addCart($recordCart);
-                if ($check)
+                if ($check) {
                     $countItemsAddCart += 1;
+                }
             }
             if ($countItemsAddCart == 0) {
                 return $this->handleView($this->view(['error' => 'Can not add product to cart'], Response::HTTP_BAD_REQUEST));
             }
 
             return $this->handleView($this->view(['success' => $countItemsAddCart . ' items is added to cart.'], Response::HTTP_CREATED));
-
         } catch (\Exception $e) {
         }
 
@@ -256,10 +257,10 @@ class PurchaseOrderController extends BaseController
      */
     private function formattedStatusOrderResponse(string $status): string
     {
-        $statusResponse = 'Pending';
+        $statusResponse = 'Approved';
         switch ($status) {
             case '2':
-                $statusResponse = 'Approved';
+                $statusResponse = 'Delivery';
                 break;
             case '3':
                 $statusResponse = 'Canceled';

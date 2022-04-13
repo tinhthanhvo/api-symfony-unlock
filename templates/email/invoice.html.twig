@@ -93,7 +93,7 @@
                                                     <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">ORDER</p>
                                                     #{{ order.getId() }}<br/>
 
-                                                    <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">11/04/2022</p>
+                                                    <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">{{ order.getUpdateAt()|date('d/m/Y') }}</p>
                                                 </td>
                                             </tr>
                                             </tbody>

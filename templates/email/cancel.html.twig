@@ -63,9 +63,9 @@
                                             </tr>
                                             <tr>
                                                 <td style="-webkit-text-size-adjust:none;font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: left;">
-                                                    VTT <br>
-                                                    CT<br>
-                                                    012345667
+                                                    {{ order.getRecipientName() }} <br>
+                                                    {{ order.getAddressDelivery() }}<br>
+                                                    {{ order.getRecipientPhone() }}
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -91,9 +91,9 @@
                                             <tr>
                                                 <td style="-webkit-text-size-adjust:none;font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: right;">
                                                     <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">ORDER</p>
-                                                    #1<br/>
+                                                    #{{ order.getId() }}<br/>
 
-                                                    <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">11/04/2022</p>
+                                                    <p style="-webkit-text-size-adjust:none;padding:0 !important;margin-top:0 !important;margin-right:0 !important;margin-bottom:0 !important;margin-left:0 !important;">{{ order.getUpdateAt()|date('d/m/Y') }}</p>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -132,20 +132,22 @@
 
                                 </tr>
                                 <tr>
+                                    <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 10px 7px 0; text-align: center">
+                                        Dear {{ order.getRecipientName() }},
+                                        <br>
+                                        Thank you for shopping with VTAK team.
+                                        Your order {{ order.getId()}} has been declined.
+                                        <br>
+                                        If you have any further questions, please contact us at 089-222-654 we are happy to assist you.
+                                        Thank you for choosing VTAK team store.
+                                        <br>
+                                        Sincerely,
+                                        VTAK team store
+                                    </th>
+                                </tr>
+                                <tr>
                                     <td style="-webkit-text-size-adjust:none;font-size: 12px; font-family: 'Open Sans', sans-serif; font-weight: bold; line-height: 18px;  vertical-align: top; padding:10px 0; text-align: center;" class="article" >
-                                        <div>
-                                            Dear {{ order.getRecipientName() }},
-                                            <br><br>
-                                            Thank you for shopping with VTAK team.
-                                            Your order {{ order.getId()}} has been declined.
-                                            <br><br>
-                                            If you have any further questions, please contact us at 089-222-654 we are happy to assist you.
-                                            Thank you for choosing VTAK team store.
-                                            <br><br>
-                                            Sincerely,
-                                            VTAK team store
-                                        </div>
-                                        <span style="font-size:18px;display:inline-block;padding:10px 12px;border-radius:4px;background:#fad2ca;text-decoration:line-through">
+                                       <span style="font-size:18px;display:inline-block;padding:10px 12px;border-radius:4px;background:#fad2ca;text-decoration:line-through">
                                                 {% if previousStatus == 1 %}
                                                     <b style="color:cadetblue;font-weight:normal;margin:0">PENDING</b>
                                                 {% elseif previousStatus == 2 %}

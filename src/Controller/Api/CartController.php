@@ -110,6 +110,9 @@ class CartController extends BaseController
             ]);
             if (!$cartItem) {
                 $cartItem = new Cart();
+                $cartItem->setUser($this->userLoginInfo);
+            } else {
+                $newCartItemAmount = $cartItem->getAmount() + intval($payload['amount']);
             }
 
             $form = $this->createForm(CartItemType::class, $cartItem);
@@ -122,7 +125,6 @@ class CartController extends BaseController
 
                     //Calculating the quantity of product need to add to cart
                     $storageAmount = $cartItem->getProductItem()->getAmount();
-                    $newCartItemAmount = $cartItem->getAmount() + intval($payload['amount']);
                     if ($storageAmount < $newCartItemAmount) {
                         $newCartItemAmount = $storageAmount;
                     }
