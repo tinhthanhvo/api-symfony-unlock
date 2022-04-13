@@ -20,7 +20,11 @@ class PurchaseOrderControllerTest extends BaseWebTestCase
     private $userRepository;
     private $cartRepository;
     private $purchaseOrderRepository;
-
+    protected const STATUS_DEFAULT_NULL = 0;
+    protected const STATUS_PENDING = 1;
+    protected const STATUS_APPROVED = 2;
+    protected const STATUS_CANCELED = 3;
+    protected const STATUS_COMPLETED = 4;
 
     public function setUp(): void
     {
@@ -150,5 +154,33 @@ class PurchaseOrderControllerTest extends BaseWebTestCase
         $this->assertSame('Cai Khe, Ninh Kieu', $order['addressDelivery']);
         $this->assertEquals(2, $order['amount']);
         $this->assertEquals(80, $order['totalPrice']);
+    }
+
+    public function testRepurchase(): void
+    {
+        $purchaseOrder = new PurchaseOrderFixtures();
+        $this->loadFixture($purchaseOrder);
+
+        $user = $this->userRepository->findOneBy(['email' => 'user@gmail.com']);
+        $order = $this->purchaseOrderRepository->findOneBy([
+            'customer' => $user->getId(),
+            'status' => self::STATUS_COMPLETED
+        ]);
+
+        $this->client->request(
+            Request::METHOD_GET,
+            'api/users/orders/' . $order->getId() . '/repurchase',
+            [],
+            [],
+            [
+                'HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE,
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', self::$token)
+            ]
+        );
+
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
+        $order = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($order);
+        $this->assertSame('Add 1 items to cart', $order['success']);
     }
 }

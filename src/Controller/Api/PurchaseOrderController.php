@@ -156,7 +156,7 @@ class PurchaseOrderController extends BaseController
      * @Rest\get("/users/orders/{id}/repurchase")
      * @return Response
      */
-    public function rePurchase(int $id): Response
+    public function repurchase(int $id): Response
     {
         try {
             $user = $this->userLoginInfo;
@@ -186,7 +186,7 @@ class PurchaseOrderController extends BaseController
                 return $this->handleView($this->view(['error' => 'Can not add product to cart'], Response::HTTP_BAD_REQUEST));
             }
 
-            return $this->handleView($this->view(['message' => 'Add ' . $countItemsAddCart . ' items to cart'], Response::HTTP_CREATED));
+            return $this->handleView($this->view(['success' => 'Add ' . $countItemsAddCart . ' items to cart'], Response::HTTP_CREATED));
 
         } catch (\Exception $e) {
         }

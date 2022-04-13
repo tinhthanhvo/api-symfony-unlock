@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller\Api;
 
+use App\DataFixtures\UserFixtures;
 use App\Entity\User;
 use App\Tests\Controller\BaseWebTestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
@@ -43,5 +44,25 @@ class AuthControllerTest extends BaseWebTestCase
         $user = $this->userRepository->findOneBy(['email' => 'user_mail@gmail.com']);
         $this->assertNotEmpty($user);
         $this->assertSame('User full name', $user->getFullName());
+    }
+
+    public function testCheckIfEmailIsExisted(): void
+    {
+        $userFixtures = new UserFixtures();
+        $this->loadFixture($userFixtures);
+
+        $payload = ['email' => 'user@gmail.com'];
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/email_check',
+            [],
+            [],
+            ['HTTP_ACCEPT' => self::DEFAULT_MIME_TYPE],
+            json_encode($payload)
+        );
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $data = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $data['isExisted']);
     }
 }
