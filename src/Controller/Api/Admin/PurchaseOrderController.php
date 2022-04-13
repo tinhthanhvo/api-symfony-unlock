@@ -65,9 +65,12 @@ class PurchaseOrderController extends BaseController
     {
         $today = new \DateTime("now");
         $today = $today->format('Y-m-d');
-        $fromDateRequest = $request->get('dateRequest', $today);
+
+        $toDateRequest = $request->get('toDate', $today);
+        $fromDateRequest = $request->get('fromDate', $toDateRequest);
+
         $fromDate = new \DateTime($fromDateRequest);
-        $toDate = new \DateTime($fromDateRequest . ' 23:59:59.999999');
+        $toDate = new \DateTime($toDateRequest . ' 23:59:59.999999');
 
         $revenue = $this->purchaseOrderRepository->getReport('totalPrice', $fromDate, $toDate);
         $summery['amountOrder'] = $this->purchaseOrderRepository->getCountPurchaseOrder(self::STATUS_DEFAULT_NULL, $fromDate, $toDate);
