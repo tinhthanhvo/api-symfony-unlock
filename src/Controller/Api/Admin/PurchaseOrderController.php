@@ -108,6 +108,7 @@ class PurchaseOrderController extends BaseController
             ));
         }
         $status = $request->get('status');
+        $reason = $request->get('reason');
         $previousStatus = $purchaseOrder->getStatus();
 
         if (count(self::checkUpdatingOrderCondition($purchaseOrder, $status)) > 0) {
@@ -117,7 +118,9 @@ class PurchaseOrderController extends BaseController
             ));
         }
 
-        if ($status == 3) {
+        if ($status == self::STATUS_CANCELED && !is_null($reason)) {
+            $purchaseOrder->setCanceledReason($reason);
+            $purchaseOrder->setUserCancel($this->userLoginInfo);
             self::cancelPurchaseOrderAction($purchaseOrder);
         }
 
@@ -139,19 +142,14 @@ class PurchaseOrderController extends BaseController
      * @param PurchaseOrder $purchaseOrder
      * @return void
      */
-    public function cancelPurchaseOrderAction(PurchaseOrder $purchaseOrder, Request $request): Response
+    public function cancelPurchaseOrderAction(PurchaseOrder $purchaseOrder): Response
     {
         try {
             $status = $purchaseOrder->getStatus();
-            $data = json_decode($request->getContent(), true);
 
             if ($status == BaseController::STATUS_PENDING) {
                 $purchaseOrder->setStatus(BaseController::STATUS_CANCELED);
                 $purchaseOrder->setUpdateAt(new \DateTime());
-                if(isset($data['reason'])) {
-                    $purchaseOrder->setCanceledReason($data['reason']);
-                    $purchaseOrder->setUserCancel($this->userLoginInfo);
-                }
 
                 $items = $purchaseOrder->getOrderItems();
                 foreach ($items as $item) {
