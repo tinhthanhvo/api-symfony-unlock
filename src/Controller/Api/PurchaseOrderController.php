@@ -115,14 +115,19 @@ class PurchaseOrderController extends BaseController
      * @param PurchaseOrder $purchaseOrder
      * @return void
      */
-    public function cancelPurchaseOrderAction(PurchaseOrder $purchaseOrder): Response
+    public function cancelPurchaseOrderAction(PurchaseOrder $purchaseOrder, Request $request): Response
     {
         try {
             $status = $purchaseOrder->getStatus();
+            $data = json_decode($request->getContent(), true);
 
             if ($status == BaseController::STATUS_PENDING) {
                 $purchaseOrder->setStatus(BaseController::STATUS_CANCELED);
                 $purchaseOrder->setUpdateAt(new \DateTime());
+                if(isset($data['reason'])) {
+                    $purchaseOrder->setCanceledReason($data['reason']);
+                    $purchaseOrder->setUserCancel($this->userLoginInfo);
+                }
 
                 $items = $purchaseOrder->getOrderItems();
                 foreach ($items as $item) {
@@ -210,6 +215,7 @@ class PurchaseOrderController extends BaseController
         $formattedPurchaseOrder['amount'] = $purchaseOrder->getAmount();
         $formattedPurchaseOrder['shippingCost'] = $purchaseOrder->getShippingCost();
         $formattedPurchaseOrder['totalPrice'] = $purchaseOrder->getTotalPrice();
+        $formattedPurchaseOrder['$canceledReason'] = $purchaseOrder->getCanceledReason();
 
         $cartItems = $purchaseOrder->getOrderItems();
         foreach ($cartItems as $cartItem) {

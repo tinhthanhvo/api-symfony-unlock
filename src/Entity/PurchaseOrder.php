@@ -92,6 +92,16 @@ class PurchaseOrder
      */
     private $shippingCost;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $canceledReason;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="purchaseOrders", cascade={"persist"})
+     */
+    private $userCancel;
+
     public function __construct(User $user)
     {
         $this->setCustomer($user);
@@ -290,6 +300,30 @@ class PurchaseOrder
     public function setShippingCost(?int $shippingCost): self
     {
         $this->shippingCost = $shippingCost;
+
+        return $this;
+    }
+
+    public function getCanceledReason(): ?string
+    {
+        return $this->canceledReason;
+    }
+
+    public function setCanceledReason(?string $canceledReason): self
+    {
+        $this->canceledReason = $canceledReason;
+
+        return $this;
+    }
+
+    public function getUserCancel(): ?User
+    {
+        return $this->userCancel;
+    }
+
+    public function setUserCancel(?User $userCancel): self
+    {
+        $this->userCancel = $userCancel;
 
         return $this;
     }

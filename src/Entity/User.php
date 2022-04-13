@@ -78,11 +78,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $orders;
 
+    /**
+     * @ORM\OneToMany(targetEntity=PurchaseOrder::class, mappedBy="userCancel")
+     */
+    private $purchaseOrders;
+
     public function __construct()
     {
         $this->carts = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->createAt = new \DateTime("now");
+        $this->purchaseOrders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -288,6 +294,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($order->getCustomer() === $this) {
                 $order->setCustomer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PurchaseOrder>
+     */
+    public function getPurchaseOrders(): Collection
+    {
+        return $this->purchaseOrders;
+    }
+
+    public function addPurchaseOrder(PurchaseOrder $purchaseOrder): self
+    {
+        if (!$this->purchaseOrders->contains($purchaseOrder)) {
+            $this->purchaseOrders[] = $purchaseOrder;
+            $purchaseOrder->setUserCancel($this);
+        }
+
+        return $this;
+    }
+
+    public function removePurchaseOrder(PurchaseOrder $purchaseOrder): self
+    {
+        if ($this->purchaseOrders->removeElement($purchaseOrder)) {
+            // set the owning side to null (unless already changed)
+            if ($purchaseOrder->getUserCancel() === $this) {
+                $purchaseOrder->setUserCancel(null);
             }
         }
 

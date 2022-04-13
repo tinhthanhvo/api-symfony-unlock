@@ -251,8 +251,8 @@ class PurchaseOrderRepository extends ServiceEntityRepository
                        (SUM(total_price)-SUM(shipping_cost)) as revenue, COUNT(id) as amountCompletedOrder
                 FROM `purchase_order`
                 WHERE delete_at IS NULL and status like 4
-                GROUP BY CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at))
-                ORDER BY CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at)) ASC
+                GROUP BY CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at)), DATE(create_at)
+                ORDER BY DATE(create_at) ASC
                 LIMIT 30;";
         $stmt = $conn->prepare($sql);
 
@@ -271,8 +271,8 @@ class PurchaseOrderRepository extends ServiceEntityRepository
                        COUNT(id) as amountOrder
                 FROM `purchase_order`
                 WHERE delete_at IS NULL AND status in (3,4)
-                GROUP BY DAY(create_at), CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at))
-                ORDER BY DAY(create_at) ASC
+                GROUP BY CONCAT(DAY(create_at), '/', MONTH(create_at), '/', YEAR(create_at)), DATE(create_at)
+                ORDER BY DATE(create_at) ASC
                 LIMIT 14;";
         $stmt = $conn->prepare($sql);
 
