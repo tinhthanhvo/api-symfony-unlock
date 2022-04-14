@@ -216,7 +216,7 @@ class PurchaseOrderController extends BaseController
         $formattedPurchaseOrder['amount'] = $purchaseOrder->getAmount();
         $formattedPurchaseOrder['shippingCost'] = $purchaseOrder->getShippingCost();
         $formattedPurchaseOrder['totalPrice'] = $purchaseOrder->getTotalPrice();
-        $formattedPurchaseOrder['$canceledReason'] = $purchaseOrder->getCanceledReason();
+        $formattedPurchaseOrder['canceledReason'] = $purchaseOrder->getCanceledReason();
 
         $cartItems = $purchaseOrder->getOrderItems();
         foreach ($cartItems as $cartItem) {
