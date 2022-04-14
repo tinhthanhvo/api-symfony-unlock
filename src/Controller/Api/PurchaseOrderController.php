@@ -111,7 +111,7 @@ class PurchaseOrderController extends BaseController
     }
 
     /**
-     * @Rest\Delete("/users/orders/{id}")
+     * @Rest\Post("/users/orders/{id}")
      * @param PurchaseOrder $purchaseOrder
      * @return void
      */
