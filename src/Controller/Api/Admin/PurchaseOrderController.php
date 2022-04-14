@@ -138,7 +138,6 @@ class PurchaseOrderController extends BaseController
     }
 
     /**
-     * @Rest\Delete("/users/orders/{id}")
      * @param PurchaseOrder $purchaseOrder
      * @return void
      */
@@ -161,9 +160,6 @@ class PurchaseOrderController extends BaseController
                 }
 
                 $this->purchaseOrderRepository->add($purchaseOrder);
-
-                $event = new PurchaseOrderEvent($purchaseOrder);
-                $this->eventDispatcher->dispatch($event);
 
                 return $this->handleView($this->view(['success' => 'Order is canceled!'], Response::HTTP_NO_CONTENT));
             }
