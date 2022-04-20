@@ -32,11 +32,10 @@ class ReportProductCommand extends Command
         ProductItemRepository $productItemRepository,
         LoggerInterface $logger
     ) {
+        parent::__construct();
         $this->orderDetailRepository = $orderDetailRepository;
         $this->productItemRepository = $productItemRepository;
         $this->logger = $logger;
-
-        parent::__construct();
     }
 
     protected function configure(): void

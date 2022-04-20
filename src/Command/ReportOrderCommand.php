@@ -30,14 +30,10 @@ class ReportOrderCommand extends Command
         4 => 'COMPLETED'
     ];
 
-    public function __construct(
-        PurchaseOrderRepository $purchaseOrderRepository,
-        LoggerInterface $logger
-    ) {
+    public function __construct(PurchaseOrderRepository $purchaseOrderRepository, LoggerInterface $logger) {
+        parent::__construct();
         $this->purchaseOrderRepository = $purchaseOrderRepository;
         $this->logger = $logger;
-
-        parent::__construct();
     }
 
     protected function configure(): void

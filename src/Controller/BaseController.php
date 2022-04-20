@@ -23,6 +23,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -237,11 +238,11 @@ class BaseController extends AbstractFOSRestController
     }
 
     /**
-     * @param array $data
+     * @param array|object $data
      * @param string $group
      * @return array
      */
-    protected function transferDataGroup(array $data, string $group): array
+    protected function transferDataGroup($data, string $group): array
     {
         $serializer = SerializerBuilder::create()->build();
         $convertToJson = $serializer->serialize(
@@ -254,10 +255,10 @@ class BaseController extends AbstractFOSRestController
     }
 
     /**
-     * @param Form $form
+     * @param FormInterface $form
      * @return array
      */
-    protected function getFormErrorMessage(Form $form): array
+    protected function getFormErrorMessage(FormInterface $form): array
     {
         $errorMessage = [];
 

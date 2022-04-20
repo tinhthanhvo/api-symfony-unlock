@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\expr;
 
 /**
  * Require ROLE_USER for all the actions of this controller
@@ -24,18 +25,9 @@ class CartController extends BaseController
      */
     public function countCartItems(): Response
     {
-        try {
-            $countCartItems = $this->cartRepository->countCartItems($this->userLoginInfo->getId());
+        $cartItems = $this->cartRepository->findBy(['user' => $this->userLoginInfo->getId()]);
 
-            return $this->handleView($this->view($countCartItems[0], Response::HTTP_OK));
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
-        }
-
-        return $this->handleView($this->view(
-            ['error' => 'Something went wrong! Please contact support.'],
-            Response::HTTP_INTERNAL_SERVER_ERROR
-        ));
+        return $this->handleView($this->view(['count' => count($cartItems)], Response::HTTP_OK));
     }
 
     /**
@@ -49,17 +41,17 @@ class CartController extends BaseController
             $limit = intval($request->get('limit', self::CART_ITEMS_PER_PAGE));
             $page = intval($request->get('page', self::ITEMS_PAGE_NUMBER_DEFAULT));
             $offset = $limit * ($page - 1);
-            $carts = $this->cartRepository->findBy(
+            $cartItems = $this->cartRepository->findBy(
                 ['deleteAt' => null, 'user' => $this->userLoginInfo->getId()],
                 self::ORDER_BY_DEFAULT,
                 $limit,
                 $offset
             );
 
-            $transferData = array_map('self::dataTransferCartItemObject', $carts);
-            $carts = $this->transferDataGroup($transferData, 'getCartItems');
+            $transferData = array_map('self::dataTransferCartItemObject', $cartItems);
+            $cartItems = $this->transferDataGroup($transferData, 'getCartItems');
 
-            return $this->handleView($this->view($carts, Response::HTTP_OK));
+            return $this->handleView($this->view($cartItems, Response::HTTP_OK));
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }
@@ -112,26 +104,17 @@ class CartController extends BaseController
                 $cartItem = new Cart();
                 $cartItem->setUser($this->userLoginInfo);
             } else {
-                $newCartItemAmount = $cartItem->getAmount() + intval($payload['amount']);
+                $amount = $cartItem->getAmount() + $payload['amount'];
+                $cartItem->setUpdateAt(new \DateTime("now"));
+                if ($amount > $cartItem->getProductItem()->getAmount()) {
+                    $amount = $cartItem->getProductItem()->getAmount();
+                }
+                $payload['amount'] = $amount;
             }
 
             $form = $this->createForm(CartItemType::class, $cartItem);
             $form->submit($payload);
             if ($form->isSubmitted() && $form->isValid()) {
-                // If this product item is already have in customer cart
-                if ($cartItem->getId()) {
-                    $cartItem->setUpdateAt(new \DateTime("now"));
-                    $cartItem->setDeleteAt(null);
-
-                    //Calculating the quantity of product need to add to cart
-                    $storageAmount = $cartItem->getProductItem()->getAmount();
-                    if ($storageAmount < $newCartItemAmount) {
-                        $newCartItemAmount = $storageAmount;
-                    }
-                    $cartItem->setAmount($newCartItemAmount);
-                }
-
-                $cartItem->setUser($this->userLoginInfo);
                 $this->cartRepository->add($cartItem);
 
                 return $this->handleView($this->view(
@@ -176,7 +159,6 @@ class CartController extends BaseController
                 $form->submit($payload);
                 if ($form->isSubmitted() && $form->isValid()) {
                     $cartItem->setUpdateAt(new \DateTime("now"));
-                    $cartItem->setDeleteAt(null);
                     $this->cartRepository->add($cartItem);
 
                     return $this->handleView($this->view(
