@@ -102,6 +102,11 @@ class PurchaseOrder
      */
     private $userCancel;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Payment::class, mappedBy="purchaseOrder")
+     */
+    private $payments;
+
     public function __construct(User $user)
     {
         $this->setCustomer($user);
@@ -111,6 +116,7 @@ class PurchaseOrder
         $this->orderItems = new ArrayCollection();
         $this->createAt = new \DateTime("now");
         $this->shippingCost = 0;
+        $this->payments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -324,6 +330,36 @@ class PurchaseOrder
     public function setUserCancel(?User $userCancel): self
     {
         $this->userCancel = $userCancel;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Payment>
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    public function addPayment(Payment $payment): self
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments[] = $payment;
+            $payment->setPurchaseOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removePayment(Payment $payment): self
+    {
+        if ($this->payments->removeElement($payment)) {
+            // set the owning side to null (unless already changed)
+            if ($payment->getPurchaseOrder() === $this) {
+                $payment->setPurchaseOrder(null);
+            }
+        }
 
         return $this;
     }
