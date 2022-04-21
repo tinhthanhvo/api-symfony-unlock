@@ -21,11 +21,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 
 class PaymentController extends BaseController
 {
-    private $paymentService;
-    private $domain;
-    private $orderService;
-    private $paymentRepository;
-
     /**
      * @Rest\Post ("/users/orders/payments")
      */
@@ -37,16 +32,18 @@ class PaymentController extends BaseController
         $cancelUrl = $this->domain . '/api/users/orders/payments/cancel';
 
         $order = new PurchaseOrder($this->userLoginInfo);
+
         $form = $this->createForm(PurchaseOrderType::class, $order);
         $requestData = $request->request->all();
 
-        $arrResult = $this->orderService->addOrder($order, $form, $requestData);
+        $arrResult = $this->purchaseOrderService->addOrder($order, $form, $requestData);
+
         if (isset($arrResult['error'])) {
             return $this->handleView($this->view($arrResult, Response::HTTP_BAD_REQUEST));
         }
 
         $currency = 'USD';
-        $amountPayable = $order->getShippingCost() + $order->getTotalPrice();
+        $amountPayable = $order->getTotalPrice();
         $payment = $this->paymentService->createPayment($order, $apiContext, $approveUrl, $cancelUrl);
 
         $paymentEntity = new \App\Entity\Payment();
@@ -55,9 +52,7 @@ class PaymentController extends BaseController
         $paymentEntity->setAmount($amountPayable);
         $paymentEntity->setStatus($payment->getState());
         $paymentEntity->setTransactionId($payment->getId());
-        $paymentEntity->setOrder($order);
-        $order->setPaymentMethod(self::METHOD_PAYPAL);
-        $order->setStatus(self::STATUS_PENDING_PAYMENT);
+        $paymentEntity->setPurchaseOrder($order);
         $this->paymentRepository->add($paymentEntity);
 
         return $this->handleView($this->view(['url' => $payment->getApprovalLink()], Response::HTTP_OK));
@@ -86,7 +81,7 @@ class PaymentController extends BaseController
                 ]);
 
                 $paymentEntity->setStatus($payment->getState());
-                $order = $paymentEntity->getOrder();
+                $order = $paymentEntity->getPurchaseOrder();
                 $order->setStatus(self::STATUS_COMPLETED);
                 $this->purchaseOrderRepository->add($order);
 
@@ -111,7 +106,7 @@ class PaymentController extends BaseController
             'token' => $tokenPaypal
         ]);
 
-        $payment->getOrder()->setStatus(self::STATUS_PENDING_PAYMENT);
+        $payment->getPurchaseOrder()->setStatus(self::STATUS_PENDING_PAYMENT);
 
         return $this->handleView($this->view(['message' => 'Cancel payment successfully'], Response::HTTP_INTERNAL_SERVER_ERROR));
     }
@@ -137,7 +132,7 @@ class PaymentController extends BaseController
         $paymentEntity->setAmount($amountPayable);
         $paymentEntity->setStatus($payment->getState());
         $paymentEntity->setTransactionId($payment->getId());
-        $paymentEntity->setOrder($order);
+        $paymentEntity->setPurchaseOrder($order);
         $order->setStatus(self::STATUS_PENDING_PAYMENT);
         $this->paymentRepository->add($paymentEntity);
 

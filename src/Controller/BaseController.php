@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\Controller\Api\PaymentController;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ColorRepository;
 use App\Repository\GalleryRepository;
+use App\Repository\PaymentRepository;
 use App\Repository\ProductItemRepository;
 use App\Repository\ProductRepository;
 use App\Repository\PurchaseOrderRepository;
@@ -15,11 +17,14 @@ use App\Repository\UserRepository;
 use App\Service\CartService;
 use App\Service\ExportData;
 use App\Service\GetUserInfo;
+use App\Service\PaymentService;
+use App\Service\PurchaseOrderService;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -35,6 +40,7 @@ class BaseController extends AbstractFOSRestController
     protected const ITEMS_PAGE_NUMBER_DEFAULT = 1;
     protected const DEFAULT_NULL = 0;
     protected const STATUS_DEFAULT_NULL = 0;
+    protected const STATUS_PENDING_PAYMENT = 5;
     protected const STATUS_APPROVED = 1;
     protected const STATUS_DELIVERY = 2;
     protected const STATUS_CANCELED = 3;
@@ -84,6 +90,21 @@ class BaseController extends AbstractFOSRestController
     /** @var CartService */
     protected $cartService;
 
+    /** @var PaymentService */
+    protected $paymentService;
+
+    /** @var string */
+    protected $domain;
+
+    /** @var ContainerBagInterface */
+    protected $containerBag;
+
+    /** @var PurchaseOrderService */
+    protected $purchaseOrderService;
+
+    /** @var PaymentRepository */
+    protected $paymentRepository;
+
     public function __construct(
         CartRepository $cartRepository,
         CategoryRepository $categoryRepository,
@@ -98,7 +119,11 @@ class BaseController extends AbstractFOSRestController
         ProductItemRepository $productItemRepository,
         GalleryRepository $galleryRepository,
         EventDispatcherInterface $eventDispatcher,
-        CartService $cartService
+        CartService $cartService,
+        PaymentService $paymentService,
+        ContainerBagInterface $containerBag,
+        PurchaseOrderService $purchaseOrderService,
+        PaymentRepository $paymentRepository
     ) {
         $this->cartRepository = $cartRepository;
         $this->categoryRepository = $categoryRepository;
@@ -114,6 +139,11 @@ class BaseController extends AbstractFOSRestController
         $this->galleryRepository = $galleryRepository;
         $this->eventDispatcher = $eventDispatcher;
         $this->cartService = $cartService;
+        $this->paymentService = $paymentService;
+        $this->containerBag = $containerBag;
+        $this->domain = $this->containerBag->get('app.domain');
+        $this->purchaseOrderService = $purchaseOrderService;
+        $this->paymentRepository = $paymentRepository;
     }
 
     /**
