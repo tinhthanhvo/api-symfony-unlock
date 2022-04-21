@@ -28,8 +28,8 @@ class PaymentController extends BaseController
     {
         $apiContext = $this->paymentService->getApiContext();
 
-        $approveUrl = $this->domain . '/api/users/orders/payments/approve';
-        $cancelUrl = $this->domain . '/api/users/orders/payments/cancel';
+        $approveUrl = $this->domain . ':8080/api/users/orders/payments/approve';
+        $cancelUrl = $this->domain . ':8080/api/users/orders/payments/cancel';
 
         $order = new PurchaseOrder($this->userLoginInfo);
 
@@ -63,8 +63,9 @@ class PaymentController extends BaseController
      */
     public function approve(Request $request)
     {
-        $apiContext = $this->paymentService->getApiContext();
 
+
+        $apiContext = $this->paymentService->getApiContext();
         $paymentId = $request->get('paymentId');
         $payerId = $request->get('PayerID');
 
@@ -79,7 +80,6 @@ class PaymentController extends BaseController
                 $paymentEntity = $this->paymentRepository->findOneBy([
                     'transactionId' => $paymentId
                 ]);
-
                 $paymentEntity->setStatus($payment->getState());
                 $order = $paymentEntity->getPurchaseOrder();
                 $order->setStatus(self::STATUS_COMPLETED);
@@ -119,8 +119,8 @@ class PaymentController extends BaseController
         $apiContext = $this->paymentService->getApiContext();
 
         $order = $this->purchaseOrderRepository->find($id);
-        $approveUrl = $this->domain . '/api/users/orders/payments/approve';
-        $cancelUrl = $this->domain . '/api/users/orders/payments/cancel';
+        $approveUrl = $this->domain . ':8080/api/users/orders/payments/approve';
+        $cancelUrl = $this->domain . ':8080/api/users/orders/payments/cancel';
 
         $currency = 'USD';
         $amountPayable = $order->getShippingCost() + $order->getTotalPrice();

@@ -63,7 +63,7 @@ class PaymentService
         $payer->setPaymentMethod('paypal');
 
         $currency = 'USD';
-        $amountPayable = $order->getShippingCost() + $order->getTotalPrice();
+        $amountPayable = $order->getTotalPrice();
         $description = 'Paypal transaction';
         $invoiceNumber = uniqid();
 

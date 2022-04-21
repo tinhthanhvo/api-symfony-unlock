@@ -65,24 +65,24 @@ class Payment
         return $this;
     }
 
-    public function getTransactionId(): ?int
+    public function getTransactionId(): ?string
     {
         return $this->transactionId;
     }
 
-    public function setTransactionId(int $transactionId): self
+    public function setTransactionId(string $transactionId): self
     {
         $this->transactionId = $transactionId;
 
         return $this;
     }
 
-    public function getCurrencyCode(): ?int
+    public function getCurrencyCode(): ?string
     {
         return $this->currencyCode;
     }
 
-    public function setCurrencyCode(int $currencyCode): self
+    public function setCurrencyCode(string $currencyCode): self
     {
         $this->currencyCode = $currencyCode;
 
