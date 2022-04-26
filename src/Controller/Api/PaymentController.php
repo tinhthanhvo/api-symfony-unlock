@@ -85,7 +85,7 @@ class PaymentController extends BaseController
                 $order->setStatus(self::STATUS_COMPLETED);
                 $this->purchaseOrderRepository->add($order);
 
-                return $this->handleView($this->view(['message' => 'Paid successfully'], Response::HTTP_OK));
+                return $this->redirect('https://www.youtube.com/');
             } catch (\Exception $e) {
                 return $this->handleView($this->view(['error' => 'Something is wrong'], Response::HTTP_INTERNAL_SERVER_ERROR));
             }
@@ -106,9 +106,9 @@ class PaymentController extends BaseController
             'token' => $tokenPaypal
         ]);
 
-        $payment->getPurchaseOrder()->setStatus(self::STATUS_PENDING_PAYMENT);
+        $payment->getPurchaseOrder()->setStatus(self::WAITING_FOR_PAYMENT);
 
-        return $this->handleView($this->view(['message' => 'Cancel payment successfully'], Response::HTTP_INTERNAL_SERVER_ERROR));
+        return $this->redirect('https://www.google.com/');
     }
 
     /**
@@ -133,7 +133,7 @@ class PaymentController extends BaseController
         $paymentEntity->setStatus($payment->getState());
         $paymentEntity->setTransactionId($payment->getId());
         $paymentEntity->setPurchaseOrder($order);
-        $order->setStatus(self::STATUS_PENDING_PAYMENT);
+        $order->setStatus(self::WAITING_FOR_PAYMENT);
         $this->paymentRepository->add($paymentEntity);
 
         return $this->handleView($this->view(['url' => $payment->getApprovalLink()], Response::HTTP_OK));

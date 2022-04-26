@@ -2,8 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\ProductItem;
 use App\Entity\PurchaseOrder;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -53,24 +55,41 @@ class PurchaseOrderType extends AbstractType
                     ])
                 ]
             ])
+            ->add('addressDelivery', TextareaType::class)
             ->add('shippingCost', NumberType::class, [
                 'constraints' => [
                     new Length([
-                        'max' => 100,
-                        'maxMessage' => 'The shipping cost cannot be longer than 100 characters',
                         'min' => 0,
                         'minMessage' => 'The shipping cost cannot be short than 0 characters',
                     ])
                 ]
             ])
-            ->add('addressDelivery', TextareaType::class)
-            ->add('shippingCost', NumberType::class, [
+            ->add('totalPrice', NumberType::class, [
                 'constraints' => [
                     new Length([
-                        'max' => 100,
-                        'maxMessage' => 'The shipping cost cannot be longer than 100 characters',
                         'min' => 0,
                         'minMessage' => 'The shipping cost cannot be short than 0 characters',
+                    ])
+                ]
+            ])
+            ->add('amount', NumberType::class, [
+                'constraints' => [
+                    new Length([
+                        'min' => 0,
+                        'minMessage' => 'The shipping cost cannot be short than 0 characters',
+                    ])
+                ]
+            ])
+            ->add('paymentMethod', TextType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'The payment method can not be null',
+                    ]),
+                    new Length([
+                        'max' => 20,
+                        'maxMessage' => 'The payment method cannot be longer than 20 characters',
+                        'min' => 3,
+                        'minMessage' => 'The payment method cannot be short than 3 characters',
                     ])
                 ]
             ])

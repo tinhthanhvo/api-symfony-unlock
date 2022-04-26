@@ -46,6 +46,18 @@ class CartRepository extends ServiceEntityRepository
     }
 
     /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function clear($cartItems = array()): void
+    {
+        foreach ($cartItems as $cartItem) {
+            $cartItem = $this->find($cartItem['id']);
+            $this->remove($cartItem);
+        }
+    }
+
+    /**
      * @param int $userId
      * @return array
      */
