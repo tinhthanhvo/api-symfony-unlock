@@ -70,6 +70,7 @@ class CartController extends BaseController
     {
         $formattedCart = [];
         $formattedCart['id'] = $cart->getId();
+        $formattedCart['productItem'] = $cart->getProductItem()->getId();
         $formattedCart['name'] = $cart->getProductItem()->getProduct()->getName();
         $formattedCart['color'] = $cart->getProductItem()->getProduct()->getColor()->getName();
         $formattedCart['size'] = $cart->getProductItem()->getSize()->getValue();
@@ -96,20 +97,21 @@ class CartController extends BaseController
     {
         try {
             $payload = json_decode($request->getContent(), true);
+
+            $productItem = $this->productItemRepository->find($payload['productItem']);
+            $amountInStock = $productItem->getAmount();
+            $payload['amount'] = ($payload['amount'] >= $amountInStock) ? $amountInStock : $payload['amount'];
+
             $cartItem = $this->cartRepository->findOneBy([
                 'productItem' => $payload['productItem'],
                 'user' => $this->userLoginInfo->getId()
             ]);
+
             if (!$cartItem) {
                 $cartItem = new Cart();
                 $cartItem->setUser($this->userLoginInfo);
             } else {
-                $amount = $cartItem->getAmount() + $payload['amount'];
                 $cartItem->setUpdateAt(new \DateTime("now"));
-                if ($amount > $cartItem->getProductItem()->getAmount()) {
-                    $amount = $cartItem->getProductItem()->getAmount();
-                }
-                $payload['amount'] = $amount;
             }
 
             $form = $this->createForm(CartItemType::class, $cartItem);

@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Controller\Api\PaymentController;
+use App\Entity\OrderDetail;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ColorRepository;
 use App\Repository\GalleryRepository;
+use App\Repository\OrderDetailRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\ProductItemRepository;
 use App\Repository\ProductRepository;
@@ -40,11 +42,11 @@ class BaseController extends AbstractFOSRestController
     protected const ITEMS_PAGE_NUMBER_DEFAULT = 1;
     protected const DEFAULT_NULL = 0;
     protected const STATUS_DEFAULT_NULL = 0;
-    protected const STATUS_PENDING_PAYMENT = 5;
     protected const STATUS_APPROVED = 1;
     protected const STATUS_DELIVERY = 2;
     protected const STATUS_CANCELED = 3;
     protected const STATUS_COMPLETED = 4;
+    protected const WAITING_FOR_PAYMENT = 5;
 
     /** @var integer HTTP status code - 200 (OK) by default */
     protected $statusCode = 200;
@@ -105,6 +107,11 @@ class BaseController extends AbstractFOSRestController
     /** @var PaymentRepository */
     protected $paymentRepository;
 
+    /**
+     * @var OrderDetailRepository
+     */
+    protected $orderDetailRepository;
+
     public function __construct(
         CartRepository $cartRepository,
         CategoryRepository $categoryRepository,
@@ -123,7 +130,8 @@ class BaseController extends AbstractFOSRestController
         PaymentService $paymentService,
         ContainerBagInterface $containerBag,
         PurchaseOrderService $purchaseOrderService,
-        PaymentRepository $paymentRepository
+        PaymentRepository $paymentRepository,
+        OrderDetailRepository $orderDetailRepository
     ) {
         $this->cartRepository = $cartRepository;
         $this->categoryRepository = $categoryRepository;
@@ -144,6 +152,7 @@ class BaseController extends AbstractFOSRestController
         $this->domain = $this->containerBag->get('app.domain');
         $this->purchaseOrderService = $purchaseOrderService;
         $this->paymentRepository = $paymentRepository;
+        $this->orderDetailRepository = $orderDetailRepository;
     }
 
     /**

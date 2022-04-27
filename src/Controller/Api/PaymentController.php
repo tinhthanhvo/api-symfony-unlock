@@ -32,9 +32,8 @@ class PaymentController extends BaseController
         $cancelUrl = $this->domain . ':8080/api/users/orders/payments/cancel';
 
         $order = new PurchaseOrder($this->userLoginInfo);
-
         $form = $this->createForm(PurchaseOrderType::class, $order);
-        $requestData = $request->request->all();
+        $requestData = json_decode($request->getContent(), true);
 
         $arrResult = $this->purchaseOrderService->addOrder($order, $form, $requestData);
 
@@ -63,8 +62,6 @@ class PaymentController extends BaseController
      */
     public function approve(Request $request)
     {
-
-
         $apiContext = $this->paymentService->getApiContext();
         $paymentId = $request->get('paymentId');
         $payerId = $request->get('PayerID');
@@ -85,7 +82,7 @@ class PaymentController extends BaseController
                 $order->setStatus(self::STATUS_COMPLETED);
                 $this->purchaseOrderRepository->add($order);
 
-                return $this->handleView($this->view(['message' => 'Paid successfully'], Response::HTTP_OK));
+                return $this->redirect('https://www.youtube.com/');
             } catch (\Exception $e) {
                 return $this->handleView($this->view(['error' => 'Something is wrong'], Response::HTTP_INTERNAL_SERVER_ERROR));
             }
@@ -106,9 +103,9 @@ class PaymentController extends BaseController
             'token' => $tokenPaypal
         ]);
 
-        $payment->getPurchaseOrder()->setStatus(self::STATUS_PENDING_PAYMENT);
+        $payment->getPurchaseOrder()->setStatus(self::WAITING_FOR_PAYMENT);
 
-        return $this->handleView($this->view(['message' => 'Cancel payment successfully'], Response::HTTP_INTERNAL_SERVER_ERROR));
+        return $this->redirect('https://www.google.com/');
     }
 
     /**
@@ -133,7 +130,7 @@ class PaymentController extends BaseController
         $paymentEntity->setStatus($payment->getState());
         $paymentEntity->setTransactionId($payment->getId());
         $paymentEntity->setPurchaseOrder($order);
-        $order->setStatus(self::STATUS_PENDING_PAYMENT);
+        $order->setStatus(self::WAITING_FOR_PAYMENT);
         $this->paymentRepository->add($paymentEntity);
 
         return $this->handleView($this->view(['url' => $payment->getApprovalLink()], Response::HTTP_OK));

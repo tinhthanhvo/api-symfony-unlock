@@ -107,6 +107,11 @@ class PurchaseOrder
      */
     private $payments;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $paymentMethod;
+
     public function __construct(User $user)
     {
         $this->setCustomer($user);
@@ -360,6 +365,18 @@ class PurchaseOrder
                 $payment->setPurchaseOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return $this->paymentMethod;
+    }
+
+    public function setPaymentMethod(string $paymentMethod): self
+    {
+        $this->paymentMethod = $paymentMethod;
 
         return $this;
     }

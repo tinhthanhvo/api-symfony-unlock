@@ -7,6 +7,8 @@ use App\Entity\OrderDetail;
 use App\Entity\PurchaseOrder;
 use App\Event\PurchaseOrderEvent;
 use App\Form\PurchaseOrderType;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -57,47 +59,38 @@ class PurchaseOrderController extends BaseController
         $order = new PurchaseOrder($this->userLoginInfo);
         $form = $this->createForm(PurchaseOrderType::class, $order);
         $requestData = json_decode($request->getContent(), true);
+
         $form->submit($requestData);
 
-        $totalPrice = 0;
-        $totalAmount = 0;
         if ($form->isSubmitted()) {
-            $cartItemsData = $this->userLoginInfo->getCarts();
+            $cartItemsData = $requestData['items'];
             $amountItemCart = count($cartItemsData);
+
             if ($amountItemCart == 0) {
                 return $this->handleView($this->view(['error' => 'Nothing in cart!'], Response::HTTP_BAD_REQUEST));
             }
             foreach ($cartItemsData as $cartItemData) {
-                $productItem = $cartItemData->getProductItem();
-                $amount = intval($cartItemData->getAmount());
+                $productItem = $this->productItemRepository->find($cartItemData['productItem']);
 
-                if ($amount > $productItem->getAmount()) {
+                if ($cartItemData['amount'] > $productItem->getAmount()) {
                     return $this->handleView($this->view(['error' => 'Amount of available product is not enough!'], Response::HTTP_BAD_REQUEST));
                 }
 
-                $price = intval($productItem->getProduct()->getPrice()) * $amount;
-                $totalPrice += intval($price);
-                $totalAmount += $amount;
                 $orderDetail = new OrderDetail();
-                $orderDetail->setAmount($amount);
-                $orderDetail->setPrice($price);
-
-                $productItem->setAmount($productItem->getAmount() - $amount);
-                $this->productItemRepository->add($productItem);
                 $orderDetail->setProductItem($productItem);
+                $orderDetail->setAmount($cartItemData['amount']);
+                $orderDetail->setPrice($cartItemData['unitPrice']);
+
+                $productItem->setAmount($productItem->getAmount() - $cartItemData['amount']);
+                $this->productItemRepository->add($productItem);
 
                 $order->addOrderItem($orderDetail);
             }
-            $totalPrice += $requestData['shippingCost'];
-            $order->setTotalPrice($totalPrice);
-            $order->setAmount($totalAmount);
 
             $this->purchaseOrderRepository->add($order);
 
             if ($amountItemCart == count($order->getOrderItems())) {
-                foreach ($cartItemsData as $cartItemData) {
-                    $this->cartRepository->remove($cartItemData);
-                }
+                $this->cartRepository->clear($cartItemsData);
             }
             $transferPurchaseOrder = self::dataTransferOrderObject($order);
 
@@ -267,6 +260,9 @@ class PurchaseOrderController extends BaseController
                 break;
             case '4':
                 $statusResponse = 'Completed';
+                break;
+            case '5':
+                $statusResponse = 'Waiting For Payment';
                 break;
         }
 

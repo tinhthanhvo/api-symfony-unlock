@@ -19,6 +19,7 @@ class PurchaseOrderEvent extends Event
     public const STATUS_DELIVERY = 2;
     public const STATUS_CANCELED = 3;
     public const STATUS_COMPLETED = 4;
+    public const WAITING_FOR_PAYMENT = 5;
     public const ROLE_DEFAULT = "ADMIN";
     /**
      * @var PurchaseOrder
