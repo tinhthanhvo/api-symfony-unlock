@@ -32,9 +32,8 @@ class PaymentController extends BaseController
         $cancelUrl = $this->domain . ':8080/api/users/orders/payments/cancel';
 
         $order = new PurchaseOrder($this->userLoginInfo);
-
         $form = $this->createForm(PurchaseOrderType::class, $order);
-        $requestData = $request->request->all();
+        $requestData = json_decode($request->getContent(), true);
 
         $arrResult = $this->purchaseOrderService->addOrder($order, $form, $requestData);
 
@@ -63,8 +62,6 @@ class PaymentController extends BaseController
      */
     public function approve(Request $request)
     {
-
-
         $apiContext = $this->paymentService->getApiContext();
         $paymentId = $request->get('paymentId');
         $payerId = $request->get('PayerID');

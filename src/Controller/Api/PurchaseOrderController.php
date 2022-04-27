@@ -261,6 +261,9 @@ class PurchaseOrderController extends BaseController
             case '4':
                 $statusResponse = 'Completed';
                 break;
+            case '5':
+                $statusResponse = 'Waiting For Payment';
+                break;
         }
 
         return $statusResponse;
